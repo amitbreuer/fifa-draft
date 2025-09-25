@@ -1,0 +1,51 @@
+<div class="settings-container">
+  <p-card header="FIFA Draft Settings" class="settings-card">
+    <div class="settings-content">
+      <div class="field">
+        <label for="numManagers">Number of Managers:</label>
+        <input
+          id="numManagers"
+          type="number"
+          pInputText
+          [(ngModel)]="numManagers"
+          min="2"
+          max="8"
+          (change)="updateManagerNames()"
+        />
+      </div>
+
+      <p-divider></p-divider>
+
+      <div class="managers-section">
+        <h3>Manager Names:</h3>
+        <div class="manager-inputs">
+          <div
+            *ngFor="let manager of managerNames; let i = index"
+            class="field"
+          >
+            <label [for]="'manager' + i">Manager {{ i + 1 }}:</label>
+            <input
+              [id]="'manager' + i"
+              type="text"
+              pInputText
+              [(ngModel)]="managerNames[i]"
+              [placeholder]="'Manager ' + (i + 1)"
+            />
+          </div>
+        </div>
+      </div>
+
+      <p-divider></p-divider>
+
+      <div class="actions">
+        <p-button
+          label="Start Draft"
+          icon="pi pi-play"
+          [disabled]="!canStartDraft()"
+          (onClick)="startDraft()"
+          styleClass="p-button-success"
+        ></p-button>
+      </div>
+    </div>
+  </p-card>
+</div>

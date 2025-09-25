@@ -1,0 +1,118 @@
+<p-card header="Team Formation" class="field-card">
+  <div class="field-container">
+    <div class="field-pitch">
+      <div
+        *ngFor="let position of fieldPositions"
+        class="field-position"
+        [style.left.%]="position.x"
+        [style.top.%]="position.y"
+        (click)="onPositionClick(position.id)"
+        [class.has-player]="position.player"
+        [class.can-place]="canPlacePlayer()"
+      >
+        <div class="position-slot">
+          <div
+            *ngIf="position.player; else emptySlot"
+            class="player-item"
+            draggable="true"
+            (dragstart)="onDragStart($event, position.player)"
+            (dragend)="onDragEnd($event)"
+          >
+            <div class="player-shirt">
+              <img
+                src="assets/images/shirt.svg"
+                alt="Player shirt"
+                class="shirt-image"
+                (error)="onShirtImageError($event)"
+              />
+              <span class="player-number">{{ getPlayerNumber(position.player) }}</span>
+            </div>
+            <div class="player-name">{{ getPlayerDisplayName(position.player) }}</div>
+            <div class="player-rating">{{ position.player.overallRating }}</div>
+          </div>
+
+          <ng-template #emptySlot>
+            <div
+              class="empty-slot"
+              (drop)="onDrop($event, position.id)"
+              (dragover)="onDragOver($event)"
+              (dragenter)="onDragEnter($event)"
+              (dragleave)="onDragLeave($event)"
+            >
+              <i class="pi pi-plus"></i>
+              <span class="position-label">{{ getPositionLabel(position.id) }}</span>
+            </div>
+          </ng-template>
+        </div>
+      </div>
+    </div>
+  </div>
+</p-card>
+
+<p-card header="Bench" class="bench-card">
+  <div class="bench-container">
+    <div class="bench-slots">
+      <div
+        *ngFor="let player of benchPlayers; trackBy: trackByPlayerId"
+        class="bench-player"
+        draggable="true"
+        (dragstart)="onDragStart($event, player)"
+        (dragend)="onDragEnd($event)"
+      >
+        <div class="player-item">
+          <div class="player-shirt">
+            <img
+              src="assets/images/shirt.svg"
+              alt="Player shirt"
+              class="shirt-image"
+              (error)="onShirtImageError($event)"
+            />
+            <span class="player-number">{{ getPlayerNumber(player) }}</span>
+          </div>
+          <div class="player-name">{{ getPlayerDisplayName(player) }}</div>
+          <div class="player-rating">{{ player.overallRating }}</div>
+        </div>
+      </div>
+
+      <div
+        class="bench-drop-zone"
+        (drop)="onDropToBench($event)"
+        (dragover)="onDragOver($event)"
+        (dragenter)="onDragEnter($event)"
+        (dragleave)="onDragLeave($event)"
+        [class.drag-over]="isDragOverBench"
+      >
+        <i class="pi pi-users"></i>
+        <span>Drop players here for bench</span>
+      </div>
+    </div>
+  </div>
+</p-card>
+
+<div class="field-actions" *ngIf="currentPickedPlayer">
+  <p-card header="Current Pick" class="current-pick-card">
+    <div class="current-pick-info">
+      <div class="picked-player">
+        <strong>{{ getPlayerDisplayName(currentPickedPlayer) }}</strong>
+        <p-tag
+          [value]="currentPickedPlayer.overallRating.toString()"
+          severity="info"
+        ></p-tag>
+      </div>
+      <div class="pick-actions">
+        <p-button
+          label="Place on Bench"
+          icon="pi pi-users"
+          (onClick)="placeOnBench()"
+          styleClass="p-button-secondary"
+        ></p-button>
+        <p-button
+          label="Undo"
+          icon="pi pi-undo"
+          (onClick)="undoPlacement()"
+          styleClass="p-button-warning"
+        ></p-button>
+      </div>
+    </div>
+  </p-card>
+</div>

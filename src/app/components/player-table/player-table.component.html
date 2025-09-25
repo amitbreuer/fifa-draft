@@ -1,0 +1,170 @@
+<p-card header="Available Players" class="player-table-card">
+  <div class="table-controls">
+    <div class="filters">
+      <div class="filter-group">
+        <label for="positionFilter">Position:</label>
+        <p-select
+          id="positionFilter"
+          [options]="positionOptions"
+          [(ngModel)]="selectedPosition"
+          (onChange)="onFilterChange()"
+          placeholder="All Positions"
+        ></p-select>
+      </div>
+
+      <div class="filter-group">
+        <p-checkbox
+          [(ngModel)]="showSelectedPlayers"
+          (onChange)="onFilterChange()"
+          binary="true"
+          inputId="showSelected"
+        ></p-checkbox>
+        <label for="showSelected">Show Selected Players</label>
+      </div>
+    </div>
+
+    <div class="pick-controls" *ngIf="selectedPlayer && !showSelectedPlayers">
+      <p-button
+        label="Pick Player"
+        icon="pi pi-check"
+        (onClick)="pickPlayer()"
+        styleClass="p-button-success"
+      ></p-button>
+    </div>
+  </div>
+
+  <p-table
+    [value]="filteredPlayers"
+    [paginator]="true"
+    [rows]="50"
+    [showCurrentPageReport]="true"
+    currentPageReportTemplate="Showing {first} to {last} of {totalRecords} players"
+    [rowsPerPageOptions]="[25, 50, 100]"
+    dataKey="id"
+    [(selection)]="selectedPlayer"
+    selectionMode="single"
+    [metaKeySelection]="false"
+    styleClass="p-datatable-striped"
+  >
+    <ng-template pTemplate="header">
+      <tr>
+        <th style="width: 3rem"></th>
+        <th>Player</th>
+        <th>Rating</th>
+        <th>Position</th>
+        <th>Team</th>
+        <th>Status</th>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="body" let-player let-expanded="expanded">
+      <tr [class.selected-row]="isPlayerSelected(player.id)">
+        <td>
+          <p-button
+            type="button"
+            pRipple
+            [icon]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"
+            (click)="toggleRow(player, $event)"
+            styleClass="p-button-text p-button-rounded p-button-plain"
+          ></p-button>
+        </td>
+        <td>
+          <div class="player-info">
+            <img
+              [src]="player.shieldUrl"
+              [alt]="getPlayerDisplayName(player)"
+              class="player-shield"
+              (error)="onImageError($event)"
+            />
+            <span class="player-name">{{ getPlayerDisplayName(player) }}</span>
+          </div>
+        </td>
+        <td>
+          <p-tag
+            [value]="player.overallRating.toString()"
+            [severity]="getRatingSeverity(player.overallRating)"
+          ></p-tag>
+        </td>
+        <td>{{ player.position.shortLabel }}</td>
+        <td>
+          <div class="team-info">
+            <img
+              [src]="player.team.imageUrl"
+              [alt]="player.team.label"
+              class="team-logo"
+              (error)="onImageError($event)"
+            />
+            <span>{{ player.team.label }}</span>
+          </div>
+        </td>
+        <td>
+          <p-tag
+            [value]="isPlayerSelected(player.id) ? 'Selected' : 'Available'"
+            [severity]="isPlayerSelected(player.id) ? 'danger' : 'success'"
+          ></p-tag>
+        </td>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="rowexpansion" let-player>
+      <tr>
+        <td colspan="6">
+          <div class="player-details">
+            <div class="details-grid">
+              <div class="detail-section">
+                <h4>Basic Info</h4>
+                <p><strong>Full Name:</strong> {{ player.firstName }} {{ player.lastName }}</p>
+                <p><strong>Common Name:</strong> {{ player.commonName || 'N/A' }}</p>
+                <p><strong>Skill Moves:</strong> {{ player.skillMoves }}</p>
+                <p><strong>Weak Foot:</strong> {{ player.weakFootAbility }}</p>
+              </div>
+
+              <div class="detail-section">
+                <h4>Position Info</h4>
+                <p><strong>Primary:</strong> {{ player.position.label }}</p>
+                <p><strong>Alternates:</strong>
+                  <span *ngFor="let pos of player.alternatePositions; let last = last">
+                    {{ pos.shortLabel }}<span *ngIf="!last">, </span>
+                  </span>
+                </p>
+              </div>
+
+              <div class="detail-section">
+                <h4>Club & Country</h4>
+                <div class="club-info">
+                  <img
+                    [src]="player.team.imageUrl"
+                    [alt]="player.team.label"
+                    class="detail-team-logo"
+                    (error)="onImageError($event)"
+                  />
+                  <span>{{ player.team.label }}</span>
+                </div>
+                <div class="nationality-info">
+                  <img
+                    [src]="player.nationality.imageUrl"
+                    [alt]="player.nationality.label"
+                    class="nationality-flag"
+                    (error)="onImageError($event)"
+                  />
+                  <span>{{ player.nationality.label }}</span>
+                </div>
+              </div>
+
+              <div class="detail-section" *ngIf="player.playerAbilities.length > 0">
+                <h4>Special Abilities</h4>
+                <div class="abilities">
+                  <p-tag
+                    *ngFor="let ability of player.playerAbilities"
+                    [value]="ability.label"
+                    styleClass="ability-tag"
+                  ></p-tag>
+                </div>
+              </div>
+            </div>
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</p-card>

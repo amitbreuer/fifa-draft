@@ -1,0 +1,52 @@
+.settings-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 2rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.settings-card {
+  width: 100%;
+  max-width: 600px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.settings-content {
+  padding: 1rem;
+}
+
+.field {
+  margin-bottom: 1.5rem;
+}
+
+.field label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.field input {
+  width: 100%;
+}
+
+.managers-section h3 {
+  margin-bottom: 1rem;
+  color: #333;
+}
+
+.manager-inputs {
+  display: grid;
+  gap: 1rem;
+}
+
+.actions {
+  text-align: center;
+  margin-top: 2rem;
+}
+
+.actions p-button {
+  width: 200px;
+}

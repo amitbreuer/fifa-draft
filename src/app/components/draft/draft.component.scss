@@ -1,0 +1,136 @@
+.draft-container {
+  padding: 1rem;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.draft-header {
+  margin-bottom: 2rem;
+}
+
+.draft-info-card {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.draft-info-card ::ng-deep .p-card-body {
+  padding: 1.5rem;
+}
+
+.draft-info {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: 2rem;
+  align-items: center;
+}
+
+.current-turn h2 {
+  margin: 0 0 0.5rem 0;
+  color: white;
+}
+
+.round-tag {
+  font-size: 0.9rem;
+}
+
+.draft-progress {
+  min-width: 200px;
+}
+
+.draft-progress label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+}
+
+.turn-actions {
+  display: flex;
+  gap: 1rem;
+}
+
+.draft-content {
+  margin-bottom: 2rem;
+}
+
+.players-section {
+  margin-bottom: 2rem;
+}
+
+.team-section {
+  margin-bottom: 2rem;
+}
+
+.managers-overview {
+  margin-top: 2rem;
+}
+
+.managers-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.manager-card {
+  padding: 1rem;
+  border: 2px solid #e9ecef;
+  border-radius: 8px;
+  background-color: #f8f9fa;
+  transition: all 0.2s;
+}
+
+.manager-card.current-manager {
+  border-color: #007ad9;
+  background-color: #e3f2fd;
+  box-shadow: 0 2px 8px rgba(0,122,217,0.2);
+}
+
+.manager-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.manager-header h4 {
+  margin: 0;
+  color: #495057;
+}
+
+.current-manager .manager-header h4 {
+  color: #007ad9;
+  font-weight: 600;
+}
+
+.manager-stats {
+  color: #6c757d;
+}
+
+.current-manager .manager-stats {
+  color: #0056b3;
+}
+
+@media (max-width: 1200px) {
+  .draft-info {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    text-align: center;
+  }
+
+  .turn-actions {
+    justify-content: center;
+  }
+}
+
+@media (max-width: 768px) {
+  .draft-container {
+    padding: 0.5rem;
+  }
+
+  .managers-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .turn-actions {
+    flex-direction: column;
+  }
+}

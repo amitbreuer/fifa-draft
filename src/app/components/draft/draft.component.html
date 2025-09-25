@@ -1,0 +1,79 @@
+<div class="draft-container">
+  <div class="draft-header" *ngIf="draftSettings">
+    <p-card class="draft-info-card">
+      <div class="draft-info">
+        <div class="current-turn">
+          <h2>{{ getCurrentManagerName() }}'s Turn</h2>
+          <p-tag
+            [value]="'Round ' + draftSettings.currentRound + ' of ' + draftSettings.maxRounds"
+            severity="info"
+            styleClass="round-tag"
+          ></p-tag>
+        </div>
+
+        <div class="draft-progress">
+          <label>Draft Progress:</label>
+          <p-progressBar
+            [value]="getDraftProgress()"
+            [showValue]="true"
+            unit="%"
+          ></p-progressBar>
+        </div>
+
+        <div class="turn-actions">
+          <p-button
+            label="Finish Turn"
+            icon="pi pi-check"
+            [disabled]="!canFinishTurn()"
+            (onClick)="finishTurn()"
+            styleClass="p-button-success"
+          ></p-button>
+
+          <p-button
+            label="Finish Draft"
+            icon="pi pi-flag"
+            (onClick)="confirmFinishDraft()"
+            styleClass="p-button-warning"
+          ></p-button>
+        </div>
+      </div>
+    </p-card>
+  </div>
+
+  <div class="draft-content">
+    <div class="players-section">
+      <app-player-table></app-player-table>
+    </div>
+
+    <p-divider></p-divider>
+
+    <div class="team-section">
+      <app-field></app-field>
+    </div>
+  </div>
+
+  <div class="managers-overview" *ngIf="draftSettings">
+    <p-card header="Draft Overview" class="overview-card">
+      <div class="managers-grid">
+        <div
+          *ngFor="let manager of draftSettings.managers; let i = index"
+          class="manager-card"
+          [class.current-manager]="i === draftSettings.currentManagerIndex"
+        >
+          <div class="manager-header">
+            <h4>{{ manager.name }}</h4>
+            <p-tag
+              [value]="manager.team.length + ' players'"
+              [severity]="getManagerTagSeverity(i)"
+            ></p-tag>
+          </div>
+          <div class="manager-stats">
+            <small>Players drafted: {{ manager.team.length }}</small>
+          </div>
+        </div>
+      </div>
+    </p-card>
+  </div>
+</div>
+
+<p-confirmDialog></p-confirmDialog>
