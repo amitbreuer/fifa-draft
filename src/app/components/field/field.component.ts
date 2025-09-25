@@ -4,7 +4,7 @@ import { Subject, takeUntil } from 'rxjs';
 import { CardModule } from 'primeng/card';
 import { ButtonModule } from 'primeng/button';
 import { TagModule } from 'primeng/tag';
-import { Player, FieldPosition } from '../../models/player.model';
+import { Player, FieldPosition } from '../../types';
 import { DraftService } from '../../services/draft.service';
 import { PlayerService } from '../../services/player.service';
 

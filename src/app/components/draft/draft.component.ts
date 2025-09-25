@@ -13,7 +13,7 @@ import { PlayerTableComponent } from '../player-table/player-table.component';
 import { FieldComponent } from '../field/field.component';
 import { DraftService } from '../../services/draft.service';
 import { PlayerService } from '../../services/player.service';
-import { DraftSettings, DraftManager, Player } from '../../models/player.model';
+import { DraftSettings, DraftManager, Player } from '../../types';
 
 @Component({
   selector: 'app-draft',

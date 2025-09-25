@@ -23,8 +23,8 @@ import { DraftService } from '../../services/draft.service';
   styleUrl: './settings.component.scss'
 })
 export class SettingsComponent {
-  numManagers = 2;
-  managerNames: string[] = ['Manager 1', 'Manager 2'];
+  numManagers = 4;
+  managerNames: string[] = ['Manager 1', 'Manager 2', 'Manager 3', 'Manager 4'];
 
   constructor(
     private draftService: DraftService,

@@ -1,22 +1,19 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { Player, PositionFilter } from '../models/player.model';
+import { Player, PositionFilter } from '../types';
+import playersData from '../../assets/players.json';
 
 @Injectable({
   providedIn: 'root'
 })
 export class PlayerService {
-  private playersSubject = new BehaviorSubject<Player[]>([]);
+  private playersSubject = new BehaviorSubject<Player[]>(playersData);
   private selectedPlayerIdsSubject = new BehaviorSubject<Set<number>>(new Set());
 
   players$ = this.playersSubject.asObservable();
   selectedPlayerIds$ = this.selectedPlayerIdsSubject.asObservable();
 
   constructor() {}
-
-  loadPlayers(playersData: Player[]): void {
-    this.playersSubject.next(playersData);
-  }
 
   getPlayers(): Player[] {
     return this.playersSubject.value;
@@ -38,7 +35,7 @@ export class PlayerService {
     if (positionFilter !== 'ALL') {
       filteredPlayers = filteredPlayers.filter(player =>
         player.position.shortLabel === positionFilter ||
-        player.alternatePositions.some(pos => pos.shortLabel === positionFilter)
+        player.alternatePositions?.some(pos => pos.shortLabel === positionFilter)
       );
     }
 

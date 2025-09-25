@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
-import { DraftSettings, DraftManager, Player, FieldPosition } from '../models/player.model';
+import { DraftSettings, DraftManager, Player, FieldPosition } from '../types';
 
 @Injectable({
   providedIn: 'root'

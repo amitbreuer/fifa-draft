@@ -19,7 +19,7 @@ export interface Player {
     id: string;
     label: string;
     shortLabel: string;
-  }[];
+  }[] | null;
   playerAbilities: {
     id: string;
     label: string;
