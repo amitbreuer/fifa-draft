@@ -35,7 +35,7 @@ export class PlayerTableComponent implements OnInit, OnDestroy {
 
   filteredPlayers: Player[] = [];
   selectedPlayers: Player[] = [];
-  expandedRows: { [key: string]: boolean } = {};
+  expandedRows: { [key: number]: boolean } = {};
 
   selectedPosition: PositionFilter = 'ALL';
   showSelectedPlayers = false;
@@ -76,11 +76,6 @@ export class PlayerTableComponent implements OnInit, OnDestroy {
       this.selectedPosition,
       this.showSelectedPlayers
     );
-  }
-
-  toggleRow(player: Player, event: Event): void {
-    event.stopPropagation();
-    this.expandedRows[player.id] = !this.expandedRows[player.id];
   }
 
   pickSelectedPlayers(): void {

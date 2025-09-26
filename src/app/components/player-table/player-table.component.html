@@ -44,6 +44,7 @@
     [(selection)]="selectedPlayers"
     selectionMode="multiple"
     [metaKeySelection]="false"
+    [expandedRowKeys]="expandedRows"
     styleClass="p-datatable-striped"
   >
     <ng-template pTemplate="header">
@@ -67,14 +68,15 @@
           <p-tableCheckbox [value]="player"></p-tableCheckbox>
         </td>
         <td>
-          <p-button
+          <button
             type="button"
+            pButton
             pRipple
-            [pRowToggler]=player
+            [pRowToggler]="player"
             [icon]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"
-            (click)="toggleRow(player, $event)"
-            styleClass="p-button-text p-button-rounded p-button-plain"
-          ></p-button>
+            class="p-button-text p-button-rounded p-button-plain"
+            aria-label="Toggle row"
+          ></button>
         </td>
         <td>
           <div class="player-info">
@@ -114,7 +116,7 @@
       </tr>
     </ng-template>
 
-    <ng-template pTemplate="expendedrow" let-player>
+    <ng-template pTemplate="expandedrow" let-player>
       <tr>
         <td colspan="7">
           <div class="player-details">
