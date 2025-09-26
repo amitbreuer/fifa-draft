@@ -104,4 +104,19 @@ export class PlayerTableComponent implements OnInit, OnDestroy {
   onImageError(event: any): void {
     event.target.src = 'iniesta.jpg';
   }
+
+  getPlayerStats(player: Player): { key: string; value: { value: number; diff: number } }[] {
+    return Object.entries(player.stats).map(([key, value]) => ({
+      key,
+      value
+    }));
+  }
+
+  formatStatName(statKey: string): string {
+    // Convert stat key to readable format
+    return statKey
+      .replace(/([A-Z])/g, ' $1') // Add space before capital letters
+      .replace(/^./, str => str.toUpperCase()) // Capitalize first letter
+      .trim();
+  }
 }

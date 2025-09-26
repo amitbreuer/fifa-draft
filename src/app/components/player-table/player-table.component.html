@@ -1,4 +1,4 @@
-<p-card header="Available Players" class="player-table-card">
+<p-card class="player-table-card">
   <div class="table-controls">
     <div class="filters">
       <div class="filter-group">
@@ -53,7 +53,7 @@
           <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
         </th>
         <th style="width: 3rem"></th>
-        <th>Player</th>
+        <th>Name</th>
         <th>Rating</th>
         <th>Position</th>
         <th>Team</th>
@@ -121,52 +121,42 @@
         <td colspan="7">
           <div class="player-details">
             <div class="details-grid">
+              <!-- Player Stats Section -->
               <div class="detail-section">
-                <h4>Basic Info</h4>
-                <p><strong>Full Name:</strong> {{ player.firstName }} {{ player.lastName }}</p>
-                <p><strong>Common Name:</strong> {{ player.commonName || 'N/A' }}</p>
-                <p><strong>Skill Moves:</strong> {{ player.skillMoves }}</p>
-                <p><strong>Weak Foot:</strong> {{ player.weakFootAbility }}</p>
-              </div>
-
-              <div class="detail-section">
-                <h4>Position Info</h4>
-                <p><strong>Primary:</strong> {{ player.position.label }}</p>
-                <p><strong>Alternates:</strong>
-                  <span *ngFor="let pos of player.alternatePositions; let last = last">
-                    {{ pos.shortLabel }}<span *ngIf="!last">, </span>
-                  </span>
-                </p>
-              </div>
-
-              <div class="detail-section">
-                <h4>Club & Country</h4>
-                <div class="club-info">
-                  <img
-                    [src]="player.team.imageUrl"
-                    [alt]="player.team.label"
-                    class="detail-team-logo"
-                    (error)="onImageError($event)"
-                  />
-                  <span>{{ player.team.label }}</span>
-                </div>
-                <div class="nationality-info">
-                  <img
-                    [src]="player.nationality.imageUrl"
-                    [alt]="player.nationality.label"
-                    class="nationality-flag"
-                    (error)="onImageError($event)"
-                  />
-                  <span>{{ player.nationality.label }}</span>
+                <h4>Player Stats</h4>
+                <div class="stats-grid">
+                  @for (stat of getPlayerStats(player); track stat.key) {
+                    @if (!stat.key.startsWith('gk') || player.position.shortLabel === 'GK') {
+                      <div class="stat-item">
+                        <span class="stat-name">{{ formatStatName(stat.key) }}:</span>
+                        <span class="stat-value">{{ stat.value.value }}</span>
+                      </div>
+                    }
+                  }
                 </div>
               </div>
 
-              <div class="detail-section" *ngIf="player.playerAbilities.length > 0">
-                <h4>Special Abilities</h4>
+              <!-- Alternative Positions Section -->
+              <div class="detail-section" *ngIf="player.alternatePositions && player.alternatePositions.length > 0">
+                <h4>Alternative Positions</h4>
+                <div class="positions">
+                  <p-tag
+                    *ngFor="let pos of player.alternatePositions"
+                    [value]="pos.shortLabel"
+                    severity="info"
+                    styleClass="position-tag"
+                  ></p-tag>
+                </div>
+              </div>
+
+              <!-- Player Abilities Section -->
+              <div class="detail-section" *ngIf="player.playerAbilities && player.playerAbilities.length > 0">
+                <h4>Player Abilities</h4>
                 <div class="abilities">
                   <p-tag
                     *ngFor="let ability of player.playerAbilities"
                     [value]="ability.label"
+                    severity="success"
                     styleClass="ability-tag"
                   ></p-tag>
                 </div>
