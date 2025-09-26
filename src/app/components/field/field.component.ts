@@ -82,10 +82,6 @@ export class FieldComponent implements OnInit, OnDestroy {
     this.draftService.undoPlayerPlacement();
   }
 
-  getPlayerDisplayName(player: Player): string {
-    return this.playerService.getPlayerDisplayName(player);
-  }
-
   getPlayerNumber(player: Player): string {
     // Simple number assignment based on player ID
     return (player.id % 99 + 1).toString();

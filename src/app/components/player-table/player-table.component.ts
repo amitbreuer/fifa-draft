@@ -11,6 +11,7 @@ import { TagModule } from 'primeng/tag';
 import { Player, AVAILABLE_POSITIONS, PositionFilter } from '../../types';
 import { PlayerService } from '../../services/player.service';
 import { DraftService } from '../../services/draft.service';
+import { Ripple } from 'primeng/ripple';
 
 @Component({
   selector: 'app-player-table',
@@ -23,7 +24,8 @@ import { DraftService } from '../../services/draft.service';
     SelectModule,
     CheckboxModule,
     CardModule,
-    TagModule
+    TagModule,
+    Ripple
   ],
   templateUrl: './player-table.component.html',
   styleUrl: './player-table.component.scss'
@@ -32,7 +34,7 @@ export class PlayerTableComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
 
   filteredPlayers: Player[] = [];
-  selectedPlayer: Player | null = null;
+  selectedPlayers: Player[] = [];
   expandedRows: { [key: string]: boolean } = {};
 
   selectedPosition: PositionFilter = 'ALL';
@@ -81,19 +83,20 @@ export class PlayerTableComponent implements OnInit, OnDestroy {
     this.expandedRows[player.id] = !this.expandedRows[player.id];
   }
 
-  pickPlayer(): void {
-    if (this.selectedPlayer && !this.isPlayerSelected(this.selectedPlayer.id)) {
-      this.draftService.pickPlayer(this.selectedPlayer);
-      this.selectedPlayer = null;
-    }
+  pickSelectedPlayers(): void {
+    const availablePlayers = this.selectedPlayers.filter(player =>
+      !this.isPlayerSelected(player.id)
+    );
+
+    availablePlayers.forEach(player => {
+      this.draftService.pickPlayer(player);
+    });
+
+    this.selectedPlayers = [];
   }
 
   isPlayerSelected(playerId: number): boolean {
     return this.playerService.isPlayerSelected(playerId);
-  }
-
-  getPlayerDisplayName(player: Player): string {
-    return this.playerService.getPlayerDisplayName(player);
   }
 
   getRatingSeverity(rating: number): string {

@@ -23,11 +23,11 @@
       </div>
     </div>
 
-    <div class="pick-controls" *ngIf="selectedPlayer && !showSelectedPlayers">
+    <div class="pick-controls" *ngIf="selectedPlayers.length > 0 && !showSelectedPlayers">
       <p-button
-        label="Pick Player"
+        label="Pick Selected Players ({{selectedPlayers.length}})"
         icon="pi pi-check"
-        (onClick)="pickPlayer()"
+        (onClick)="pickSelectedPlayers()"
         styleClass="p-button-success"
       ></p-button>
     </div>
@@ -41,13 +41,16 @@
     currentPageReportTemplate="Showing {first} to {last} of {totalRecords} players"
     [rowsPerPageOptions]="[25, 50, 100]"
     dataKey="id"
-    [(selection)]="selectedPlayer"
-    selectionMode="single"
+    [(selection)]="selectedPlayers"
+    selectionMode="multiple"
     [metaKeySelection]="false"
     styleClass="p-datatable-striped"
   >
     <ng-template pTemplate="header">
       <tr>
+        <th style="width: 3rem">
+          <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+        </th>
         <th style="width: 3rem"></th>
         <th>Player</th>
         <th>Rating</th>
@@ -58,11 +61,16 @@
     </ng-template>
 
     <ng-template pTemplate="body" let-player let-expanded="expanded">
+      @let playerName = player.commonName || `${player.firstName} ${player.lastName}`;
       <tr [class.selected-row]="isPlayerSelected(player.id)">
+        <td>
+          <p-tableCheckbox [value]="player"></p-tableCheckbox>
+        </td>
         <td>
           <p-button
             type="button"
             pRipple
+            [pRowToggler]=player
             [icon]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"
             (click)="toggleRow(player, $event)"
             styleClass="p-button-text p-button-rounded p-button-plain"
@@ -72,11 +80,11 @@
           <div class="player-info">
             <img
               [src]="player.shieldUrl"
-              [alt]="getPlayerDisplayName(player)"
+              [alt]="playerName"
               class="player-shield"
               (error)="onImageError($event)"
             />
-            <span class="player-name">{{ getPlayerDisplayName(player) }}</span>
+            <span class="player-name">{{ playerName }}</span>
           </div>
         </td>
         <td>
@@ -106,9 +114,9 @@
       </tr>
     </ng-template>
 
-    <ng-template pTemplate="rowexpansion" let-player>
+    <ng-template pTemplate="expendedrow" let-player>
       <tr>
-        <td colspan="6">
+        <td colspan="7">
           <div class="player-details">
             <div class="details-grid">
               <div class="detail-section">

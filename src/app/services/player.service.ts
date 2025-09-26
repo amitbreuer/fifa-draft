@@ -62,8 +62,4 @@ export class PlayerService {
   getPlayerById(playerId: number): Player | undefined {
     return this.playersSubject.value.find(player => player.id === playerId);
   }
-
-  getPlayerDisplayName(player: Player): string {
-    return player.commonName || `${player.firstName} ${player.lastName}`;
-  }
 }

@@ -10,6 +10,7 @@
         [class.has-player]="position.player"
         [class.can-place]="canPlacePlayer()"
       >
+        @let playerName = position?.player?.commonName || `${position?.player?.firstName} ${position?.player?.lastName}`;
         <div class="position-slot">
           <div
             *ngIf="position.player; else emptySlot"
@@ -27,7 +28,7 @@
               />
               <span class="player-number">{{ getPlayerNumber(position.player) }}</span>
             </div>
-            <div class="player-name">{{ getPlayerDisplayName(position.player) }}</div>
+            <div class="player-name">{{ playerName }}</div>
             <div class="player-rating">{{ position.player.overallRating }}</div>
           </div>
 
@@ -59,6 +60,7 @@
         (dragstart)="onDragStart($event, player)"
         (dragend)="onDragEnd($event)"
       >
+        @let playerName = player.commonName || `${player.firstName} ${player.lastName}`;
         <div class="player-item">
           <div class="player-shirt">
             <img
@@ -69,7 +71,7 @@
             />
             <span class="player-number">{{ getPlayerNumber(player) }}</span>
           </div>
-          <div class="player-name">{{ getPlayerDisplayName(player) }}</div>
+          <div class="player-name">{{ playerName }}</div>
           <div class="player-rating">{{ player.overallRating }}</div>
         </div>
       </div>
@@ -90,10 +92,11 @@
 </p-card>
 
 <div class="field-actions" *ngIf="currentPickedPlayer">
+  @let playerName = currentPickedPlayer.commonName || `${currentPickedPlayer.firstName} ${currentPickedPlayer.lastName}`;
   <p-card header="Current Pick" class="current-pick-card">
     <div class="current-pick-info">
       <div class="picked-player">
-        <strong>{{ getPlayerDisplayName(currentPickedPlayer) }}</strong>
+        <strong>{{ playerName }}</strong>
         <p-tag
           [value]="currentPickedPlayer.overallRating.toString()"
           severity="info"
