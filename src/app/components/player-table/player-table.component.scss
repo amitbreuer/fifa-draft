@@ -231,6 +231,44 @@
   font-size: 0.75rem;
 }
 
+.player-info-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.info-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.info-label {
+  font-weight: 500;
+  font-size: 0.875rem;
+  color: #b0b0b0;
+  min-width: 100px;
+}
+
+.info-value {
+  font-weight: 600;
+  font-size: 0.875rem;
+  color: #ffffff;
+}
+
+.weak-foot-rating ::ng-deep .p-rating .p-rating-item {
+  margin-right: 0.25rem;
+}
+
+.weak-foot-rating ::ng-deep .p-rating .p-rating-item .p-rating-icon {
+  font-size: 1rem;
+  color: #ffc107;
+}
+
+.weak-foot-rating ::ng-deep .p-rating .p-rating-item .p-rating-icon.p-rating-cancel {
+  color: #6c757d;
+}
+
 @media (max-width: 768px) {
   .table-controls {
     flex-direction: column;
@@ -259,6 +297,16 @@
   }
 
   .additional-info .detail-section {
+    min-width: unset;
+  }
+
+  .info-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.25rem;
+  }
+
+  .info-label {
     min-width: unset;
   }
 }

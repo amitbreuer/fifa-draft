@@ -9,6 +9,7 @@ import { CheckboxModule } from 'primeng/checkbox';
 import { CardModule } from 'primeng/card';
 import { TagModule } from 'primeng/tag';
 import { ProgressBarModule } from 'primeng/progressbar';
+import { RatingModule } from 'primeng/rating';
 import { Player, AVAILABLE_POSITIONS, PositionFilter, mainStatsMap, MainStats } from '../../types';
 import { PlayerService } from '../../services/player.service';
 import { DraftService } from '../../services/draft.service';
@@ -27,6 +28,7 @@ import { Ripple } from 'primeng/ripple';
     CardModule,
     TagModule,
     ProgressBarModule,
+    RatingModule,
     Ripple
   ],
   templateUrl: './player-table.component.html',

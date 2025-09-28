@@ -6,6 +6,7 @@ export interface Player {
   overallRating: number;
   skillMoves: number;
   weakFootAbility: number;
+  preferredFoot: string;
   position: {
     id: string;
     shortLabel: string;

@@ -188,6 +188,26 @@
             </div>
 
             <div class="additional-info flex">
+              <!-- Player Info Section -->
+              <div class="detail-section">
+                <h4>Player Info</h4>
+                <div class="player-info-details">
+                  <div class="info-item">
+                    <span class="info-label">Preferred Foot:</span>
+                    <span class="info-value">{{ player.preferredFoot }}</span>
+                  </div>
+                  <div class="info-item">
+                    <span class="info-label">Weak Foot:</span>
+                    <p-rating
+                      [ngModel]="player.weakFootAbility"
+                      [readonly]="true"
+                      [stars]="5"
+                      styleClass="weak-foot-rating"
+                    ></p-rating>
+                  </div>
+                </div>
+              </div>
+
               <!-- Alternative Positions Section -->
               <div class="detail-section" *ngIf="player.alternatePositions && player.alternatePositions.length > 0">
                 <h4>Alternative Positions</h4>
