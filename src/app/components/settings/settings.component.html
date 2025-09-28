@@ -19,10 +19,8 @@
       <div class="managers-section">
         <h3>Manager Names:</h3>
         <div class="manager-inputs">
-          <div
-            *ngFor="let manager of managerNames; let i = index"
-            class="field"
-          >
+          @for (manager of managerNames; track $index; let i = $index) {
+          <div class="field">
             <label [for]="'manager' + i">Manager {{ i + 1 }}:</label>
             <input
               [id]="'manager' + i"
@@ -32,6 +30,7 @@
               [placeholder]="'Manager ' + (i + 1)"
             />
           </div>
+          }
         </div>
       </div>
 
@@ -43,7 +42,7 @@
           icon="pi pi-play"
           [disabled]="!canStartDraft()"
           (onClick)="startDraft()"
-          styleClass="p-button-success"
+          class="p-button-success"
         ></p-button>
       </div>
     </div>

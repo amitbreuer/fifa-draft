@@ -14,6 +14,10 @@ import { Player, AVAILABLE_POSITIONS, PositionFilter, mainStatsMap, MainStats } 
 import { PlayerService } from '../../services/player.service';
 import { DraftService } from '../../services/draft.service';
 import { Ripple } from 'primeng/ripple';
+import { RatingSeverityPipe } from '../../pipes/rating-severity.pipe';
+import { StatSeverityPipe } from '../../pipes/stat-severity.pipe';
+import { StatNamePipe } from '../../pipes/stat-name.pipe';
+import { MainStatNamePipe } from '../../pipes/main-stat-name.pipe';
 
 @Component({
   selector: 'app-player-table',
@@ -29,6 +33,10 @@ import { Ripple } from 'primeng/ripple';
     TagModule,
     ProgressBarModule,
     RatingModule,
+    RatingSeverityPipe,
+    StatSeverityPipe,
+    StatNamePipe,
+    MainStatNamePipe,
     Ripple
   ],
   templateUrl: './player-table.component.html',
@@ -98,30 +106,9 @@ export class PlayerTableComponent implements OnInit, OnDestroy {
     return this.playerService.isPlayerSelected(playerId);
   }
 
-  getRatingSeverity(rating: number): string {
-    if (rating >= 90) return 'success';
-    if (rating >= 80) return 'info';
-    if (rating >= 70) return 'warning';
-    return 'danger';
-  }
 
   onImageError(event: any): void {
     event.target.src = 'iniesta.jpg';
-  }
-
-  getPlayerStats(player: Player): { key: string; value: { value: number; diff: number } }[] {
-    return Object.entries(player.stats).map(([key, value]) => ({
-      key,
-      value
-    }));
-  }
-
-  formatStatName(statKey: string): string {
-    // Convert stat key to readable format
-    return statKey
-      .replace(/([A-Z])/g, ' $1') // Add space before capital letters
-      .replace(/^./, str => str.toUpperCase()) // Capitalize first letter
-      .trim();
   }
 
   getMainStats(player: Player): MainStats {
@@ -149,16 +136,5 @@ export class PlayerTableComponent implements OnInit, OnDestroy {
 
   getSubStatsForMainStat(mainStat: keyof typeof mainStatsMap): string[] {
     return mainStatsMap[mainStat];
-  }
-
-  formatMainStatName(statKey: string): string {
-    return statKey.toUpperCase();
-  }
-
-  getStatSeverity(statValue: number): string {
-    if (statValue >= 85) return 'success'; // Green
-    if (statValue >= 70) return 'warn'; // Yellow
-    if (statValue >= 55) return 'info'; // Orange
-    return 'danger'; // Red
   }
 }

@@ -23,14 +23,16 @@
       </div>
     </div>
 
-    <div class="pick-controls" *ngIf="selectedPlayers.length > 0 && !showSelectedPlayers">
+    @if (selectedPlayers.length > 0 && !showSelectedPlayers) {
+    <div class="pick-controls">
       <p-button
         label="Pick Selected Players ({{selectedPlayers.length}})"
         icon="pi pi-check"
         (onClick)="pickSelectedPlayers()"
-        styleClass="p-button-success"
+        class="p-button-success"
       ></p-button>
     </div>
+    }
   </div>
 
   <p-table
@@ -45,7 +47,7 @@
     selectionMode="multiple"
     [metaKeySelection]="false"
     [expandedRowKeys]="expandedRows"
-    styleClass="p-datatable-striped"
+    class="p-datatable-striped"
   >
     <ng-template pTemplate="header">
       <tr>
@@ -71,7 +73,8 @@
     <ng-template pTemplate="body" let-player let-expanded="expanded">
       @let playerName = player.commonName || `${player.firstName} ${player.lastName}`;
       @let mainStats = getMainStats(player);
-      <tr [class.selected-row]="isPlayerSelected(player.id)">
+      @let isSelected = isPlayerSelected(player.id);
+      <tr [class.selected-row]="isSelected">
         <td>
           <p-tableCheckbox [value]="player"></p-tableCheckbox>
         </td>
@@ -123,7 +126,7 @@
         <td>
           <p-tag
             [value]="player.overallRating.toString()"
-            [severity]="getRatingSeverity(player.overallRating)"
+            [severity]="player.overallRating | ratingSeverity"
           ></p-tag>
         </td>
         <td>{{ mainStats.pace }}</td>
@@ -134,8 +137,8 @@
         <td>{{ mainStats.physicality }}</td>
         <td>
           <p-tag
-            [value]="isPlayerSelected(player.id) ? 'Selected' : 'Available'"
-            [severity]="isPlayerSelected(player.id) ? 'danger' : 'success'"
+            [value]="isSelected ? 'Selected' : 'Available'"
+            [severity]="isSelected ? 'danger' : 'success'"
           ></p-tag>
         </td>
       </tr>
@@ -152,14 +155,14 @@
                 <div class="stat-group">
                   <div class="main-stat-header">
                     <div class="main-stat-title">
-                      <span class="main-stat-name">{{ formatMainStatName(mainStat) }}</span>
+                      <span class="main-stat-name">{{ mainStat | mainStatName }}</span>
                       <span class="main-stat-value">{{ mainStats[mainStat] }}</span>
                     </div>
                     <p-progressbar
                       [value]="mainStats[mainStat]"
-                      [color]="getStatSeverity(mainStats[mainStat])"
+                      [color]="mainStats[mainStat] | statSeverity"
                       [showValue]="false"
-                      styleClass="main-stat-progress"
+                      [class]="'main-stat-progress'"
                     ></p-progressbar>
                   </div>
                   <div class="sub-stats">
@@ -169,14 +172,14 @@
                         @if (statValue !== undefined) {
                           <div class="sub-stat-item">
                             <div class="sub-stat-header">
-                              <span class="sub-stat-name">{{ formatStatName(subStat) }}</span>
+                              <span class="sub-stat-name">{{ subStat | statName }}</span>
                               <span class="sub-stat-value">{{ statValue }}</span>
                             </div>
                             <p-progressbar
                               [value]="statValue"
-                              [color]="getStatSeverity(statValue)"
+                              [color]="statValue | statSeverity"
                               [showValue]="false"
-                              styleClass="sub-stat-progress"
+                              [class]="'sub-stat-progress'"
                             ></p-progressbar>
                           </div>
                         }
@@ -202,37 +205,43 @@
                       [ngModel]="player.weakFootAbility"
                       [readonly]="true"
                       [stars]="5"
-                      styleClass="weak-foot-rating"
+                      class="weak-foot-rating"
                     ></p-rating>
                   </div>
                 </div>
               </div>
 
               <!-- Alternative Positions Section -->
-              <div class="detail-section" *ngIf="player.alternatePositions && player.alternatePositions.length > 0">
+              @if (player.alternatePositions && player.alternatePositions.length > 0) {
+              <div class="detail-section">
                 <h4>Alternative Positions</h4>
                 <div class="positions">
+                  @for (pos of player.alternatePositions; track pos.id) {
                   <p-tag
-                    *ngFor="let pos of player.alternatePositions"
                     [value]="pos.shortLabel"
                     severity="info"
-                    styleClass="position-tag"
+                    class="position-tag"
                   ></p-tag>
+                  }
                 </div>
               </div>
+              }
 
               <!-- Player Abilities Section -->
-              <div class="detail-section" *ngIf="player.playerAbilities && player.playerAbilities.length > 0">
+              @if (player.playerAbilities && player.playerAbilities.length > 0) {
+              <div class="detail-section">
                 <h4>Player Abilities</h4>
                 <div class="abilities">
+                  @for (ability of player.playerAbilities; track ability.id) {
                   <p-tag
-                    *ngFor="let ability of player.playerAbilities"
                     [value]="ability.label"
                     severity="warn"
-                    styleClass="ability-tag"
+                    class="ability-tag"
                   ></p-tag>
+                  }
                 </div>
               </div>
+              }
             </div>
           </div>
         </td>

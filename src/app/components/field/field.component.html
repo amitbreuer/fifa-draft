@@ -1,8 +1,8 @@
 <p-card header="Team Formation" class="field-card">
   <div class="field-container">
     <div class="field-pitch">
+      @for (position of fieldPositions; track position.id) {
       <div
-        *ngFor="let position of fieldPositions"
         class="field-position"
         [style.left.%]="position.x"
         [style.top.%]="position.y"
@@ -12,8 +12,8 @@
       >
         @let playerName = position?.player?.commonName || `${position?.player?.firstName} ${position?.player?.lastName}`;
         <div class="position-slot">
+          @if (position.player) {
           <div
-            *ngIf="position.player; else emptySlot"
             class="player-item"
             draggable="true"
             (dragstart)="onDragStart($event, position.player)"
@@ -31,21 +31,21 @@
             <div class="player-name">{{ playerName }}</div>
             <div class="player-rating">{{ position.player.overallRating }}</div>
           </div>
-
-          <ng-template #emptySlot>
-            <div
-              class="empty-slot"
-              (drop)="onDrop($event, position.id)"
-              (dragover)="onDragOver($event)"
-              (dragenter)="onDragEnter($event)"
-              (dragleave)="onDragLeave($event)"
-            >
-              <i class="pi pi-plus"></i>
-              <span class="position-label">{{ getPositionLabel(position.id) }}</span>
-            </div>
-          </ng-template>
+          } @else {
+          <div
+            class="empty-slot"
+            (drop)="onDrop($event, position.id)"
+            (dragover)="onDragOver($event)"
+            (dragenter)="onDragEnter($event)"
+            (dragleave)="onDragLeave($event)"
+          >
+            <i class="pi pi-plus"></i>
+            <span class="position-label">{{ getPositionLabel(position.id) }}</span>
+          </div>
+          }
         </div>
       </div>
+      }
     </div>
   </div>
 </p-card>
@@ -53,8 +53,8 @@
 <p-card header="Bench" class="bench-card">
   <div class="bench-container">
     <div class="bench-slots">
+      @for (player of benchPlayers; track trackByPlayerId($index, player)) {
       <div
-        *ngFor="let player of benchPlayers; trackBy: trackByPlayerId"
         class="bench-player"
         draggable="true"
         (dragstart)="onDragStart($event, player)"
@@ -75,6 +75,7 @@
           <div class="player-rating">{{ player.overallRating }}</div>
         </div>
       </div>
+      }
 
       <div
         class="bench-drop-zone"
@@ -91,7 +92,8 @@
   </div>
 </p-card>
 
-<div class="field-actions" *ngIf="currentPickedPlayer">
+@if (currentPickedPlayer) {
+<div class="field-actions">
   @let playerName = currentPickedPlayer.commonName || `${currentPickedPlayer.firstName} ${currentPickedPlayer.lastName}`;
   <p-card header="Current Pick" class="current-pick-card">
     <div class="current-pick-info">
@@ -107,15 +109,16 @@
           label="Place on Bench"
           icon="pi pi-users"
           (onClick)="placeOnBench()"
-          styleClass="p-button-secondary"
+          class="p-button-secondary"
         ></p-button>
         <p-button
           label="Undo"
           icon="pi pi-undo"
           (onClick)="undoPlacement()"
-          styleClass="p-button-warning"
+          class="p-button-warning"
         ></p-button>
       </div>
     </div>
   </p-card>
 </div>
+}

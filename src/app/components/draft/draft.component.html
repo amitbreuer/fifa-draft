@@ -1,5 +1,6 @@
 <div class="draft-container">
-  <div class="draft-header" *ngIf="draftSettings">
+  @if (draftSettings) {
+  <div class="draft-header">
     <p-card class="draft-info-card">
       <div class="draft-info">
         <div class="current-turn">
@@ -7,7 +8,7 @@
           <p-tag
             [value]="'Round ' + draftSettings.currentRound + ' of ' + draftSettings.maxRounds"
             severity="info"
-            styleClass="round-tag"
+            class="round-tag"
           ></p-tag>
         </div>
 
@@ -26,19 +27,20 @@
             icon="pi pi-check"
             [disabled]="!canFinishTurn()"
             (onClick)="finishTurn()"
-            styleClass="p-button-success"
+            class="p-button-success"
           ></p-button>
 
           <p-button
             label="Finish Draft"
             icon="pi pi-flag"
             (onClick)="confirmFinishDraft()"
-            styleClass="p-button-warning"
+            class="p-button-warning"
           ></p-button>
         </div>
       </div>
     </p-card>
   </div>
+  }
 
   <div class="draft-content">
     <div class="players-section">
@@ -52,11 +54,12 @@
     </div>
   </div>
 
-  <div class="managers-overview" *ngIf="draftSettings">
+  @if (draftSettings) {
+  <div class="managers-overview">
     <p-card header="Draft Overview" class="overview-card">
       <div class="managers-grid">
+        @for (manager of draftSettings.managers; track manager.id; let i = $index) {
         <div
-          *ngFor="let manager of draftSettings.managers; let i = index"
           class="manager-card"
           [class.current-manager]="i === draftSettings.currentManagerIndex"
         >
@@ -71,9 +74,11 @@
             <small>Players drafted: {{ manager.team.length }}</small>
           </div>
         </div>
+        }
       </div>
     </p-card>
   </div>
+  }
 </div>
 
 <p-confirmDialog></p-confirmDialog>
