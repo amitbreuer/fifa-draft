@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { DraftSettings, DraftManager, Player, FieldPosition } from '../types';
+import { PlayerService } from './player.service';
 
 @Injectable({
   providedIn: 'root'
@@ -16,7 +17,7 @@ export class DraftService {
   fieldPositions$ = this.fieldPositionsSubject.asObservable();
   benchPlayers$ = this.benchPlayersSubject.asObservable();
 
-  constructor() {
+  constructor(private playerService: PlayerService) {
     this.initializeFieldPositions();
   }
 
@@ -100,6 +101,12 @@ export class DraftService {
     // Remove from bench
     const bench = this.benchPlayersSubject.value.filter(p => p.id !== pickedPlayer.id);
     this.benchPlayersSubject.next(bench);
+
+    // Unselect the player so they appear back in the main table
+    this.playerService.unselectPlayer(pickedPlayer.id);
+
+    // Clear the current picked player
+    this.currentPickedPlayerSubject.next(null);
   }
 
   finishTurn(): void {

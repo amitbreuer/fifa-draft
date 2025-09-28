@@ -70,10 +70,9 @@
     <ng-template pTemplate="body" let-player>
       @let playerName = player.commonName || `${player.firstName} ${player.lastName}`;
       @let mainStats = getMainStats(player);
-      @let isSelected = isPlayerSelected(player.id);
-      <tr [class.selected-row]="isSelected" [class.disabled-row]="isSelected" [pRowToggler]="player">
+      <tr [pRowToggler]="player">
         <td (click)="$event.stopPropagation()">
-          <p-tableCheckbox [value]="player" [disabled]="isSelected"></p-tableCheckbox>
+          <p-tableCheckbox [value]="player"></p-tableCheckbox>
         </td>
         <td>
           <div class="player-info">

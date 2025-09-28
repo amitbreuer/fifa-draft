@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
@@ -13,7 +13,7 @@ import { PlayerTableComponent } from '../player-table/player-table.component';
 import { FieldComponent } from '../field/field.component';
 import { DraftService } from '../../services/draft.service';
 import { PlayerService } from '../../services/player.service';
-import { DraftSettings, DraftManager, Player } from '../../types';
+import { DraftSettings, Player } from '../../types';
 
 @Component({
   selector: 'app-draft',
@@ -102,8 +102,9 @@ export class DraftComponent implements OnInit, OnDestroy {
       header: 'Confirm Turn',
       icon: 'pi pi-question-circle',
       accept: () => {
-        this.draftService.finishTurn();
+        // Mark the player as selected before finishing the turn
         this.playerService.selectPlayer(this.currentPickedPlayer!.id);
+        this.draftService.finishTurn();
       }
     });
   }

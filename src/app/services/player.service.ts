@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject } from 'rxjs';
 import { Player, PositionFilter } from '../types';
 import playersData from '../../assets/players.json';
 
@@ -52,6 +52,12 @@ export class PlayerService {
   selectPlayer(playerId: number): void {
     const selectedIds = new Set(this.selectedPlayerIdsSubject.value);
     selectedIds.add(playerId);
+    this.selectedPlayerIdsSubject.next(selectedIds);
+  }
+
+  unselectPlayer(playerId: number): void {
+    const selectedIds = new Set(this.selectedPlayerIdsSubject.value);
+    selectedIds.delete(playerId);
     this.selectedPlayerIdsSubject.next(selectedIds);
   }
 
