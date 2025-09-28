@@ -1,136 +1,215 @@
 .draft-container {
   padding: 1rem;
-  max-width: 1400px;
-  margin: 0 auto;
+  min-height: 100vh;
+  max-width: 100%;
+  overflow-x: auto;
 }
 
 .draft-header {
-  margin-bottom: 2rem;
+  margin-bottom: 1rem;
 }
 
 .draft-info-card {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-}
+  .draft-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
 
-.draft-info-card ::ng-deep .p-card-body {
-  padding: 1.5rem;
-}
+    .current-turn {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
 
-.draft-info {
-  display: grid;
-  grid-template-columns: 1fr auto auto;
-  gap: 2rem;
-  align-items: center;
-}
+      h2 {
+        margin: 0;
+        color: var(--primary-color);
+      }
+    }
 
-.current-turn h2 {
-  margin: 0 0 0.5rem 0;
-  color: white;
-}
+    .draft-progress {
+      flex: 1;
+      min-width: 200px;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
 
-.round-tag {
-  font-size: 0.9rem;
-}
+      label {
+        font-weight: 600;
+        color: var(--text-color-secondary);
+      }
+    }
 
-.draft-progress {
-  min-width: 200px;
-}
-
-.draft-progress label {
-  display: block;
-  margin-bottom: 0.5rem;
-  font-weight: 600;
-}
-
-.turn-actions {
-  display: flex;
-  gap: 1rem;
+    .turn-actions {
+      display: flex;
+      gap: 0.5rem;
+    }
+  }
 }
 
 .draft-content {
-  margin-bottom: 2rem;
-}
+  margin-bottom: 1rem;
 
-.players-section {
-  margin-bottom: 2rem;
-}
+  .content-row {
+    display: flex;
+    gap: 1rem;
+    width: 100%;
+    min-height: 70vh;
 
-.team-section {
-  margin-bottom: 2rem;
+    .players-section {
+      flex: 0 1 auto; // Allow shrinking, don't grow, auto width based on content
+      min-width: 0; // Allows flex item to shrink below its content size
+
+      ::ng-deep app-player-table {
+        height: 100%;
+
+        .player-table-card {
+          height: 100%;
+
+          .p-card-body {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+          }
+
+          .p-datatable-wrapper {
+            flex: 1;
+            overflow: auto;
+          }
+        }
+      }
+    }
+
+    .team-section {
+      flex: 1; // Take remaining space
+      min-width: 400px; // Minimum width for field functionality
+
+      ::ng-deep app-field {
+        height: 100%;
+
+        .field-card,
+        .bench-card,
+        .current-pick-card {
+          margin-bottom: 1rem;
+
+          &:last-child {
+            margin-bottom: 0;
+          }
+        }
+      }
+    }
+  }
 }
 
 .managers-overview {
-  margin-top: 2rem;
+  margin-top: 1rem;
+
+  .managers-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1rem;
+
+    .manager-card {
+      padding: 1rem;
+      border: 2px solid var(--surface-border);
+      border-radius: var(--border-radius);
+      background: var(--surface-card);
+      transition: all 0.3s ease;
+
+      &.current-manager {
+        border-color: var(--primary-color);
+        background: var(--primary-50);
+        box-shadow: 0 0 10px rgba(var(--primary-color-rgb), 0.3);
+      }
+
+      .manager-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 0.5rem;
+
+        h4 {
+          margin: 0;
+          color: var(--text-color);
+        }
+      }
+
+      .manager-stats {
+        color: var(--text-color-secondary);
+        font-size: 0.875rem;
+      }
+    }
+  }
 }
 
-.managers-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 1rem;
-}
-
-.manager-card {
-  padding: 1rem;
-  border: 2px solid #e9ecef;
-  border-radius: 8px;
-  background-color: #f8f9fa;
-  transition: all 0.2s;
-}
-
-.manager-card.current-manager {
-  border-color: #007ad9;
-  background-color: #e3f2fd;
-  box-shadow: 0 2px 8px rgba(0,122,217,0.2);
-}
-
-.manager-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 0.5rem;
-}
-
-.manager-header h4 {
-  margin: 0;
-  color: #495057;
-}
-
-.current-manager .manager-header h4 {
-  color: #007ad9;
-  font-weight: 600;
-}
-
-.manager-stats {
-  color: #6c757d;
-}
-
-.current-manager .manager-stats {
-  color: #0056b3;
-}
-
+// Responsive adjustments
 @media (max-width: 1200px) {
-  .draft-info {
-    grid-template-columns: 1fr;
-    gap: 1.5rem;
-    text-align: center;
-  }
-
-  .turn-actions {
-    justify-content: center;
+  .draft-content {
+    .content-row {
+      .team-section {
+        flex: 0 0 350px;
+        min-width: 350px;
+      }
+    }
   }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 992px) {
   .draft-container {
     padding: 0.5rem;
   }
 
-  .managers-grid {
-    grid-template-columns: 1fr;
+  .draft-content {
+    .content-row {
+      flex-direction: column;
+      min-height: auto;
+
+      .players-section,
+      .team-section {
+        flex: none;
+        min-width: auto;
+        width: 100%;
+      }
+
+      .team-section {
+        margin-top: 1rem;
+      }
+    }
   }
 
-  .turn-actions {
-    flex-direction: column;
+  .draft-info-card {
+    .draft-info {
+      flex-direction: column;
+      align-items: stretch;
+
+      .current-turn,
+      .draft-progress,
+      .turn-actions {
+        width: 100%;
+      }
+
+      .turn-actions {
+        justify-content: center;
+      }
+    }
+  }
+
+  .managers-overview {
+    .managers-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .draft-content {
+    .content-row {
+      gap: 0.5rem;
+
+      .team-section {
+        margin-top: 0.5rem;
+      }
+    }
   }
 }
