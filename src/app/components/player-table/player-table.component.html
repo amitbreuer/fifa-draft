@@ -151,8 +151,16 @@
               @for (mainStat of getMainStatsKeys(); track mainStat) {
                 <div class="stat-group">
                   <div class="main-stat-header">
-                    <span class="main-stat-name">{{ formatMainStatName(mainStat) }}</span>
-                    <span class="main-stat-value">{{ mainStats[mainStat] }}</span>
+                    <div class="main-stat-title">
+                      <span class="main-stat-name">{{ formatMainStatName(mainStat) }}</span>
+                      <span class="main-stat-value">{{ mainStats[mainStat] }}</span>
+                    </div>
+                    <p-progressbar
+                      [value]="mainStats[mainStat]"
+                      [color]="getStatSeverity(mainStats[mainStat])"
+                      [showValue]="false"
+                      styleClass="main-stat-progress"
+                    ></p-progressbar>
                   </div>
                   <div class="sub-stats">
                     @for (subStat of getSubStatsForMainStat(mainStat); track subStat) {
@@ -160,8 +168,16 @@
                         @let statValue = player.stats[subStat]?.value;
                         @if (statValue !== undefined) {
                           <div class="sub-stat-item">
-                            <span class="sub-stat-name">{{ formatStatName(subStat) }}</span>
-                            <span class="sub-stat-value">{{ statValue }}</span>
+                            <div class="sub-stat-header">
+                              <span class="sub-stat-name">{{ formatStatName(subStat) }}</span>
+                              <span class="sub-stat-value">{{ statValue }}</span>
+                            </div>
+                            <p-progressbar
+                              [value]="statValue"
+                              [color]="getStatSeverity(statValue)"
+                              [showValue]="false"
+                              styleClass="sub-stat-progress"
+                            ></p-progressbar>
                           </div>
                         }
                       }
@@ -192,7 +208,7 @@
                   <p-tag
                     *ngFor="let ability of player.playerAbilities"
                     [value]="ability.label"
-                    severity="success"
+                    severity="warn"
                     styleClass="ability-tag"
                   ></p-tag>
                 </div>

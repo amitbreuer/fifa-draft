@@ -8,6 +8,7 @@ import { SelectModule } from 'primeng/select';
 import { CheckboxModule } from 'primeng/checkbox';
 import { CardModule } from 'primeng/card';
 import { TagModule } from 'primeng/tag';
+import { ProgressBarModule } from 'primeng/progressbar';
 import { Player, AVAILABLE_POSITIONS, PositionFilter, mainStatsMap, MainStats } from '../../types';
 import { PlayerService } from '../../services/player.service';
 import { DraftService } from '../../services/draft.service';
@@ -25,6 +26,7 @@ import { Ripple } from 'primeng/ripple';
     CheckboxModule,
     CardModule,
     TagModule,
+    ProgressBarModule,
     Ripple
   ],
   templateUrl: './player-table.component.html',
@@ -149,5 +151,12 @@ export class PlayerTableComponent implements OnInit, OnDestroy {
 
   formatMainStatName(statKey: string): string {
     return statKey.toUpperCase();
+  }
+
+  getStatSeverity(statValue: number): string {
+    if (statValue >= 85) return 'success'; // Green
+    if (statValue >= 70) return 'warn'; // Yellow
+    if (statValue >= 55) return 'info'; // Orange
+    return 'danger'; // Red
   }
 }
