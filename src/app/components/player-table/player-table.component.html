@@ -44,6 +44,7 @@
     [rowsPerPageOptions]="[25, 50, 100]"
     dataKey="id"
     [(selection)]="selectedPlayers"
+    (selectionChange)="onSelectionChange($event)"
     selectionMode="multiple"
     [metaKeySelection]="false"
     [expandedRowKeys]="expandedRows"
@@ -51,12 +52,9 @@
   >
     <ng-template pTemplate="header">
       <tr>
-        <th style="width: 3rem">
-          <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
-        </th>
         <th style="width: 3rem"></th>
         <th>NAME</th>
-        <th>NAT</th>
+<!--        <th>NAT</th>-->
         <th>TEAM</th>
         <th>POS</th>
         <th>OVR</th>
@@ -66,28 +64,16 @@
         <th>DRI</th>
         <th>DEF</th>
         <th>PHY</th>
-        <th>Status</th>
       </tr>
     </ng-template>
 
-    <ng-template pTemplate="body" let-player let-expanded="expanded">
+    <ng-template pTemplate="body" let-player>
       @let playerName = player.commonName || `${player.firstName} ${player.lastName}`;
       @let mainStats = getMainStats(player);
       @let isSelected = isPlayerSelected(player.id);
-      <tr [class.selected-row]="isSelected">
-        <td>
-          <p-tableCheckbox [value]="player"></p-tableCheckbox>
-        </td>
-        <td>
-          <button
-            type="button"
-            pButton
-            pRipple
-            [pRowToggler]="player"
-            [icon]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"
-            class="p-button-text p-button-rounded p-button-plain"
-            aria-label="Toggle row"
-          ></button>
+      <tr [class.selected-row]="isSelected" [class.disabled-row]="isSelected" [pRowToggler]="player">
+        <td (click)="$event.stopPropagation()">
+          <p-tableCheckbox [value]="player" [disabled]="isSelected"></p-tableCheckbox>
         </td>
         <td>
           <div class="player-info">
@@ -100,17 +86,17 @@
             <span class="player-name">{{ playerName }}</span>
           </div>
         </td>
-        <td>
-          <div class="nationality-info">
-            <img
-              [src]="player.nationality.imageUrl"
-              [alt]="player.nationality.label"
-              class="nationality-flag"
-              (error)="onImageError($event)"
-            />
-<!--            <span>{{ player.nationality.label }}</span>-->
-          </div>
-        </td>
+<!--        <td>-->
+<!--          <div class="nationality-info">-->
+<!--            <img-->
+<!--              [src]="player.nationality.imageUrl"-->
+<!--              [alt]="player.nationality.label"-->
+<!--              class="nationality-flag"-->
+<!--              (error)="onImageError($event)"-->
+<!--            />-->
+<!--&lt;!&ndash;            <span>{{ player.nationality.label }}</span>&ndash;&gt;-->
+<!--          </div>-->
+<!--        </td>-->
         <td>
           <div class="team-info">
             <img
@@ -135,18 +121,12 @@
         <td>{{ mainStats.dribbling }}</td>
         <td>{{ mainStats.defending }}</td>
         <td>{{ mainStats.physicality }}</td>
-        <td>
-          <p-tag
-            [value]="isSelected ? 'Selected' : 'Available'"
-            [severity]="isSelected ? 'danger' : 'success'"
-          ></p-tag>
-        </td>
       </tr>
     </ng-template>
 
     <ng-template pTemplate="expandedrow" let-player>
       <tr>
-        <td colspan="13">
+        <td colspan="12">
           <div class="player-details flex">
             <!-- Player Stats Section -->
             <div class="stats-container flex">

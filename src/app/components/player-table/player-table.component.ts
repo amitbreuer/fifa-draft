@@ -10,10 +10,10 @@ import { CardModule } from 'primeng/card';
 import { TagModule } from 'primeng/tag';
 import { ProgressBarModule } from 'primeng/progressbar';
 import { RatingModule } from 'primeng/rating';
+import { SpeedDialModule } from 'primeng/speeddial';
 import { Player, AVAILABLE_POSITIONS, PositionFilter, mainStatsMap, MainStats } from '../../types';
 import { PlayerService } from '../../services/player.service';
 import { DraftService } from '../../services/draft.service';
-import { Ripple } from 'primeng/ripple';
 import { RatingSeverityPipe } from '../../pipes/rating-severity.pipe';
 import { StatSeverityPipe } from '../../pipes/stat-severity.pipe';
 import { StatNamePipe } from '../../pipes/stat-name.pipe';
@@ -33,11 +33,11 @@ import { MainStatNamePipe } from '../../pipes/main-stat-name.pipe';
     TagModule,
     ProgressBarModule,
     RatingModule,
+    SpeedDialModule,
     RatingSeverityPipe,
     StatSeverityPipe,
     StatNamePipe,
     MainStatNamePipe,
-    Ripple
   ],
   templateUrl: './player-table.component.html',
   styleUrl: './player-table.component.scss'
@@ -83,6 +83,10 @@ export class PlayerTableComponent implements OnInit, OnDestroy {
     this.updateFilteredPlayers();
   }
 
+  onSelectionChange(event: Player[]): void {
+    this.selectedPlayers = event;
+  }
+
   private updateFilteredPlayers(): void {
     this.filteredPlayers = this.playerService.getFilteredPlayers(
       this.selectedPosition,
@@ -100,7 +104,22 @@ export class PlayerTableComponent implements OnInit, OnDestroy {
     });
 
     this.selectedPlayers = [];
+    this.scrollToField();
   }
+
+  private scrollToField(): void {
+    // Scroll to the field component
+    setTimeout(() => {
+      const fieldElement = document.querySelector('app-field');
+      if (fieldElement) {
+        fieldElement.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start'
+        });
+      }
+    }, 100);
+  }
+
 
   isPlayerSelected(playerId: number): boolean {
     return this.playerService.isPlayerSelected(playerId);
