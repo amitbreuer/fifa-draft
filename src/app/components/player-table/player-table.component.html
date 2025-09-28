@@ -53,16 +53,24 @@
           <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
         </th>
         <th style="width: 3rem"></th>
-        <th>Name</th>
-        <th>Rating</th>
-        <th>Position</th>
-        <th>Team</th>
+        <th>NAME</th>
+        <th>NAT</th>
+        <th>TEAM</th>
+        <th>POS</th>
+        <th>OVR</th>
+        <th>PAC</th>
+        <th>SHO</th>
+        <th>PAS</th>
+        <th>DRI</th>
+        <th>DEF</th>
+        <th>PHY</th>
         <th>Status</th>
       </tr>
     </ng-template>
 
     <ng-template pTemplate="body" let-player let-expanded="expanded">
       @let playerName = player.commonName || `${player.firstName} ${player.lastName}`;
+      @let mainStats = getMainStats(player);
       <tr [class.selected-row]="isPlayerSelected(player.id)">
         <td>
           <p-tableCheckbox [value]="player"></p-tableCheckbox>
@@ -90,12 +98,16 @@
           </div>
         </td>
         <td>
-          <p-tag
-            [value]="player.overallRating.toString()"
-            [severity]="getRatingSeverity(player.overallRating)"
-          ></p-tag>
+          <div class="nationality-info">
+            <img
+              [src]="player.nationality.imageUrl"
+              [alt]="player.nationality.label"
+              class="nationality-flag"
+              (error)="onImageError($event)"
+            />
+<!--            <span>{{ player.nationality.label }}</span>-->
+          </div>
         </td>
-        <td>{{ player.position.shortLabel }}</td>
         <td>
           <div class="team-info">
             <img
@@ -104,9 +116,22 @@
               class="team-logo"
               (error)="onImageError($event)"
             />
-            <span>{{ player.team.label }}</span>
+            <!--            <span>{{ player.team.label }}</span>-->
           </div>
         </td>
+        <td>{{ player.position.shortLabel }}</td>
+        <td>
+          <p-tag
+            [value]="player.overallRating.toString()"
+            [severity]="getRatingSeverity(player.overallRating)"
+          ></p-tag>
+        </td>
+        <td>{{ mainStats.pace }}</td>
+        <td>{{ mainStats.shooting }}</td>
+        <td>{{ mainStats.passing }}</td>
+        <td>{{ mainStats.dribbling }}</td>
+        <td>{{ mainStats.defending }}</td>
+        <td>{{ mainStats.physicality }}</td>
         <td>
           <p-tag
             [value]="isPlayerSelected(player.id) ? 'Selected' : 'Available'"
@@ -118,7 +143,7 @@
 
     <ng-template pTemplate="expandedrow" let-player>
       <tr>
-        <td colspan="7">
+        <td colspan="13">
           <div class="player-details">
             <div class="details-grid">
               <!-- Player Stats Section -->

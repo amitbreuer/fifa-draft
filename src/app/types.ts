@@ -73,3 +73,14 @@ export interface FieldPosition {
 
 export const AVAILABLE_POSITIONS = ['GK', 'RB', 'CB', 'LB', 'CDM', 'CM', 'CAM', 'RM', 'LM', 'RW', 'LW', 'ST'] as const;
 export type PositionFilter = typeof AVAILABLE_POSITIONS[number] | 'ALL';
+
+export const mainStatsMap = {
+  pace: ['acceleration', 'sprintSpeed'],
+  shooting: ['positioning', 'finishing', 'shotPower', 'longShots', 'volleys', 'penalties'],
+  passing: ['vision', 'crossing', 'freeKickAccuracy', 'shortPassing', 'longPassing', 'curve'],
+  dribbling: ['agility', 'balance', 'reactions', 'ballControl', 'dribbling', 'composure'],
+  defending: ['interceptions', 'headingAccuracy', 'defensiveAwareness', 'standingTackle', 'slidingTackle'],
+  physicality: ['jumping', 'stamina', 'strength', 'aggression'],
+};
+
+export type MainStats = Record<keyof typeof mainStatsMap, number>;

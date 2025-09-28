@@ -51,13 +51,13 @@
   font-weight: 600;
 }
 
-.team-info {
+.team-info, .nationality-info {
   display: flex;
   align-items: center;
   gap: 0.5rem;
 }
 
-.team-logo {
+.team-logo, .nationality-flag {
   width: 20px;
   height: 20px;
   object-fit: contain;

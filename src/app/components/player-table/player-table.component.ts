@@ -8,7 +8,7 @@ import { SelectModule } from 'primeng/select';
 import { CheckboxModule } from 'primeng/checkbox';
 import { CardModule } from 'primeng/card';
 import { TagModule } from 'primeng/tag';
-import { Player, AVAILABLE_POSITIONS, PositionFilter } from '../../types';
+import { Player, AVAILABLE_POSITIONS, PositionFilter, mainStatsMap, MainStats } from '../../types';
 import { PlayerService } from '../../services/player.service';
 import { DraftService } from '../../services/draft.service';
 import { Ripple } from 'primeng/ripple';
@@ -118,5 +118,24 @@ export class PlayerTableComponent implements OnInit, OnDestroy {
       .replace(/([A-Z])/g, ' $1') // Add space before capital letters
       .replace(/^./, str => str.toUpperCase()) // Capitalize first letter
       .trim();
+  }
+
+  getMainStats(player: Player): MainStats {
+    return Object.entries(mainStatsMap).reduce((mainStats, [mainKey, subKeys]) => {
+      const { sum, count } = subKeys.reduce(
+        (acc, subKey) => {
+          const stat = player.stats[subKey];
+          if (stat && !Number.isNaN(stat.value)) {
+            acc.sum += stat.value;
+            acc.count += 1;
+          }
+          return acc;
+        },
+        { sum: 0, count: 0 }
+      );
+
+      (mainStats as any)[mainKey] = count > 0 ? Math.round(sum / count) : 0;
+      return mainStats;
+    }, {} as MainStats);
   }
 }
