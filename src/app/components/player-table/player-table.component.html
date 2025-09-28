@@ -144,23 +144,34 @@
     <ng-template pTemplate="expandedrow" let-player>
       <tr>
         <td colspan="13">
-          <div class="player-details">
-            <div class="details-grid">
-              <!-- Player Stats Section -->
-              <div class="detail-section">
-                <h4>Player Stats</h4>
-                <div class="stats-grid">
-                  @for (stat of getPlayerStats(player); track stat.key) {
-                    @if (!stat.key.startsWith('gk') || player.position.shortLabel === 'GK') {
-                      <div class="stat-item">
-                        <span class="stat-name">{{ formatStatName(stat.key) }}:</span>
-                        <span class="stat-value">{{ stat.value.value }}</span>
-                      </div>
+          <div class="player-details flex">
+            <!-- Player Stats Section -->
+            <div class="stats-container flex">
+              @let mainStats = getMainStats(player);
+              @for (mainStat of getMainStatsKeys(); track mainStat) {
+                <div class="stat-group">
+                  <div class="main-stat-header">
+                    <span class="main-stat-name">{{ formatMainStatName(mainStat) }}</span>
+                    <span class="main-stat-value">{{ mainStats[mainStat] }}</span>
+                  </div>
+                  <div class="sub-stats">
+                    @for (subStat of getSubStatsForMainStat(mainStat); track subStat) {
+                      @if (!subStat.startsWith('gk') || player.position.shortLabel === 'GK') {
+                        @let statValue = player.stats[subStat]?.value;
+                        @if (statValue !== undefined) {
+                          <div class="sub-stat-item">
+                            <span class="sub-stat-name">{{ formatStatName(subStat) }}</span>
+                            <span class="sub-stat-value">{{ statValue }}</span>
+                          </div>
+                        }
+                      }
                     }
-                  }
+                  </div>
                 </div>
-              </div>
+              }
+            </div>
 
+            <div class="additional-info flex">
               <!-- Alternative Positions Section -->
               <div class="detail-section" *ngIf="player.alternatePositions && player.alternatePositions.length > 0">
                 <h4>Alternative Positions</h4>

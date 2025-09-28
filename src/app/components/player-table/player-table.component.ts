@@ -138,4 +138,16 @@ export class PlayerTableComponent implements OnInit, OnDestroy {
       return mainStats;
     }, {} as MainStats);
   }
+
+  getMainStatsKeys(): (keyof typeof mainStatsMap)[] {
+    return Object.keys(mainStatsMap) as (keyof typeof mainStatsMap)[];
+  }
+
+  getSubStatsForMainStat(mainStat: keyof typeof mainStatsMap): string[] {
+    return mainStatsMap[mainStat];
+  }
+
+  formatMainStatName(statKey: string): string {
+    return statKey.toUpperCase();
+  }
 }
