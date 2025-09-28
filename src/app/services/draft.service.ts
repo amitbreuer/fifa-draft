@@ -175,26 +175,26 @@ export class DraftService {
   }
 
   private initializeFieldPositions(): void {
-    // Initialize field positions in a basic 4-3-3 formation
+    // Initialize field positions in a basic 4-3-3 formation (attack on top)
     const positions: FieldPosition[] = [
-      // Goalkeeper
-      { id: 'gk', x: 50, y: 10, player: undefined },
-
-      // Defense
-      { id: 'rb', x: 80, y: 25, player: undefined },
-      { id: 'cb1', x: 60, y: 25, player: undefined },
-      { id: 'cb2', x: 40, y: 25, player: undefined },
-      { id: 'lb', x: 20, y: 25, player: undefined },
+      // Attack (now at the top)
+      { id: 'rw', x: 75, y: 25, player: undefined },
+      { id: 'st', x: 50, y: 25, player: undefined },
+      { id: 'lw', x: 25, y: 25, player: undefined },
 
       // Midfield
       { id: 'cm1', x: 65, y: 50, player: undefined },
       { id: 'cm2', x: 50, y: 50, player: undefined },
       { id: 'cm3', x: 35, y: 50, player: undefined },
 
-      // Attack
-      { id: 'rw', x: 75, y: 75, player: undefined },
-      { id: 'st', x: 50, y: 75, player: undefined },
-      { id: 'lw', x: 25, y: 75, player: undefined }
+      // Defense (now in the middle)
+      { id: 'rb', x: 80, y: 75, player: undefined },
+      { id: 'cb1', x: 60, y: 75, player: undefined },
+      { id: 'cb2', x: 40, y: 75, player: undefined },
+      { id: 'lb', x: 20, y: 75, player: undefined },
+
+      // Goalkeeper (now at the bottom)
+      { id: 'gk', x: 50, y: 90, player: undefined }
     ];
 
     this.fieldPositionsSubject.next(positions);

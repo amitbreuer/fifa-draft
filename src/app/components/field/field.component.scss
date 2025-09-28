@@ -66,12 +66,24 @@
   border: 3px solid #fff;
   border-radius: 8px;
   overflow: hidden;
+
+  // Drag over effect for field
+  &.drag-over {
+    background-color: rgba(0,122,217,0.1);
+    border-color: #007ad9;
+  }
 }
 
 .field-position {
   position: absolute;
   transform: translate(-50%, -50%);
   z-index: 10;
+}
+
+.free-positioned-player {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  z-index: 15; // Higher than fixed positions
 }
 
 .position-slot {
