@@ -57,20 +57,171 @@
   position: relative;
   width: 100%;
   flex: 1; // Take remaining space in container
-  min-height: 400px; // Minimum height for functionality
-  //background: linear-gradient(to bottom, #4CAF50 0%, #45a049 50%, #4CAF50 100%);
-  background-image:
-    linear-gradient(90deg, rgba(255,255,255,0.1) 50%, transparent 50%),
-    linear-gradient(rgba(255,255,255,0.1) 50%, transparent 50%);
-  background-size: 20px 20px;
+  min-height: 600px; // Minimum height for functionality
+  background:
+    // Grass pattern stripes (horizontal stripes)
+    repeating-linear-gradient(
+      90deg,
+      #2d7a2d 0px,
+      #2d7a2d 40px,
+      #3a8f3a 40px,
+      #3a8f3a 80px
+    );
   border: 3px solid #fff;
-  border-radius: 8px;
+  border-radius: 4px;
   overflow: hidden;
 
   // Drag over effect for field
   &.drag-over {
-    background-color: rgba(0,122,217,0.1);
+    background: repeating-linear-gradient(
+      90deg,
+      rgba(0,122,217,0.3) 0px,
+      rgba(0,122,217,0.3) 40px,
+      rgba(0,122,217,0.4) 40px,
+      rgba(0,122,217,0.4) 80px
+    );
     border-color: #007ad9;
+  }
+}
+
+// Half-way line (horizontal line dividing top and bottom)
+.half-line {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 2px;
+  background: rgba(255,255,255,0.9);
+  transform: translateY(-50%);
+  pointer-events: none;
+  z-index: 1;
+}
+
+// Center circle
+.center-circle {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 20%;
+  aspect-ratio: 1;
+  border: 2px solid rgba(255,255,255,0.9);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  z-index: 1;
+}
+
+// Center spot
+.center-spot {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 8px;
+  height: 8px;
+  background: rgba(255,255,255,0.9);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  z-index: 2;
+}
+
+// Penalty areas (large boxes)
+.penalty-area {
+  position: absolute;
+  left: 50%;
+  width: 50%;
+  height: 20%;
+  border: 2px solid rgba(255,255,255,0.9);
+  transform: translateX(-50%);
+  pointer-events: none;
+  z-index: 1;
+
+  &.top {
+    top: 0;
+    border-top: none;
+  }
+
+  &.bottom {
+    bottom: 0;
+    border-bottom: none;
+  }
+}
+
+// Goal areas (small boxes)
+.goal-area {
+  position: absolute;
+  left: 50%;
+  width: 30%;
+  height: 10%;
+  border: 2px solid rgba(255,255,255,0.9);
+  transform: translateX(-50%);
+  pointer-events: none;
+  z-index: 1;
+
+  &.top {
+    top: 0;
+    border-top: none;
+  }
+
+  &.bottom {
+    bottom: 0;
+    border-bottom: none;
+  }
+}
+
+// Penalty marks
+.penalty-mark {
+  position: absolute;
+  left: 50%;
+  width: 6px;
+  height: 6px;
+  background: rgba(255,255,255,0.9);
+  border-radius: 50%;
+  transform: translateX(-50%);
+  pointer-events: none;
+  z-index: 2;
+
+  &.top {
+    top: 13%;
+  }
+
+  &.bottom {
+    bottom: 13%;
+  }
+}
+
+// Corner arcs
+.corner-arc {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(255,255,255,0.9);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 1;
+
+  &.top-left {
+    top: -10px;
+    left: -10px;
+    clip-path: polygon(50% 50%, 100% 50%, 100% 100%, 50% 100%);
+  }
+
+  &.top-right {
+    top: -10px;
+    right: -10px;
+    clip-path: polygon(0 50%, 50% 50%, 50% 100%, 0 100%);
+  }
+
+  &.bottom-left {
+    bottom: -10px;
+    left: -10px;
+    clip-path: polygon(50% 0, 100% 0, 100% 50%, 50% 50%);
+  }
+
+  &.bottom-right {
+    bottom: -10px;
+    right: -10px;
+    clip-path: polygon(0 0, 50% 0, 50% 50%, 0 50%);
   }
 }
 

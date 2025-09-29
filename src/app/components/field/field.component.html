@@ -7,6 +7,27 @@
       (dragenter)="onDragEnter($event)"
       (dragleave)="onDragLeave($event)"
     >
+      <!-- Field markings -->
+      <div class="half-line"></div>
+      <div class="center-circle"></div>
+      <div class="center-spot"></div>
+
+      <!-- Top goal (left side when horizontal) -->
+      <div class="penalty-area top"></div>
+      <div class="goal-area top"></div>
+      <div class="penalty-mark top"></div>
+
+      <!-- Bottom goal (right side when horizontal) -->
+      <div class="penalty-area bottom"></div>
+      <div class="goal-area bottom"></div>
+      <div class="penalty-mark bottom"></div>
+
+      <!-- Corner arcs -->
+      <div class="corner-arc top-left"></div>
+      <div class="corner-arc top-right"></div>
+      <div class="corner-arc bottom-left"></div>
+      <div class="corner-arc bottom-right"></div>
+
       @for (position of fieldPositions; track position.id) {
       <div
         class="field-position"
