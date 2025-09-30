@@ -69,6 +69,9 @@ export class DraftService {
 
       positions[positionIndex].player = pickedPlayer;
       this.fieldPositionsSubject.next(positions);
+
+      // Clear the current picked player after placement
+      this.currentPickedPlayerSubject.next(null);
     }
   }
 
@@ -85,6 +88,9 @@ export class DraftService {
     if (!pickedPlayer) return;
 
     this.addToBench(pickedPlayer);
+
+    // Clear the current picked player after placement
+    this.currentPickedPlayerSubject.next(null);
   }
 
   undoPlayerPlacement(): void {

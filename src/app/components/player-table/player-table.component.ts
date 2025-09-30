@@ -48,7 +48,7 @@ export class PlayerTableComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
 
   filteredPlayers: Player[] = [];
-  selectedPlayers: Player[] = [];
+  selectedPlayer: Player | null = null;
   selectedPlayerForDialog: Player | null = null;
   showPlayerDialog = false;
 
@@ -91,6 +91,15 @@ export class PlayerTableComponent implements OnInit, OnDestroy {
     ).subscribe(() => {
       this.updateFilteredPlayers();
     });
+
+    // Subscribe to current picked player to clear selection after placement
+    this.draftService.currentPickedPlayer$.pipe(
+      takeUntil(this.destroy$)
+    ).subscribe(pickedPlayer => {
+      if (!pickedPlayer) {
+        this.selectedPlayer = null;
+      }
+    });
   }
 
   ngOnDestroy(): void {
@@ -117,8 +126,11 @@ export class PlayerTableComponent implements OnInit, OnDestroy {
            this.showSelectedPlayers;
   }
 
-  onSelectionChange(event: Player[]): void {
-    this.selectedPlayers = event;
+  onSelectionChange(event: Player | null): void {
+    this.selectedPlayer = event;
+    if (event) {
+      this.draftService.pickPlayer(event);
+    }
   }
 
   private updateFilteredPlayers(): void {
@@ -130,31 +142,6 @@ export class PlayerTableComponent implements OnInit, OnDestroy {
     );
   }
 
-  pickSelectedPlayers(): void {
-    const availablePlayers = this.selectedPlayers.filter(player =>
-      !this.isPlayerSelected(player.id)
-    );
-
-    availablePlayers.forEach(player => {
-      this.draftService.pickPlayer(player);
-    });
-
-    this.selectedPlayers = [];
-    this.scrollToField();
-  }
-
-  private scrollToField(): void {
-    // Scroll to the field component
-    setTimeout(() => {
-      const fieldElement = document.querySelector('app-field');
-      if (fieldElement) {
-        fieldElement.scrollIntoView({
-          behavior: 'smooth',
-          block: 'start'
-        });
-      }
-    }, 100);
-  }
 
 
   isPlayerSelected(playerId: number): boolean {
@@ -193,7 +180,9 @@ export class PlayerTableComponent implements OnInit, OnDestroy {
     return mainStatsMap[mainStat];
   }
 
-  onRowClick(player: Player): void {
+  onRowClick(player: Player, event: Event): void {
+    // Open dialog but don't interfere with selection
+    event.stopPropagation();
     this.selectedPlayerForDialog = player;
     this.showPlayerDialog = true;
   }

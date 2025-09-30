@@ -1,15 +1,4 @@
 <p-card class="player-table-card">
-  @if (selectedPlayers.length > 0 && !showSelectedPlayers) {
-  <div class="pick-controls">
-    <p-button
-      label="Pick Selected Players ({{selectedPlayers.length}})"
-      icon="pi pi-check"
-      (onClick)="pickSelectedPlayers()"
-      class="p-button-success"
-    ></p-button>
-  </div>
-  }
-
   <p-table
     [value]="filteredPlayers"
     [paginator]="true"
@@ -18,10 +7,9 @@
     currentPageReportTemplate="Showing {first} to {last} of {totalRecords} players"
     [rowsPerPageOptions]="[25, 50, 100]"
     dataKey="id"
-    [(selection)]="selectedPlayers"
+    [(selection)]="selectedPlayer"
     (selectionChange)="onSelectionChange($event)"
-    selectionMode="multiple"
-    [metaKeySelection]="false"
+    selectionMode="single"
     class="p-datatable-striped"
   >
     <ng-template pTemplate="header">
@@ -105,11 +93,11 @@
     <ng-template pTemplate="body" let-player>
       @let playerName = player.commonName || `${player.firstName} ${player.lastName}`;
       @let mainStats = getMainStats(player);
-      <tr (click)="onRowClick(player)" style="cursor: pointer;">
-        <td (click)="$event.stopPropagation()">
-          <p-tableCheckbox [value]="player"></p-tableCheckbox>
-        </td>
+      <tr style="cursor: pointer;">
         <td>
+          <p-tableRadioButton [value]="player" ></p-tableRadioButton>
+        </td>
+        <td (click)="onRowClick(player, $event)">
           <div class="player-info">
             <img
               [src]="player.shieldUrl"
