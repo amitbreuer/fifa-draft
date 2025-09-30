@@ -87,6 +87,13 @@ export class DraftService {
     const pickedPlayer = this.currentPickedPlayerSubject.value;
     if (!pickedPlayer) return;
 
+    // Check if bench is full (max 7 players)
+    const currentBench = this.benchPlayersSubject.value;
+    if (currentBench.length >= 7) {
+      console.warn('Bench is full. Cannot add more than 7 players.');
+      return;
+    }
+
     this.addToBench(pickedPlayer);
 
     // Clear the current picked player after placement

@@ -99,8 +99,14 @@ export class FieldComponent implements OnInit, OnDestroy {
     this.draftService.placePlayerOnBench();
   }
 
-  undoPlacement(): void {
-    this.draftService.undoPlayerPlacement();
+  onBenchClick(): void {
+    if (this.canPlacePlayer() && !this.isBenchFull()) {
+      this.placeOnBench();
+    }
+  }
+
+  isBenchFull(): boolean {
+    return this.benchPlayers.length >= 7;
   }
 
   getPlayerNumber(player: Player): string {
@@ -206,6 +212,12 @@ export class FieldComponent implements OnInit, OnDestroy {
     }
 
     if (!this.draggedPlayer) return;
+
+    // Check if bench is full (max 7 players) and dragging from field
+    if (this.isBenchFull() && !this.draggedFromBench) {
+      console.warn('Bench is full. Cannot add more than 7 players.');
+      return;
+    }
 
     // Remove player from original position
     this.removePlayerFromOriginalPosition();

@@ -89,8 +89,25 @@
   </div>
 </p-card>
 
-<p-card header="Bench" class="bench-card">
-  <div class="bench-container">
+<p-card class="bench-card">
+  <ng-template pTemplate="header">
+    <div class="bench-header">
+      <span>Bench</span>
+      <p-tag [value]="benchPlayers.length + '/7'" [severity]="isBenchFull() ? 'danger' : 'info'"></p-tag>
+    </div>
+  </ng-template>
+
+  <div
+    class="bench-container"
+    (click)="onBenchClick()"
+    (drop)="onDropToBench($event)"
+    (dragover)="onDragOver($event)"
+    (dragenter)="onDragEnter($event)"
+    (dragleave)="onDragLeave($event)"
+    [class.drag-over]="isDragOverBench"
+    [class.can-place]="canPlacePlayer() && !isBenchFull()"
+    [class.bench-full]="isBenchFull()"
+  >
     <div class="bench-slots">
       @for (player of benchPlayers; track trackByPlayerId($index, player)) {
       <div
@@ -98,6 +115,7 @@
         draggable="true"
         (dragstart)="onDragStart($event, player, true)"
         (dragend)="onDragEnd($event)"
+        (click)="$event.stopPropagation()"
       >
         @let playerName = player.commonName || `${player.firstName} ${player.lastName}`;
         <div class="player-item">
@@ -116,48 +134,13 @@
       </div>
       }
 
-      <div
-        class="bench-drop-zone"
-        (drop)="onDropToBench($event)"
-        (dragover)="onDragOver($event)"
-        (dragenter)="onDragEnter($event)"
-        (dragleave)="onDragLeave($event)"
-        [class.drag-over]="isDragOverBench"
-      >
+      @if (benchPlayers.length === 0) {
+      <div class="bench-empty-state">
         <i class="pi pi-users"></i>
-        <span>Drop players here for bench</span>
+        <span>Click here to add players to bench</span>
       </div>
+      }
     </div>
   </div>
 </p-card>
 
-@if (currentPickedPlayer) {
-<div class="field-actions">
-  @let playerName = currentPickedPlayer.commonName || `${currentPickedPlayer.firstName} ${currentPickedPlayer.lastName}`;
-  <p-card header="Current Pick" class="current-pick-card">
-    <div class="current-pick-info">
-      <div class="picked-player">
-        <strong>{{ playerName }}</strong>
-        <p-tag
-          [value]="currentPickedPlayer.overallRating.toString()"
-          severity="info"
-        ></p-tag>
-      </div>
-      <div class="pick-actions">
-        <p-button
-          label="Place on Bench"
-          icon="pi pi-users"
-          (onClick)="placeOnBench()"
-          class="p-button-secondary"
-        ></p-button>
-        <p-button
-          label="Undo"
-          icon="pi pi-undo"
-          (onClick)="undoPlacement()"
-          class="p-button-warning"
-        ></p-button>
-      </div>
-    </div>
-  </p-card>
-</div>
-}

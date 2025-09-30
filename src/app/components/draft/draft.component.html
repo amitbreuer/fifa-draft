@@ -23,6 +23,14 @@
 
         <div class="turn-actions">
           <p-button
+            label="Undo"
+            icon="pi pi-undo"
+            [disabled]="!canUndo()"
+            (onClick)="undoPlacement()"
+            class="p-button-secondary"
+          ></p-button>
+
+          <p-button
             label="Finish Turn"
             icon="pi pi-check"
             [disabled]="!canFinishTurn()"

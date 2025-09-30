@@ -94,6 +94,14 @@ export class DraftComponent implements OnInit, OnDestroy {
     return this.currentPickedPlayer !== null;
   }
 
+  canUndo(): boolean {
+    return this.currentPickedPlayer !== null;
+  }
+
+  undoPlacement(): void {
+    this.draftService.undoPlayerPlacement();
+  }
+
   finishTurn(): void {
     if (!this.canFinishTurn()) return;
 

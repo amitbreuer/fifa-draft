@@ -52,6 +52,16 @@
   margin-bottom: 1rem;
 }
 
+.bench-header {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 1rem;
+  width: 100%;
+  font-weight: 600;
+  padding: 0.5rem 1rem;
+}
+
 .current-pick-card {
   flex: 0 0 auto; // Don't grow or shrink, auto height
 }
@@ -349,6 +359,27 @@
 
 .bench-container {
   min-height: 120px;
+  padding: 1rem;
+  border: 2px dashed #ccc;
+  border-radius: 8px;
+  transition: all 0.2s;
+  cursor: pointer;
+
+  &.drag-over {
+    border-color: #007ad9;
+    background-color: rgba(0,122,217,0.1);
+  }
+
+  &.can-place:hover {
+    border-color: #007ad9;
+    background-color: rgba(0,122,217,0.05);
+  }
+
+  &.bench-full {
+    border-color: #dc3545;
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
 }
 
 .bench-slots {
@@ -360,28 +391,27 @@
 
 .bench-player {
   flex-shrink: 0;
+  cursor: grab;
+
+  &:active {
+    cursor: grabbing;
+  }
 }
 
-.bench-drop-zone {
-  min-width: 120px;
-  min-height: 80px;
-  border: 2px dashed #ccc;
-  border-radius: 8px;
+.bench-empty-state {
+  width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: 0.5rem;
   color: #666;
-  font-size: 12px;
-  text-align: center;
-  transition: all 0.2s;
-  cursor: pointer;
-}
+  font-size: 14px;
+  padding: 0.8rem;
 
-.bench-drop-zone.drag-over {
-  border-color: #007ad9;
-  background-color: rgba(0,122,217,0.1);
-  color: #007ad9;
+  i {
+    font-size: 2rem;
+  }
 }
 
 .field-actions {
