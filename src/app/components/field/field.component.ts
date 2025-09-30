@@ -30,11 +30,10 @@ export class FieldComponent implements OnInit, OnDestroy {
   fieldPositions: FieldPosition[] = [];
   benchPlayers: Player[] = [];
   currentPickedPlayer: Player | null = null;
-  freePositionedPlayers: { player: Player, x: number, y: number }[] = [];
 
   private draggedPlayer: Player | null = null;
   private draggedFromPosition: string | null = null;
-  private draggedFromFreePosition = false;
+  private draggedFromBench = false;
   isDragOverBench = false;
 
   // Formation dropdown
@@ -120,16 +119,13 @@ export class FieldComponent implements OnInit, OnDestroy {
   }
 
   // Drag and Drop handlers
-  onDragStart(event: DragEvent, player: Player): void {
+  onDragStart(event: DragEvent, player: Player, fromBench: boolean = false): void {
     this.draggedPlayer = player;
+    this.draggedFromBench = fromBench;
 
     // Find if player is on field position
     const fieldPosition = this.fieldPositions.find(pos => pos.player?.id === player.id);
     this.draggedFromPosition = fieldPosition ? fieldPosition.id : null;
-
-    // Check if player is in free position
-    const freePositionIndex = this.freePositionedPlayers.findIndex(fp => fp.player.id === player.id);
-    this.draggedFromFreePosition = freePositionIndex !== -1;
 
     if (event.dataTransfer) {
       event.dataTransfer.effectAllowed = 'move';
@@ -140,7 +136,7 @@ export class FieldComponent implements OnInit, OnDestroy {
   onDragEnd(event: DragEvent): void {
     this.draggedPlayer = null;
     this.draggedFromPosition = null;
-    this.draggedFromFreePosition = false;
+    this.draggedFromBench = false;
     this.isDragOverBench = false;
   }
 
@@ -173,16 +169,30 @@ export class FieldComponent implements OnInit, OnDestroy {
 
     if (!this.draggedPlayer) return;
 
-    // Remove player from original position
-    this.removePlayerFromOriginalPosition();
-
-    // Place player in new position
+    // Find target position
     const targetPosition = this.fieldPositions.find(pos => pos.id === positionId);
-    if (targetPosition) {
-      // If target position has a player, move them to bench
-      if (targetPosition.player) {
-        this.draftService.addToBench(targetPosition.player);
+    if (!targetPosition) return;
+
+    const targetPlayer = targetPosition.player;
+
+    // If dragging from one field position to another (swap scenario)
+    if (this.draggedFromPosition && targetPlayer) {
+      // Swap: put target player in the dragged player's original position
+      const originalPosition = this.fieldPositions.find(pos => pos.id === this.draggedFromPosition);
+      if (originalPosition) {
+        originalPosition.player = targetPlayer;
+        targetPosition.player = this.draggedPlayer;
       }
+    } else {
+      // Remove player from original position (bench or empty position)
+      this.removePlayerFromOriginalPosition();
+
+      // If target position has a player and we're dragging from bench, move target to bench
+      if (targetPlayer && this.draggedFromBench) {
+        this.draftService.addToBench(targetPlayer);
+      }
+
+      // Place dragged player in target position
       targetPosition.player = this.draggedPlayer;
     }
   }
@@ -204,33 +214,6 @@ export class FieldComponent implements OnInit, OnDestroy {
     this.draftService.addToBench(this.draggedPlayer);
   }
 
-  // Free positioning on field
-  onFieldDrop(event: DragEvent): void {
-    event.preventDefault();
-
-    if (!this.draggedPlayer) return;
-
-    const fieldElement = event.currentTarget as HTMLElement;
-    const rect = fieldElement.getBoundingClientRect();
-
-    // Calculate relative position within the field (as percentages)
-    const x = ((event.clientX - rect.left) / rect.width) * 100;
-    const y = ((event.clientY - rect.top) / rect.height) * 100;
-
-    // Remove player from original positions
-    this.removePlayerFromOriginalPosition();
-
-    // Add or update player in free position
-    const existingIndex = this.freePositionedPlayers.findIndex(fp => fp.player.id === this.draggedPlayer!.id);
-    if (existingIndex !== -1) {
-      // Update existing position
-      this.freePositionedPlayers[existingIndex] = { player: this.draggedPlayer, x, y };
-    } else {
-      // Add new free position
-      this.freePositionedPlayers.push({ player: this.draggedPlayer, x, y });
-    }
-  }
-
   private removePlayerFromOriginalPosition(): void {
     if (!this.draggedPlayer) return;
 
@@ -243,16 +226,10 @@ export class FieldComponent implements OnInit, OnDestroy {
     }
 
     // Remove from bench
-    const benchIndex = this.benchPlayers.findIndex(p => p.id === this.draggedPlayer!.id);
-    if (benchIndex !== -1) {
-      this.benchPlayers.splice(benchIndex, 1);
-    }
-
-    // Remove from free positions if dragging from there
-    if (this.draggedFromFreePosition) {
-      const freeIndex = this.freePositionedPlayers.findIndex(fp => fp.player.id === this.draggedPlayer!.id);
-      if (freeIndex !== -1) {
-        this.freePositionedPlayers.splice(freeIndex, 1);
+    if (this.draggedFromBench) {
+      const benchIndex = this.benchPlayers.findIndex(p => p.id === this.draggedPlayer!.id);
+      if (benchIndex !== -1) {
+        this.benchPlayers.splice(benchIndex, 1);
       }
     }
   }

@@ -14,13 +14,7 @@
   </div>
 
   <div class="field-container">
-    <div
-      class="field-pitch"
-      (drop)="onFieldDrop($event)"
-      (dragover)="onDragOver($event)"
-      (dragenter)="onDragEnter($event)"
-      (dragleave)="onDragLeave($event)"
-    >
+    <div class="field-pitch">
       <!-- Field markings -->
       <div class="half-line"></div>
       <div class="center-circle"></div>
@@ -57,8 +51,12 @@
           <div
             class="player-item"
             draggable="true"
-            (dragstart)="onDragStart($event, position.player)"
+            (dragstart)="onDragStart($event, position.player, false)"
             (dragend)="onDragEnd($event)"
+            (drop)="onDrop($event, position.id)"
+            (dragover)="onDragOver($event)"
+            (dragenter)="onDragEnter($event)"
+            (dragleave)="onDragLeave($event)"
           >
             <div class="player-shirt">
               <img
@@ -87,35 +85,6 @@
         </div>
       </div>
       }
-
-      <!-- Freely positioned players -->
-      @for (freePlayer of freePositionedPlayers; track freePlayer.player.id) {
-      @let playerName = freePlayer.player.commonName || `${freePlayer.player.firstName} ${freePlayer.player.lastName}`;
-      <div
-        class="free-positioned-player"
-        [style.left.%]="freePlayer.x"
-        [style.top.%]="freePlayer.y"
-      >
-        <div
-          class="player-item"
-          draggable="true"
-          (dragstart)="onDragStart($event, freePlayer.player)"
-          (dragend)="onDragEnd($event)"
-        >
-          <div class="player-shirt">
-            <img
-              src="assets/images/shirt.svg"
-              alt="Player shirt"
-              class="shirt-image"
-              (error)="onShirtImageError($event)"
-            />
-            <span class="player-number">{{ getPlayerNumber(freePlayer.player) }}</span>
-          </div>
-          <div class="player-name">{{ playerName }}</div>
-          <div class="player-rating">{{ freePlayer.player.overallRating }}</div>
-        </div>
-      </div>
-      }
     </div>
   </div>
 </p-card>
@@ -127,7 +96,7 @@
       <div
         class="bench-player"
         draggable="true"
-        (dragstart)="onDragStart($event, player)"
+        (dragstart)="onDragStart($event, player, true)"
         (dragend)="onDragEnd($event)"
       >
         @let playerName = player.commonName || `${player.firstName} ${player.lastName}`;
