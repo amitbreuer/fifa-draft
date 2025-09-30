@@ -34,6 +34,19 @@
   }
 }
 
+.formation-selector {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  padding: 0.5rem 0;
+
+  label {
+    font-weight: 600;
+    color: var(--text-color);
+  }
+}
+
 .bench-card {
   flex: 0 0 auto; // Don't grow or shrink, auto height
   margin-bottom: 1rem;

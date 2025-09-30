@@ -1,4 +1,18 @@
 <p-card header="Team Formation" class="field-card">
+  <div class="formation-selector">
+    <label for="formation">Formation:</label>
+    <p-select
+      id="formation"
+      [options]="formations"
+      [(ngModel)]="selectedFormation"
+      (onChange)="onFormationChange()"
+      optionLabel="label"
+      optionValue="value"
+      placeholder="Select Formation"
+      [style]="{'width': '250px'}"
+    ></p-select>
+  </div>
+
   <div class="field-container">
     <div
       class="field-pitch"

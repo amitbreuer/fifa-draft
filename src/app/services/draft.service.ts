@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
-import { DraftSettings, DraftManager, Player, FieldPosition } from '../types';
+import { DraftSettings, DraftManager, Player, FieldPosition, FORMATIONS, FormationName, POSITION_COORDINATES } from '../types';
 import { PlayerService } from './player.service';
 
 @Injectable({
@@ -11,11 +11,13 @@ export class DraftService {
   private currentPickedPlayerSubject = new BehaviorSubject<Player | null>(null);
   private fieldPositionsSubject = new BehaviorSubject<FieldPosition[]>([]);
   private benchPlayersSubject = new BehaviorSubject<Player[]>([]);
+  private currentFormationSubject = new BehaviorSubject<FormationName>('4-3-3 Flat');
 
   draftSettings$ = this.draftSettingsSubject.asObservable();
   currentPickedPlayer$ = this.currentPickedPlayerSubject.asObservable();
   fieldPositions$ = this.fieldPositionsSubject.asObservable();
   benchPlayers$ = this.benchPlayersSubject.asObservable();
+  currentFormation$ = this.currentFormationSubject.asObservable();
 
   constructor(private playerService: PlayerService) {
     this.initializeFieldPositions();
@@ -175,29 +177,72 @@ export class DraftService {
   }
 
   private initializeFieldPositions(): void {
-    // Initialize field positions in a basic 4-3-3 formation (attack on top)
-    const positions: FieldPosition[] = [
-      // Attack (now at the top)
-      { id: 'rw', x: 75, y: 25, player: undefined },
-      { id: 'st', x: 50, y: 25, player: undefined },
-      { id: 'lw', x: 25, y: 25, player: undefined },
+    const formation = this.currentFormationSubject.value;
+    this.setFormation(formation);
+  }
 
-      // Midfield
-      { id: 'cm1', x: 65, y: 50, player: undefined },
-      { id: 'cm2', x: 50, y: 50, player: undefined },
-      { id: 'cm3', x: 35, y: 50, player: undefined },
+  setFormation(formationName: FormationName): void {
+    const positions = FORMATIONS[formationName];
+    const currentPositions = this.fieldPositionsSubject.value;
 
-      // Defense (now in the middle)
-      { id: 'rb', x: 80, y: 75, player: undefined },
-      { id: 'cb1', x: 60, y: 75, player: undefined },
-      { id: 'cb2', x: 40, y: 75, player: undefined },
-      { id: 'lb', x: 20, y: 75, player: undefined },
+    // Create a map of existing players by position type
+    const existingPlayers = new Map<string, Player>();
+    currentPositions.forEach(pos => {
+      if (pos.player) {
+        const positionLabel = pos.id.toUpperCase().replace(/\d+$/, '');
+        existingPlayers.set(pos.id, pos.player);
+      }
+    });
 
-      // Goalkeeper (now at the bottom)
-      { id: 'gk', x: 50, y: 90, player: undefined }
-    ];
+    // Create new field positions based on the formation
+    const newFieldPositions: FieldPosition[] = [];
+    const positionCounts = new Map<string, number>();
 
-    this.fieldPositionsSubject.next(positions);
+    positions.forEach((positionType, index) => {
+      const count = positionCounts.get(positionType) || 0;
+      const positionId = count === 0 ? positionType.toLowerCase() : `${positionType.toLowerCase()}_${count}`;
+      positionCounts.set(positionType, count + 1);
+
+      const baseCoords = POSITION_COORDINATES[positionType];
+
+      // Calculate position with slight adjustments for multiple players in same position
+      let x = baseCoords.x;
+      let y = baseCoords.y;
+
+      // Count how many of this position type we've seen so far (for spacing)
+      const positionsProcessedSoFar = positions.slice(0, index + 1).filter(p => p === positionType).length;
+      const totalSamePositions = positions.filter(p => p === positionType).length;
+
+      // Adjust x coordinate for multiple positions of the same type
+      if (totalSamePositions > 1) {
+        const currentIndex = positionsProcessedSoFar - 1;
+
+        if (totalSamePositions === 2) {
+          x = baseCoords.x + (currentIndex === 0 ? -12 : 12);
+        } else if (totalSamePositions === 3) {
+          x = baseCoords.x + (currentIndex === 0 ? -18 : currentIndex === 1 ? 0 : 18);
+        } else if (totalSamePositions === 4) {
+          x = baseCoords.x + (currentIndex * 12 - 18);
+        }
+      }
+
+      newFieldPositions.push({
+        id: positionId,
+        x,
+        y,
+        player: undefined
+      });
+    });
+
+    this.currentFormationSubject.next(formationName);
+    this.fieldPositionsSubject.next(newFieldPositions);
+  }
+
+  getAvailableFormations(): { name: FormationName; label: string }[] {
+    return Object.keys(FORMATIONS).map(name => ({
+      name: name as FormationName,
+      label: name
+    }));
   }
 
   isDraftComplete(): boolean {

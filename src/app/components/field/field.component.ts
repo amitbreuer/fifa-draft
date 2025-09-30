@@ -1,10 +1,12 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { Subject, takeUntil } from 'rxjs';
 import { CardModule } from 'primeng/card';
 import { ButtonModule } from 'primeng/button';
 import { TagModule } from 'primeng/tag';
-import { Player, FieldPosition } from '../../types';
+import { SelectModule } from 'primeng/select';
+import { Player, FieldPosition, FormationName, FORMATIONS } from '../../types';
 import { DraftService } from '../../services/draft.service';
 import { PlayerService } from '../../services/player.service';
 
@@ -13,9 +15,11 @@ import { PlayerService } from '../../services/player.service';
   standalone: true,
   imports: [
     CommonModule,
+    FormsModule,
     CardModule,
     ButtonModule,
-    TagModule
+    TagModule,
+    SelectModule
   ],
   templateUrl: './field.component.html',
   styleUrl: './field.component.scss'
@@ -33,10 +37,19 @@ export class FieldComponent implements OnInit, OnDestroy {
   private draggedFromFreePosition = false;
   isDragOverBench = false;
 
+  // Formation dropdown
+  selectedFormation: FormationName = '4-3-3 Flat';
+  formations: { label: string; value: FormationName }[] = [];
+
   constructor(
     private draftService: DraftService,
     private playerService: PlayerService
-  ) {}
+  ) {
+    this.formations = Object.keys(FORMATIONS).map(key => ({
+      label: key,
+      value: key as FormationName
+    }));
+  }
 
   ngOnInit(): void {
     // Subscribe to field positions
@@ -58,6 +71,13 @@ export class FieldComponent implements OnInit, OnDestroy {
       takeUntil(this.destroy$)
     ).subscribe(player => {
       this.currentPickedPlayer = player;
+    });
+
+    // Subscribe to current formation
+    this.draftService.currentFormation$.pipe(
+      takeUntil(this.destroy$)
+    ).subscribe(formation => {
+      this.selectedFormation = formation;
     });
   }
 
@@ -90,20 +110,9 @@ export class FieldComponent implements OnInit, OnDestroy {
   }
 
   getPositionLabel(positionId: string): string {
-    const labels: { [key: string]: string } = {
-      'gk': 'GK',
-      'rb': 'RB',
-      'cb1': 'CB',
-      'cb2': 'CB',
-      'lb': 'LB',
-      'cm1': 'CM',
-      'cm2': 'CM',
-      'cm3': 'CM',
-      'rw': 'RW',
-      'st': 'ST',
-      'lw': 'LW'
-    };
-    return labels[positionId] || positionId.toUpperCase();
+    // Extract the base position type (remove _0, _1, etc suffixes)
+    const basePosition = positionId.replace(/_\d+$/, '').toUpperCase();
+    return basePosition;
   }
 
   trackByPlayerId(index: number, player: Player): number {
@@ -266,5 +275,9 @@ export class FieldComponent implements OnInit, OnDestroy {
       `;
       parent.appendChild(fallback);
     }
+  }
+
+  onFormationChange(): void {
+    this.draftService.setFormation(this.selectedFormation);
   }
 }
