@@ -93,9 +93,15 @@
     <ng-template pTemplate="body" let-player>
       @let playerName = player.commonName || `${player.firstName} ${player.lastName}`;
       @let mainStats = getMainStats(player);
-      <tr style="cursor: pointer;">
+      <tr
+        [class.disabled-row]="isPlayerPlacedThisTurn(player.id)"
+        style="cursor: pointer;"
+      >
         <td>
-          <p-tableRadioButton [value]="player" ></p-tableRadioButton>
+          <p-tableRadioButton
+            [value]="player"
+            [disabled]="isPlayerPlacedThisTurn(player.id)"
+          ></p-tableRadioButton>
         </td>
         <td (click)="onRowClick(player, $event)">
           <div class="player-info">

@@ -38,6 +38,7 @@ export class DraftComponent implements OnInit, OnDestroy {
 
   draftSettings: DraftSettings | null = null;
   currentPickedPlayer: Player | null = null;
+  hasPlacedPlayerThisTurn = false;
 
   constructor(
     private draftService: DraftService,
@@ -70,6 +71,13 @@ export class DraftComponent implements OnInit, OnDestroy {
     ).subscribe(player => {
       this.currentPickedPlayer = player;
     });
+
+    // Subscribe to placement status
+    this.draftService.hasPlacedPlayerThisTurn$.pipe(
+      takeUntil(this.destroy$)
+    ).subscribe(hasPlaced => {
+      this.hasPlacedPlayerThisTurn = hasPlaced;
+    });
   }
 
   ngOnDestroy(): void {
@@ -91,11 +99,11 @@ export class DraftComponent implements OnInit, OnDestroy {
   }
 
   canFinishTurn(): boolean {
-    return this.currentPickedPlayer !== null;
+    return this.hasPlacedPlayerThisTurn;
   }
 
   canUndo(): boolean {
-    return this.currentPickedPlayer !== null;
+    return this.hasPlacedPlayerThisTurn;
   }
 
   undoPlacement(): void {
@@ -104,17 +112,7 @@ export class DraftComponent implements OnInit, OnDestroy {
 
   finishTurn(): void {
     if (!this.canFinishTurn()) return;
-
-    this.confirmationService.confirm({
-      message: `Finish turn for ${this.getCurrentManagerName()}?`,
-      header: 'Confirm Turn',
-      icon: 'pi pi-question-circle',
-      accept: () => {
-        // Mark the player as selected before finishing the turn
-        this.playerService.selectPlayer(this.currentPickedPlayer!.id);
-        this.draftService.finishTurn();
-      }
-    });
+    this.draftService.finishTurn();
   }
 
   confirmFinishDraft(): void {

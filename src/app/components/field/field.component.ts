@@ -175,31 +175,12 @@ export class FieldComponent implements OnInit, OnDestroy {
 
     if (!this.draggedPlayer) return;
 
-    // Find target position
-    const targetPosition = this.fieldPositions.find(pos => pos.id === positionId);
-    if (!targetPosition) return;
-
-    const targetPlayer = targetPosition.player;
-
-    // If dragging from one field position to another (swap scenario)
-    if (this.draggedFromPosition && targetPlayer) {
-      // Swap: put target player in the dragged player's original position
-      const originalPosition = this.fieldPositions.find(pos => pos.id === this.draggedFromPosition);
-      if (originalPosition) {
-        originalPosition.player = targetPlayer;
-        targetPosition.player = this.draggedPlayer;
-      }
-    } else {
-      // Remove player from original position (bench or empty position)
-      this.removePlayerFromOriginalPosition();
-
-      // If target position has a player and we're dragging from bench, move target to bench
-      if (targetPlayer && this.draggedFromBench) {
-        this.draftService.addToBench(targetPlayer);
-      }
-
-      // Place dragged player in target position
-      targetPosition.player = this.draggedPlayer;
+    // If dragging from one field position to another
+    if (this.draggedFromPosition) {
+      this.draftService.swapFieldPositions(this.draggedFromPosition, positionId);
+    } else if (this.draggedFromBench) {
+      // Dragging from bench to field
+      this.draftService.movePlayerFromBenchToField(this.draggedPlayer, positionId);
     }
   }
 
@@ -213,17 +194,11 @@ export class FieldComponent implements OnInit, OnDestroy {
 
     if (!this.draggedPlayer) return;
 
-    // Check if bench is full (max 7 players) and dragging from field
-    if (this.isBenchFull() && !this.draggedFromBench) {
-      console.warn('Bench is full. Cannot add more than 7 players.');
-      return;
+    // Only handle dragging from field to bench
+    if (this.draggedFromPosition) {
+      this.draftService.movePlayerFromFieldToBench(this.draggedPlayer, this.draggedFromPosition);
     }
-
-    // Remove player from original position
-    this.removePlayerFromOriginalPosition();
-
-    // Add to bench
-    this.draftService.addToBench(this.draggedPlayer);
+    // Dragging from bench to bench does nothing (player stays on bench)
   }
 
   private removePlayerFromOriginalPosition(): void {

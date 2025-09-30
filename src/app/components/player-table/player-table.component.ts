@@ -51,6 +51,7 @@ export class PlayerTableComponent implements OnInit, OnDestroy {
   selectedPlayer: Player | null = null;
   selectedPlayerForDialog: Player | null = null;
   showPlayerDialog = false;
+  placedPlayerIdsThisTurn: Set<number> = new Set();
 
   selectedPosition: PositionFilter = 'ALL';
   selectedTeamId: number | null = null;
@@ -100,6 +101,13 @@ export class PlayerTableComponent implements OnInit, OnDestroy {
         this.selectedPlayer = null;
       }
     });
+
+    // Subscribe to placed players this turn
+    this.draftService.placedPlayerIdsThisTurn$.pipe(
+      takeUntil(this.destroy$)
+    ).subscribe(placedIds => {
+      this.placedPlayerIdsThisTurn = placedIds;
+    });
   }
 
   ngOnDestroy(): void {
@@ -127,6 +135,12 @@ export class PlayerTableComponent implements OnInit, OnDestroy {
   }
 
   onSelectionChange(event: Player | null): void {
+    // Don't allow selecting players that are already placed this turn
+    if (event && this.isPlayerPlacedThisTurn(event.id)) {
+      this.selectedPlayer = null;
+      return;
+    }
+
     this.selectedPlayer = event;
     if (event) {
       this.draftService.pickPlayer(event);
@@ -146,6 +160,10 @@ export class PlayerTableComponent implements OnInit, OnDestroy {
 
   isPlayerSelected(playerId: number): boolean {
     return this.playerService.isPlayerSelected(playerId);
+  }
+
+  isPlayerPlacedThisTurn(playerId: number): boolean {
+    return this.placedPlayerIdsThisTurn.has(playerId);
   }
 
 
