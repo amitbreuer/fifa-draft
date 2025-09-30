@@ -188,7 +188,6 @@
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 1rem;
-  margin-bottom: 1rem;
 }
 
 .stats-container {
@@ -290,11 +289,29 @@
   border-radius: 2px;
 }
 
+.player-shield-section {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.player-shield-large {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid #404040;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
 .additional-info {
   display: flex;
   flex-direction: row;
   gap: 2rem;
   flex-wrap: wrap;
+  align-items: flex-start;
+  margin-bottom: 0.9rem;
 }
 
 .additional-info .detail-section {
