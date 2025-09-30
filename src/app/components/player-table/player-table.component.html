@@ -22,7 +22,6 @@
     (selectionChange)="onSelectionChange($event)"
     selectionMode="multiple"
     [metaKeySelection]="false"
-    [expandedRowKeys]="expandedRows"
     class="p-datatable-striped"
   >
     <ng-template pTemplate="header">
@@ -106,7 +105,7 @@
     <ng-template pTemplate="body" let-player>
       @let playerName = player.commonName || `${player.firstName} ${player.lastName}`;
       @let mainStats = getMainStats(player);
-      <tr [pRowToggler]="player">
+      <tr (click)="onRowClick(player)" style="cursor: pointer;">
         <td (click)="$event.stopPropagation()">
           <p-tableCheckbox [value]="player"></p-tableCheckbox>
         </td>
@@ -158,109 +157,116 @@
         <td>{{ mainStats.physicality }}</td>
       </tr>
     </ng-template>
+  </p-table>
 
-    <ng-template pTemplate="expandedrow" let-player>
-      <tr>
-        <td colspan="12">
-          <div class="player-details flex">
-            <!-- Player Stats Section -->
-            <div class="stats-container flex">
-              @let mainStats = getMainStats(player);
-              @for (mainStat of getMainStatsKeys(); track mainStat) {
-                <div class="stat-group">
-                  <div class="main-stat-header">
-                    <div class="main-stat-title">
-                      <span class="main-stat-name">{{ mainStat | mainStatName }}</span>
-                      <span class="main-stat-value">{{ mainStats[mainStat] }}</span>
-                    </div>
-                    <p-progressbar
-                      [value]="mainStats[mainStat]"
-                      [color]="mainStats[mainStat] | statSeverity"
-                      [showValue]="false"
-                      [class]="'main-stat-progress'"
-                    ></p-progressbar>
-                  </div>
-                  <div class="sub-stats">
-                    @for (subStat of getSubStatsForMainStat(mainStat); track subStat) {
-                      @if (!subStat.startsWith('gk') || player.position.shortLabel === 'GK') {
-                        @let statValue = player.stats[subStat]?.value;
-                        @if (statValue !== undefined) {
-                          <div class="sub-stat-item">
-                            <div class="sub-stat-header">
-                              <span class="sub-stat-name">{{ subStat | statName }}</span>
-                              <span class="sub-stat-value">{{ statValue }}</span>
-                            </div>
-                            <p-progressbar
-                              [value]="statValue"
-                              [color]="statValue | statSeverity"
-                              [showValue]="false"
-                              [class]="'sub-stat-progress'"
-                            ></p-progressbar>
-                          </div>
-                        }
-                      }
+  <!-- Player Details Dialog -->
+  <p-dialog
+    [(visible)]="showPlayerDialog"
+    [modal]="true"
+    [closable]="true"
+    [closeOnEscape]="true"
+    [style]="{'width': '800px', 'max-width': '95vw'}"
+    [header]="selectedPlayerForDialog ? (selectedPlayerForDialog.commonName || selectedPlayerForDialog.firstName + ' ' + selectedPlayerForDialog.lastName) : ''"
+  >
+    @if (selectedPlayerForDialog) {
+      <div class="player-dialog-content">
+        <!-- Player Stats Section - Grid Layout -->
+        <div class="stats-grid">
+          @let mainStats = getMainStats(selectedPlayerForDialog);
+          @for (mainStat of getMainStatsKeys(); track mainStat) {
+            <div class="stat-group">
+              <div class="main-stat-header">
+                <div class="main-stat-title">
+                  <span class="main-stat-name">{{ mainStat | mainStatName }}</span>
+                  <span class="main-stat-value">{{ mainStats[mainStat] }}</span>
+                </div>
+                <p-progressbar
+                  [value]="mainStats[mainStat]"
+                  [color]="mainStats[mainStat] | statSeverity"
+                  [showValue]="false"
+                  [class]="'main-stat-progress'"
+                ></p-progressbar>
+              </div>
+              <div class="sub-stats">
+                @for (subStat of getSubStatsForMainStat(mainStat); track subStat) {
+                  @if (!subStat.startsWith('gk') || selectedPlayerForDialog.position.shortLabel === 'GK') {
+                    @let statValue = selectedPlayerForDialog.stats[subStat]?.value;
+                    @if (statValue !== undefined) {
+                      <div class="sub-stat-item">
+                        <div class="sub-stat-header">
+                          <span class="sub-stat-name">{{ subStat | statName }}</span>
+                          <span class="sub-stat-value">{{ statValue }}</span>
+                        </div>
+                        <p-progressbar
+                          [value]="statValue"
+                          [color]="statValue | statSeverity"
+                          [showValue]="false"
+                          [class]="'sub-stat-progress'"
+                        ></p-progressbar>
+                      </div>
                     }
-                  </div>
-                </div>
-              }
+                  }
+                }
+              </div>
             </div>
+          }
+        </div>
 
-            <div class="additional-info flex">
-              <!-- Player Info Section -->
-              <div class="detail-section">
-                <h4>Player Info</h4>
-                <div class="player-info-details">
-                  <div class="info-item">
-                    <span class="info-label">Preferred Foot:</span>
-                    <span class="info-value">{{ player.preferredFoot }}</span>
-                  </div>
-                  <div class="info-item">
-                    <span class="info-label">Weak Foot:</span>
-                    <p-rating
-                      [ngModel]="player.weakFootAbility"
-                      [readonly]="true"
-                      [stars]="5"
-                      class="weak-foot-rating"
-                    ></p-rating>
-                  </div>
-                </div>
+        <!-- Additional Info Section -->
+        <div class="additional-info">
+          <!-- Player Info Section -->
+          <div class="detail-section">
+            <h4>Player Info</h4>
+            <div class="player-info-details">
+              <div class="info-item">
+                <span class="info-label">Preferred Foot:</span>
+                <span class="info-value">{{ selectedPlayerForDialog.preferredFoot }}</span>
               </div>
+              <div class="info-item">
+                <span class="info-label">Weak Foot:</span>
+                <p-rating
+                  [ngModel]="selectedPlayerForDialog.weakFootAbility"
+                  [readonly]="true"
+                  [stars]="5"
+                  class="weak-foot-rating"
+                ></p-rating>
+              </div>
+            </div>
+          </div>
 
-              <!-- Alternative Positions Section -->
-              @if (player.alternatePositions && player.alternatePositions.length > 0) {
-              <div class="detail-section">
-                <h4>Alternative Positions</h4>
-                <div class="positions">
-                  @for (pos of player.alternatePositions; track pos.id) {
-                  <p-tag
-                    [value]="pos.shortLabel"
-                    severity="info"
-                    class="position-tag"
-                  ></p-tag>
-                  }
-                </div>
-              </div>
-              }
-
-              <!-- Player Abilities Section -->
-              @if (player.playerAbilities && player.playerAbilities.length > 0) {
-              <div class="detail-section">
-                <h4>Player Abilities</h4>
-                <div class="abilities">
-                  @for (ability of player.playerAbilities; track ability.id) {
-                  <p-tag
-                    [value]="ability.label"
-                    severity="warn"
-                    class="ability-tag"
-                  ></p-tag>
-                  }
-                </div>
-              </div>
+          <!-- Alternative Positions Section -->
+          @if (selectedPlayerForDialog.alternatePositions && selectedPlayerForDialog.alternatePositions.length > 0) {
+          <div class="detail-section">
+            <h4>Alternative Positions</h4>
+            <div class="positions">
+              @for (pos of selectedPlayerForDialog.alternatePositions; track pos.id) {
+              <p-tag
+                [value]="pos.shortLabel"
+                severity="info"
+                class="position-tag"
+              ></p-tag>
               }
             </div>
           </div>
-        </td>
-      </tr>
-    </ng-template>
-  </p-table>
+          }
+
+          <!-- Player Abilities Section -->
+          @if (selectedPlayerForDialog.playerAbilities && selectedPlayerForDialog.playerAbilities.length > 0) {
+          <div class="detail-section">
+            <h4>Player Abilities</h4>
+            <div class="abilities">
+              @for (ability of selectedPlayerForDialog.playerAbilities; track ability.id) {
+              <p-tag
+                [value]="ability.label"
+                severity="warn"
+                class="ability-tag"
+              ></p-tag>
+              }
+            </div>
+          </div>
+          }
+        </div>
+      </div>
+    }
+  </p-dialog>
 </p-card>

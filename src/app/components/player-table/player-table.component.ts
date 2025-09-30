@@ -11,6 +11,7 @@ import { TagModule } from 'primeng/tag';
 import { ProgressBarModule } from 'primeng/progressbar';
 import { RatingModule } from 'primeng/rating';
 import { SpeedDialModule } from 'primeng/speeddial';
+import { DialogModule } from 'primeng/dialog';
 import { Player, AVAILABLE_POSITIONS, PositionFilter, mainStatsMap, MainStats } from '../../types';
 import { PlayerService } from '../../services/player.service';
 import { DraftService } from '../../services/draft.service';
@@ -34,6 +35,7 @@ import { MainStatNamePipe } from '../../pipes/main-stat-name.pipe';
     ProgressBarModule,
     RatingModule,
     SpeedDialModule,
+    DialogModule,
     RatingSeverityPipe,
     StatSeverityPipe,
     StatNamePipe,
@@ -47,7 +49,8 @@ export class PlayerTableComponent implements OnInit, OnDestroy {
 
   filteredPlayers: Player[] = [];
   selectedPlayers: Player[] = [];
-  expandedRows: { [key: number]: boolean } = {};
+  selectedPlayerForDialog: Player | null = null;
+  showPlayerDialog = false;
 
   selectedPosition: PositionFilter = 'ALL';
   selectedTeamId: number | null = null;
@@ -188,5 +191,15 @@ export class PlayerTableComponent implements OnInit, OnDestroy {
 
   getSubStatsForMainStat(mainStat: keyof typeof mainStatsMap): string[] {
     return mainStatsMap[mainStat];
+  }
+
+  onRowClick(player: Player): void {
+    this.selectedPlayerForDialog = player;
+    this.showPlayerDialog = true;
+  }
+
+  closePlayerDialog(): void {
+    this.showPlayerDialog = false;
+    this.selectedPlayerForDialog = null;
   }
 }
