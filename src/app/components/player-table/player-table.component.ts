@@ -50,6 +50,8 @@ export class PlayerTableComponent implements OnInit, OnDestroy {
   expandedRows: { [key: number]: boolean } = {};
 
   selectedPosition: PositionFilter = 'ALL';
+  selectedTeamId: number | null = null;
+  selectedNationalityId: number | null = null;
   showSelectedPlayers = false;
 
   positionOptions = [
@@ -57,10 +59,24 @@ export class PlayerTableComponent implements OnInit, OnDestroy {
     ...AVAILABLE_POSITIONS.map(pos => ({ label: pos, value: pos }))
   ];
 
+  teamOptions: { label: string; value: number }[] = [];
+  nationalityOptions: { label: string; value: number }[] = [];
+
   constructor(
     private playerService: PlayerService,
     private draftService: DraftService
-  ) {}
+  ) {
+    // Load teams and nationalities
+    this.teamOptions = this.playerService.getAllTeams().map(team => ({
+      label: team.label,
+      value: team.id
+    }));
+
+    this.nationalityOptions = this.playerService.getAllNationalities().map(nat => ({
+      label: nat.label,
+      value: nat.id
+    }));
+  }
 
   ngOnInit(): void {
     // Subscribe to changes
@@ -83,6 +99,21 @@ export class PlayerTableComponent implements OnInit, OnDestroy {
     this.updateFilteredPlayers();
   }
 
+  clearFilters(): void {
+    this.selectedPosition = 'ALL';
+    this.selectedTeamId = null;
+    this.selectedNationalityId = null;
+    this.showSelectedPlayers = false;
+    this.updateFilteredPlayers();
+  }
+
+  hasActiveFilters(): boolean {
+    return this.selectedPosition !== 'ALL' ||
+           this.selectedTeamId !== null ||
+           this.selectedNationalityId !== null ||
+           this.showSelectedPlayers;
+  }
+
   onSelectionChange(event: Player[]): void {
     this.selectedPlayers = event;
   }
@@ -90,7 +121,9 @@ export class PlayerTableComponent implements OnInit, OnDestroy {
   private updateFilteredPlayers(): void {
     this.filteredPlayers = this.playerService.getFilteredPlayers(
       this.selectedPosition,
-      this.showSelectedPlayers
+      this.showSelectedPlayers,
+      this.selectedTeamId ?? undefined,
+      this.selectedNationalityId ?? undefined
     );
   }
 

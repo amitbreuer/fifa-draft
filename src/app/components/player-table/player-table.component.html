@@ -1,39 +1,14 @@
 <p-card class="player-table-card">
-  <div class="table-controls">
-    <div class="filters">
-      <div class="filter-group">
-        <label for="positionFilter">Position:</label>
-        <p-select
-          id="positionFilter"
-          [options]="positionOptions"
-          [(ngModel)]="selectedPosition"
-          (onChange)="onFilterChange()"
-          placeholder="All Positions"
-        ></p-select>
-      </div>
-
-      <div class="filter-group">
-        <p-checkbox
-          [(ngModel)]="showSelectedPlayers"
-          (onChange)="onFilterChange()"
-          binary="true"
-          inputId="showSelected"
-        ></p-checkbox>
-        <label for="showSelected">Show Selected Players</label>
-      </div>
-    </div>
-
-    @if (selectedPlayers.length > 0 && !showSelectedPlayers) {
-    <div class="pick-controls">
-      <p-button
-        label="Pick Selected Players ({{selectedPlayers.length}})"
-        icon="pi pi-check"
-        (onClick)="pickSelectedPlayers()"
-        class="p-button-success"
-      ></p-button>
-    </div>
-    }
+  @if (selectedPlayers.length > 0 && !showSelectedPlayers) {
+  <div class="pick-controls">
+    <p-button
+      label="Pick Selected Players ({{selectedPlayers.length}})"
+      icon="pi pi-check"
+      (onClick)="pickSelectedPlayers()"
+      class="p-button-success"
+    ></p-button>
   </div>
+  }
 
   <p-table
     [value]="filteredPlayers"
@@ -64,6 +39,67 @@
         <th>DRI</th>
         <th>DEF</th>
         <th>PHY</th>
+      </tr>
+      <tr>
+        <th>
+          @if (hasActiveFilters()) {
+          <p-button
+            icon="pi pi-filter-slash"
+            (onClick)="clearFilters()"
+            [outlined]="true"
+            severity="secondary"
+            size="small"
+            [text]="true"
+          ></p-button>
+          }
+        </th>
+        <th colspan="2">
+          <p-select
+            [options]="teamOptions"
+            [(ngModel)]="selectedTeamId"
+            (onChange)="onFilterChange()"
+            placeholder="All Teams"
+            [showClear]="true"
+            [filter]="true"
+            filterPlaceholder="Search teams"
+            [style]="{'width': '100%'}"
+            appendTo="body"
+          ></p-select>
+        </th>
+        <th>
+          <p-select
+            [options]="positionOptions"
+            [(ngModel)]="selectedPosition"
+            (onChange)="onFilterChange()"
+            placeholder="All Positions"
+            [style]="{'width': '100%'}"
+            appendTo="body"
+          ></p-select>
+        </th>
+        <th colspan="3">
+          <p-select
+            [options]="nationalityOptions"
+            [(ngModel)]="selectedNationalityId"
+            (onChange)="onFilterChange()"
+            placeholder="All Nationalities"
+            [showClear]="true"
+            [filter]="true"
+            filterPlaceholder="Search nationalities"
+            [style]="{'width': '100%'}"
+            appendTo="body"
+          ></p-select>
+        </th>
+        <th colspan="4">
+          <div style="display: flex; align-items: center; gap: 0.5rem;">
+            <p-checkbox
+              [(ngModel)]="showSelectedPlayers"
+              (onChange)="onFilterChange()"
+              binary="true"
+              inputId="showSelected"
+            ></p-checkbox>
+            <label for="showSelected" style="margin: 0; cursor: pointer;">Show Selected</label>
+          </div>
+        </th>
       </tr>
     </ng-template>
 

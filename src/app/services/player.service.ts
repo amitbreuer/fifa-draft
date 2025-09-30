@@ -25,7 +25,12 @@ export class PlayerService {
     return allPlayers.filter(player => !selectedIds.has(player.id));
   }
 
-  getFilteredPlayers(positionFilter: PositionFilter, showSelected: boolean): Player[] {
+  getFilteredPlayers(
+    positionFilter: PositionFilter,
+    showSelected: boolean,
+    teamId?: number,
+    nationalityId?: number
+  ): Player[] {
     const allPlayers = this.playersSubject.value;
     const selectedIds = this.selectedPlayerIdsSubject.value;
 
@@ -39,6 +44,16 @@ export class PlayerService {
       );
     }
 
+    // Filter by team
+    if (teamId !== undefined && teamId !== null) {
+      filteredPlayers = filteredPlayers.filter(player => player.team.id === teamId);
+    }
+
+    // Filter by nationality
+    if (nationalityId !== undefined && nationalityId !== null) {
+      filteredPlayers = filteredPlayers.filter(player => player.nationality.id === nationalityId);
+    }
+
     // Filter by selected/unselected
     if (showSelected) {
       filteredPlayers = filteredPlayers.filter(player => selectedIds.has(player.id));
@@ -47,6 +62,32 @@ export class PlayerService {
     }
 
     return filteredPlayers;
+  }
+
+  getAllTeams(): { id: number; label: string; imageUrl: string }[] {
+    const allPlayers = this.playersSubject.value;
+    const teamsMap = new Map<number, { id: number; label: string; imageUrl: string }>();
+
+    allPlayers.forEach(player => {
+      if (!teamsMap.has(player.team.id)) {
+        teamsMap.set(player.team.id, player.team);
+      }
+    });
+
+    return Array.from(teamsMap.values()).sort((a, b) => a.label.localeCompare(b.label));
+  }
+
+  getAllNationalities(): { id: number; label: string; imageUrl: string }[] {
+    const allPlayers = this.playersSubject.value;
+    const nationalitiesMap = new Map<number, { id: number; label: string; imageUrl: string }>();
+
+    allPlayers.forEach(player => {
+      if (!nationalitiesMap.has(player.nationality.id)) {
+        nationalitiesMap.set(player.nationality.id, player.nationality);
+      }
+    });
+
+    return Array.from(nationalitiesMap.values()).sort((a, b) => a.label.localeCompare(b.label));
   }
 
   selectPlayer(playerId: number): void {
