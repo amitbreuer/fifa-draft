@@ -24,7 +24,7 @@ export class DraftService {
   private currentPickedPlayerSubject = new BehaviorSubject<Player | null>(null);
   private fieldPositionsSubject = new BehaviorSubject<FieldPosition[]>([]);
   private benchPlayersSubject = new BehaviorSubject<Player[]>([]);
-  private currentFormationSubject = new BehaviorSubject<FormationName>('4-3-3 Flat');
+  private currentFormationSubject = new BehaviorSubject<FormationName>('4-3-3 Attack');
   private hasPlacedPlayerThisTurnSubject = new BehaviorSubject<boolean>(false);
   private placedPlayerIdsThisTurnSubject = new BehaviorSubject<Set<number>>(new Set());
   private actionHistorySubject = new BehaviorSubject<DraftAction[]>([]);

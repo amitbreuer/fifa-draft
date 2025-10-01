@@ -37,7 +37,7 @@ export class FieldComponent implements OnInit, OnDestroy {
   isDragOverBench = false;
 
   // Formation dropdown
-  selectedFormation: FormationName = '4-3-3 Flat';
+  selectedFormation: FormationName = '4-3-3 Attack';
   formations: { label: string; value: FormationName }[] = [];
 
   constructor(
