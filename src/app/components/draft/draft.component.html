@@ -1,26 +1,33 @@
 <div class="draft-container">
   @if (draftSettings) {
   <div class="draft-header">
-    <p-card class="draft-info-card">
-      <div class="draft-info">
-        <div class="current-turn">
-          <h2>{{ getCurrentManagerName() }}'s Turn</h2>
-          <p-tag
-            [value]="'Round ' + draftSettings.currentRound + ' of ' + draftSettings.maxRounds"
-            severity="info"
-            class="round-tag"
-          ></p-tag>
+    <p-card class="overview-card">
+      <div class="overview-content">
+<!--        <p-tag-->
+<!--          [value]="'Round ' + draftSettings.currentRound + ' of ' + draftSettings.maxRounds"-->
+<!--          severity="info"-->
+<!--          class="round-tag"-->
+<!--        ></p-tag>-->
+        <div class="managers-grid">
+          @for (manager of draftSettings.managers; track manager.id; let i = $index) {
+          <div
+            class="manager-card"
+            [class.current-manager]="i === draftSettings.currentManagerIndex"
+          >
+            <div class="manager-header" >
+              <h4>{{ manager.name }}</h4>
+              <div class="manager-stats">
+                <small>Players: {{ manager.team.length }} / 18</small>
+              </div>
+            </div>
+          </div>
+          }
         </div>
-
-        <div class="draft-progress">
-          <label>Draft Progress:</label>
-          <p-progressBar
-            [value]="getDraftProgress()"
-            [showValue]="true"
-            unit="%"
-          ></p-progressBar>
-        </div>
-
+        <p-tag
+          [value]="'Round ' + draftSettings.currentRound + ' of ' + draftSettings.maxRounds"
+          severity="info"
+          class="round-tag"
+        ></p-tag>
         <div class="turn-actions">
           <p-button
             label="Undo"
@@ -62,32 +69,6 @@
       </div>
     </div>
   </div>
-
-  @if (draftSettings) {
-  <div class="managers-overview">
-    <p-card header="Draft Overview" class="overview-card">
-      <div class="managers-grid">
-        @for (manager of draftSettings.managers; track manager.id; let i = $index) {
-        <div
-          class="manager-card"
-          [class.current-manager]="i === draftSettings.currentManagerIndex"
-        >
-          <div class="manager-header">
-            <h4>{{ manager.name }}</h4>
-            <p-tag
-              [value]="manager.team.length + ' players'"
-              [severity]="getManagerTagSeverity(i)"
-            ></p-tag>
-          </div>
-          <div class="manager-stats">
-            <small>Players drafted: {{ manager.team.length }}</small>
-          </div>
-        </div>
-        }
-      </div>
-    </p-card>
-  </div>
-  }
 </div>
 
 <p-confirmDialog></p-confirmDialog>
