@@ -1,0 +1,40 @@
+<div class="summary-container">
+  <div class="summary-header">
+    <h1 class="title">⚽ Draft Summary 🏆</h1>
+    @if (draftSettings && draftSettings.draftName) {
+      <h2 class="draft-name">{{ draftSettings.draftName }}</h2>
+    }
+  </div>
+
+  <div class="managers-grid">
+    @for (manager of managers; track manager.id) {
+      <div class="manager-section">
+        <h3 class="manager-name">{{ manager.name }}</h3>
+        <div class="players-list">
+          @for (player of manager.team; track player.id) {
+            <div class="player-card">
+              <img [src]="player.shieldUrl" [alt]="player.commonName || player.lastName" class="player-shield" />
+              <div class="player-name">{{ player.commonName || player.lastName }}</div>
+              <div class="player-rating">{{ player.overallRating }}</div>
+              <img [src]="player.team.imageUrl" [alt]="player.team.label" class="team-logo" />
+              <div class="team-name">{{ player.team.label }}</div>
+            </div>
+          }
+          @if (manager.team.length === 0) {
+            <div class="empty-message">No players selected</div>
+          }
+        </div>
+      </div>
+    }
+  </div>
+
+  <div class="actions">
+    <p-button
+      label="Back to Settings"
+      icon="pi pi-home"
+      (onClick)="backToSettings()"
+      severity="primary"
+      [raised]="true"
+    ></p-button>
+  </div>
+</div>

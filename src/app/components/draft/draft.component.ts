@@ -126,28 +126,19 @@ export class DraftComponent implements OnInit, OnDestroy {
 
   confirmFinishDraft(): void {
     this.confirmationService.confirm({
-      message: 'Are you sure you want to finish the draft early? This cannot be undone.',
+      message: 'Are you sure you want to finish the draft early?',
       header: 'Finish Draft',
       icon: 'pi pi-exclamation-triangle',
       acceptButtonStyleClass: 'p-button-warning',
       accept: () => {
         this.draftService.finishDraft();
-        this.onDraftComplete();
+        this.router.navigate(['/summary']);
       }
     });
   }
 
   private onDraftComplete(): void {
-    this.confirmationService.confirm({
-      message: 'Draft completed! Would you like to start a new draft?',
-      header: 'Draft Complete',
-      icon: 'pi pi-check-circle',
-      acceptLabel: 'New Draft',
-      rejectLabel: 'Stay Here',
-      accept: () => {
-        this.router.navigate(['/']);
-      }
-    });
+    this.router.navigate(['/summary']);
   }
 
   getManagerTagSeverity(managerIndex: number): string {
