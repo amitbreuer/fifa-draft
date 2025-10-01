@@ -6,6 +6,7 @@ import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { CardModule } from 'primeng/card';
 import { DividerModule } from 'primeng/divider';
+import { SelectButtonModule } from 'primeng/selectbutton';
 import { DraftService } from '../../services/draft.service';
 
 @Component({
@@ -17,14 +18,23 @@ import { DraftService } from '../../services/draft.service';
     ButtonModule,
     InputTextModule,
     CardModule,
-    DividerModule
+    DividerModule,
+    SelectButtonModule
   ],
   templateUrl: './settings.component.html',
   styleUrl: './settings.component.scss'
 })
 export class SettingsComponent {
+  draftName = '';
   numManagers = 4;
   managerNames: string[] = ['Manager 1', 'Manager 2', 'Manager 3', 'Manager 4'];
+  managerOptions = [
+    { label: '2', value: 2 },
+    { label: '3', value: 3 },
+    { label: '4', value: 4 },
+    { label: '5', value: 5 },
+    { label: '6', value: 6 }
+  ];
 
   constructor(
     private draftService: DraftService,
@@ -40,7 +50,8 @@ export class SettingsComponent {
   }
 
   canStartDraft(): boolean {
-    return this.numManagers >= 2 &&
+    return this.draftName.trim().length > 0 &&
+           this.numManagers >= 2 &&
            this.managerNames.length === this.numManagers &&
            this.managerNames.every(name => name.trim().length > 0);
   }

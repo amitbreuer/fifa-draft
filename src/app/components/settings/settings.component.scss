@@ -1,52 +1,229 @@
 .settings-container {
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
   min-height: 100vh;
   padding: 2rem;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background:
+    radial-gradient(circle at 20% 50%, rgba(59, 130, 246, 0.15), transparent 50%),
+    radial-gradient(circle at 80% 80%, rgba(34, 197, 94, 0.15), transparent 50%),
+    radial-gradient(circle at 40% 20%, rgba(168, 85, 247, 0.1), transparent 50%),
+    linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+}
+
+.main-title {
+  font-size: 3.5rem;
+  font-weight: 900;
+  color: #ffffff;
+  margin-bottom: 2rem;
+  text-shadow: 0 4px 20px rgba(59, 130, 246, 0.4);
+  letter-spacing: 0.02em;
+  text-align: center;
 }
 
 .settings-card {
   width: 100%;
-  max-width: 600px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  max-width: 700px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+  border-radius: 16px;
+  overflow: hidden;
+  background: #1e293b;
+  border: 1px solid rgba(59, 130, 246, 0.2);
+
+  ::ng-deep .p-card-header {
+    background: linear-gradient(135deg, #334155 0%, #1e293b 100%);
+    color: #f1f5f9;
+    padding: 1.25rem 2rem;
+    font-size: 1.5rem;
+    font-weight: 700;
+    text-align: center;
+    border-bottom: 2px solid rgba(59, 130, 246, 0.3);
+  }
+
+  ::ng-deep .p-card-body {
+    padding: 2rem;
+    background: #1e293b;
+  }
+
+  ::ng-deep .p-card-content {
+    padding: 0;
+  }
 }
 
 .settings-content {
-  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
 }
 
 .field {
-  margin-bottom: 1.5rem;
+  margin-bottom: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
 }
 
 .field label {
-  display: block;
-  margin-bottom: 0.5rem;
   font-weight: 600;
-  color: #333;
+  color: #cbd5e1;
+  font-size: 0.95rem;
+  letter-spacing: 0.01em;
 }
 
 .field input {
   width: 100%;
+  padding: 0.75rem;
+  border: 2px solid #334155;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: all 0.2s;
+  background: #0f172a;
+  color: #f1f5f9;
+
+  &::placeholder {
+    color: #64748b;
+  }
+
+  &:hover {
+    border-color: #475569;
+  }
+
+  &:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+  }
 }
 
-.managers-section h3 {
-  margin-bottom: 1rem;
-  color: #333;
+::ng-deep .p-selectbutton {
+  display: flex;
+  gap: 0.5rem;
+
+  .p-button {
+    background: #0f172a;
+    border: 2px solid #334155;
+    color: #cbd5e1;
+    padding: 0.75rem 1.5rem;
+    font-weight: 600;
+    transition: all 0.2s;
+
+    &:hover {
+      background: #1e293b;
+      border-color: #475569;
+    }
+
+    &.p-highlight {
+      background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+      border-color: #2563eb;
+      color: #ffffff;
+      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+    }
+  }
+}
+
+::ng-deep .p-divider {
+  margin: 2rem 0;
+
+  &::before {
+    border-top: 1px solid #334155;
+  }
+}
+
+.managers-section {
+  h3 {
+    margin-bottom: 1.5rem;
+    color: #f1f5f9;
+    font-size: 1.25rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    &::before {
+      content: '👥';
+      font-size: 1.5rem;
+    }
+  }
 }
 
 .manager-inputs {
   display: grid;
-  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.25rem;
+
+  .field {
+    background: #0f172a;
+    padding: 1rem;
+    border-radius: 8px;
+    border: 1px solid #334155;
+    transition: all 0.2s;
+
+    &:hover {
+      background: #1a1f2e;
+      border-color: #475569;
+      transform: translateY(-1px);
+    }
+  }
 }
 
 .actions {
   text-align: center;
   margin-top: 2rem;
+
+  ::ng-deep .p-button {
+    padding: 0.875rem 2.5rem;
+    font-size: 1.125rem;
+    font-weight: 600;
+    border-radius: 10px;
+    transition: all 0.2s;
+    box-shadow: 0 4px 14px rgba(34, 197, 94, 0.3);
+
+    &:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(34, 197, 94, 0.4);
+    }
+
+    &:active:not(:disabled) {
+      transform: translateY(0);
+    }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
 }
 
-.actions p-button {
-  width: 200px;
+@media (max-width: 768px) {
+  .settings-container {
+    padding: 1rem;
+  }
+
+  .main-title {
+    font-size: 2.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .settings-card {
+    max-width: 100%;
+
+    ::ng-deep .p-card-header {
+      font-size: 1.25rem;
+      padding: 1rem 1.5rem;
+    }
+
+    ::ng-deep .p-card-body {
+      padding: 1.5rem;
+    }
+  }
+
+  .manager-inputs {
+    grid-template-columns: 1fr;
+  }
+
+  ::ng-deep .p-selectbutton {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
 }

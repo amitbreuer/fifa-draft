@@ -1,33 +1,46 @@
 <div class="settings-container">
-  <p-card header="FIFA Draft Settings" class="settings-card">
+  <h1 class="main-title">⚽ FIFA Draft 🏆</h1>
+
+  <p-card header="Draft Settings" class="settings-card">
     <div class="settings-content">
       <div class="field">
-        <label for="numManagers">Number of Managers:</label>
         <input
-          id="numManagers"
-          type="number"
+          id="draftName"
+          type="text"
           pInputText
-          [(ngModel)]="numManagers"
-          min="2"
-          max="8"
-          (change)="updateManagerNames()"
+          [(ngModel)]="draftName"
+          placeholder="Enter draft name"
         />
       </div>
 
       <p-divider></p-divider>
 
+      <div class="field">
+        <label for="numManagers">Number of Managers</label>
+        <p-selectButton
+          id="numManagers"
+          [options]="managerOptions"
+          [(ngModel)]="numManagers"
+          (onChange)="updateManagerNames()"
+          optionLabel="label"
+          optionValue="value"
+        ></p-selectButton>
+      </div>
+
+      <p-divider></p-divider>
+
       <div class="managers-section">
-        <h3>Manager Names:</h3>
+        <h3>Manager Names</h3>
         <div class="manager-inputs">
           @for (manager of managerNames; track $index; let i = $index) {
           <div class="field">
-            <label [for]="'manager' + i">Manager {{ i + 1 }}:</label>
+            <label [for]="'manager' + i">Manager {{ i + 1 }}</label>
             <input
               [id]="'manager' + i"
               type="text"
               pInputText
               [(ngModel)]="managerNames[i]"
-              [placeholder]="'Manager ' + (i + 1)"
+              [placeholder]="'Enter manager name'"
             />
           </div>
           }
@@ -42,7 +55,8 @@
           icon="pi pi-play"
           [disabled]="!canStartDraft()"
           (onClick)="startDraft()"
-          class="p-button-success"
+          severity="success"
+          [raised]="true"
         ></p-button>
       </div>
     </div>
