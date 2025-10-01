@@ -39,6 +39,7 @@ export class DraftComponent implements OnInit, OnDestroy {
   draftSettings: DraftSettings | null = null;
   currentPickedPlayer: Player | null = null;
   hasPlacedPlayerThisTurn = false;
+  actionHistory: any[] = [];
 
   constructor(
     private draftService: DraftService,
@@ -78,6 +79,13 @@ export class DraftComponent implements OnInit, OnDestroy {
     ).subscribe(hasPlaced => {
       this.hasPlacedPlayerThisTurn = hasPlaced;
     });
+
+    // Subscribe to action history
+    this.draftService.actionHistory$.pipe(
+      takeUntil(this.destroy$)
+    ).subscribe(history => {
+      this.actionHistory = history;
+    });
   }
 
   ngOnDestroy(): void {
@@ -103,7 +111,8 @@ export class DraftComponent implements OnInit, OnDestroy {
   }
 
   canUndo(): boolean {
-    return this.hasPlacedPlayerThisTurn;
+    // Undo is enabled if there are any actions (including position swaps)
+    return this.hasPlacedPlayerThisTurn || this.actionHistory.length > 0;
   }
 
   undoPlacement(): void {

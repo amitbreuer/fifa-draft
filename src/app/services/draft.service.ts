@@ -404,10 +404,12 @@ export class DraftService {
     this.fieldPositionsSubject.next(positions);
     this.benchPlayersSubject.next(bench);
 
-    // Remove player from placed this turn tracking
-    const placedIds = new Set(this.placedPlayerIdsThisTurnSubject.value);
-    placedIds.delete(lastAction.player.id);
-    this.placedPlayerIdsThisTurnSubject.next(placedIds);
+    // Only remove player from placed this turn tracking if it was a new player placement
+    if (lastAction.isNewPlayerPlacement) {
+      const placedIds = new Set(this.placedPlayerIdsThisTurnSubject.value);
+      placedIds.delete(lastAction.player.id);
+      this.placedPlayerIdsThisTurnSubject.next(placedIds);
+    }
 
     // Remove the last action from history
     const newHistory = history.slice(0, -1);
