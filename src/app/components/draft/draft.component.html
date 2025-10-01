@@ -25,22 +25,23 @@
           <p-button
             label="Undo"
             icon="pi pi-undo"
+            severity="secondary"
             [disabled]="!canUndo()"
             (onClick)="undoPlacement()"
-            class="p-button-secondary"
           ></p-button>
 
           <p-button
             label="Finish Turn"
             icon="pi pi-check"
+            severity="primary"
             [disabled]="!canFinishTurn()"
             (onClick)="finishTurn()"
-            class="p-button-success"
           ></p-button>
 
           <p-button
             label="Finish Draft"
             icon="pi pi-flag"
+            severity="danger"
             (onClick)="confirmFinishDraft()"
             class="p-button-warning"
           ></p-button>
