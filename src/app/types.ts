@@ -55,6 +55,9 @@ export interface DraftManager {
   id: number;
   name: string;
   team: Player[];
+  fieldPositions?: FieldPosition[];
+  benchPlayers?: Player[];
+  formation?: FormationName;
 }
 
 export interface DraftSettings {

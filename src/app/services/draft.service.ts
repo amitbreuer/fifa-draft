@@ -13,6 +13,7 @@ interface DraftAction {
   fromBench?: boolean;
   toBench?: boolean;
   swappedPlayer?: Player;
+  isNewPlayerPlacement?: boolean; // True if placing a new player (not just moving existing ones)
 }
 
 @Injectable({
@@ -87,7 +88,8 @@ export class DraftService {
         type: existingPlayer ? 'swapField' : 'placeOnField',
         player: pickedPlayer,
         toPositionId: positionId,
-        swappedPlayer: existingPlayer
+        swappedPlayer: existingPlayer,
+        isNewPlayerPlacement: true // This is a new player being placed
       };
 
       // If there's already a player in this position, move them to bench
@@ -140,18 +142,21 @@ export class DraftService {
 
     this.fieldPositionsSubject.next(positions);
 
-    // Track the action
+    // Track the action (not a new player placement, just moving existing players)
     const action: DraftAction = {
       type: 'swapField',
       player: fromPlayer,
       fromPositionId,
       toPositionId,
-      swappedPlayer: toPlayer
+      swappedPlayer: toPlayer,
+      isNewPlayerPlacement: false
     };
 
     const history = [...this.actionHistorySubject.value, action];
     this.actionHistorySubject.next(history);
-    this.hasPlacedPlayerThisTurnSubject.next(true);
+
+    // Check if there are any new player placements in history
+    this.updateHasPlacedPlayerThisTurn();
   }
 
   // Method for drag-and-drop from bench to field
@@ -180,18 +185,24 @@ export class DraftService {
     this.fieldPositionsSubject.next(positions);
     this.benchPlayersSubject.next(bench);
 
+    // Check if this is a new player being placed (from placedPlayerIdsThisTurn)
+    const isNewPlayer = this.placedPlayerIdsThisTurnSubject.value.has(player.id);
+
     // Track the action
     const action: DraftAction = {
       type: existingPlayer ? 'swapField' : 'moveFromBench',
       player,
       toPositionId,
       fromBench: true,
-      swappedPlayer: existingPlayer
+      swappedPlayer: existingPlayer,
+      isNewPlayerPlacement: isNewPlayer
     };
 
     const history = [...this.actionHistorySubject.value, action];
     this.actionHistorySubject.next(history);
-    this.hasPlacedPlayerThisTurnSubject.next(true);
+
+    // Check if there are any new player placements in history
+    this.updateHasPlacedPlayerThisTurn();
   }
 
   // Method for drag-and-drop from field to bench
@@ -217,17 +228,23 @@ export class DraftService {
     this.fieldPositionsSubject.next(positions);
     this.benchPlayersSubject.next(bench);
 
+    // Check if this is a new player being placed (from placedPlayerIdsThisTurn)
+    const isNewPlayer = this.placedPlayerIdsThisTurnSubject.value.has(player.id);
+
     // Track the action
     const action: DraftAction = {
       type: 'moveFromBench', // We'll treat this as reverse operation
       player,
       fromPositionId,
-      toBench: true
+      toBench: true,
+      isNewPlayerPlacement: isNewPlayer
     };
 
     const history = [...this.actionHistorySubject.value, action];
     this.actionHistorySubject.next(history);
-    this.hasPlacedPlayerThisTurnSubject.next(true);
+
+    // Check if there are any new player placements in history
+    this.updateHasPlacedPlayerThisTurn();
   }
 
   placePlayerOnBench(): void {
@@ -245,7 +262,8 @@ export class DraftService {
     const action: DraftAction = {
       type: 'placeOnBench',
       player: pickedPlayer,
-      toBench: true
+      toBench: true,
+      isNewPlayerPlacement: true
     };
 
     this.addToBench(pickedPlayer);
@@ -264,6 +282,13 @@ export class DraftService {
 
     // Clear the current picked player after placement
     this.currentPickedPlayerSubject.next(null);
+  }
+
+  // Helper to check if any action in history is a new player placement
+  private updateHasPlacedPlayerThisTurn(): void {
+    const history = this.actionHistorySubject.value;
+    const hasNewPlayer = history.some(action => action.isNewPlayerPlacement);
+    this.hasPlacedPlayerThisTurnSubject.next(hasNewPlayer);
   }
 
   undoPlayerPlacement(): void {
@@ -391,8 +416,8 @@ export class DraftService {
     // Clear the current picked player
     this.currentPickedPlayerSubject.next(null);
 
-    // Check if there are still any actions
-    this.hasPlacedPlayerThisTurnSubject.next(newHistory.length > 0);
+    // Check if there are still any new player placements in history
+    this.updateHasPlacedPlayerThisTurn();
   }
 
   finishTurn(): void {
@@ -407,8 +432,13 @@ export class DraftService {
       this.playerService.selectPlayer(playerId);
     });
 
-    // Add all placed players to current manager's team
+    // Save current manager's field positions, bench, and formation
     const currentManager = settings.managers[settings.currentManagerIndex];
+    currentManager.fieldPositions = [...this.fieldPositionsSubject.value];
+    currentManager.benchPlayers = [...this.benchPlayersSubject.value];
+    currentManager.formation = this.currentFormationSubject.value;
+
+    // Add all placed players to current manager's team
     const allPlayers = [
       ...this.fieldPositionsSubject.value.filter(pos => pos.player).map(pos => pos.player!),
       ...this.benchPlayersSubject.value
@@ -464,8 +494,6 @@ export class DraftService {
 
   private resetCurrentManagerState(): void {
     this.currentPickedPlayerSubject.next(null);
-    this.initializeFieldPositions();
-    this.benchPlayersSubject.next([]);
     this.hasPlacedPlayerThisTurnSubject.next(false);
     this.placedPlayerIdsThisTurnSubject.next(new Set());
     this.actionHistorySubject.next([]);
@@ -473,8 +501,30 @@ export class DraftService {
     // Load current manager's team state
     const currentManager = this.getCurrentManager();
     if (currentManager) {
-      // For now, just put all players on bench - in a real app you'd save field positions
-      this.benchPlayersSubject.next([...currentManager.team]);
+      // Restore saved formation, field positions, and bench
+      if (currentManager.formation) {
+        this.currentFormationSubject.next(currentManager.formation);
+      }
+
+      if (currentManager.fieldPositions && currentManager.fieldPositions.length > 0) {
+        // Restore saved field positions
+        this.fieldPositionsSubject.next([...currentManager.fieldPositions]);
+      } else {
+        // Initialize empty field positions
+        this.initializeFieldPositions();
+      }
+
+      if (currentManager.benchPlayers) {
+        // Restore saved bench
+        this.benchPlayersSubject.next([...currentManager.benchPlayers]);
+      } else {
+        // Initialize empty bench
+        this.benchPlayersSubject.next([]);
+      }
+    } else {
+      // No current manager, initialize empty state
+      this.initializeFieldPositions();
+      this.benchPlayersSubject.next([]);
     }
   }
 
