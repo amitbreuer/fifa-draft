@@ -15,12 +15,25 @@
     height: 100%;
     display: flex;
     flex-direction: column;
+    background: #1e293b;
+    border: 1px solid rgba(59, 130, 246, 0.2);
+    border-radius: 12px;
+  }
+
+  ::ng-deep .p-card-header {
+    background: linear-gradient(135deg, #334155 0%, #1e293b 100%);
+    color: #f1f5f9;
+    padding: 1rem 1.5rem;
+    font-size: 1.25rem;
+    font-weight: 700;
+    border-bottom: 2px solid rgba(59, 130, 246, 0.3);
   }
 
   ::ng-deep .p-card-body {
     flex: 1;
     display: flex;
     flex-direction: column;
+    padding: 1.5rem;
   }
 
   ::ng-deep .p-card-title {
@@ -43,13 +56,38 @@
 
   label {
     font-weight: 600;
-    color: var(--text-color);
+    color: #cbd5e1;
+  }
+
+  ::ng-deep .p-select {
+    background: #0f172a;
+    border: 2px solid #334155;
+    color: #f1f5f9;
+
+    &:hover {
+      border-color: #475569;
+    }
+
+    &:focus {
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+    }
   }
 }
 
 .bench-card {
   flex: 0 0 auto; // Don't grow or shrink, auto height
   margin-bottom: 1rem;
+
+  ::ng-deep .p-card {
+    background: #1e293b;
+    border: 1px solid rgba(59, 130, 246, 0.2);
+    border-radius: 12px;
+  }
+
+  ::ng-deep .p-card-body {
+    padding: 1rem;
+  }
 }
 
 .bench-header {
@@ -60,6 +98,7 @@
   width: 100%;
   font-weight: 600;
   padding: 0.5rem 1rem;
+  color: #f1f5f9;
 }
 
 .current-pick-card {
@@ -355,23 +394,24 @@
 .bench-container {
   min-height: 120px;
   padding: 1rem;
-  border: 2px dashed #ccc;
+  border: 2px dashed #334155;
   border-radius: 8px;
   transition: all 0.2s;
   cursor: pointer;
+  background: #0f172a;
 
   &.drag-over {
-    border-color: #007ad9;
-    background-color: rgba(0,122,217,0.1);
+    border-color: #3b82f6;
+    background-color: rgba(59, 130, 246, 0.15);
   }
 
   &.can-place:hover {
-    border-color: #007ad9;
-    background-color: rgba(0,122,217,0.05);
+    border-color: #3b82f6;
+    background-color: rgba(59, 130, 246, 0.08);
   }
 
   &.bench-full {
-    border-color: #dc3545;
+    border-color: #ef4444;
     opacity: 0.6;
     cursor: not-allowed;
   }
@@ -400,12 +440,13 @@
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  color: #666;
+  color: #64748b;
   font-size: 14px;
   padding: 0.8rem;
 
   i {
     font-size: 2rem;
+    color: #475569;
   }
 }
 

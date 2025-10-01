@@ -1,6 +1,25 @@
 .player-table-card {
   margin-bottom: 1rem;
 
+  ::ng-deep .p-card {
+    background: #1e293b;
+    border: 1px solid rgba(59, 130, 246, 0.2);
+    border-radius: 12px;
+  }
+
+  ::ng-deep .p-card-header {
+    background: linear-gradient(135deg, #334155 0%, #1e293b 100%);
+    color: #f1f5f9;
+    padding: 1rem 1.5rem;
+    font-size: 1.25rem;
+    font-weight: 700;
+    border-bottom: 2px solid rgba(59, 130, 246, 0.3);
+  }
+
+  ::ng-deep .p-card-body {
+    padding: 1.5rem;
+  }
+
   ::ng-deep .p-datatable {
     .p-datatable-table {
       table-layout: auto;
@@ -8,11 +27,30 @@
       min-width: 100%;
     }
 
-    .p-datatable-thead > tr > th,
-    .p-datatable-tbody > tr > td {
+    .p-datatable-thead > tr > th {
+      background: #0f172a;
+      color: #cbd5e1;
+      border-color: #334155;
       padding: 0.5rem 0.75rem;
       white-space: nowrap;
       width: auto;
+      font-weight: 600;
+    }
+
+    .p-datatable-tbody > tr {
+      background: #1e293b;
+      color: #f1f5f9;
+
+      &:hover {
+        background: #1a2332 !important;
+      }
+
+      > td {
+        padding: 0.5rem 0.75rem;
+        white-space: nowrap;
+        width: auto;
+        border-color: #334155;
+      }
     }
 
     // Specific column widths
@@ -61,29 +99,45 @@
 .filter-group label {
   font-weight: 600;
   white-space: nowrap;
+  color: #cbd5e1;
+}
+
+::ng-deep .p-multiselect {
+  background: #0f172a;
+  border: 2px solid #334155;
+  color: #f1f5f9;
+
+  &:hover {
+    border-color: #475569;
+  }
+
+  &:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+  }
 }
 
 .selected-row {
-  background-color: #f8f9fa !important;
-  opacity: 0.7;
+  background-color: rgba(59, 130, 246, 0.15) !important;
+  opacity: 0.8;
 }
 
 .disabled-row {
-  opacity: 0.5 !important;
-  background-color: #e9ecef !important;
+  opacity: 0.4 !important;
+  background-color: #0f172a !important;
 
   td {
-    color: #6c757d !important;
+    color: #64748b !important;
   }
 
   .p-tag {
-    opacity: 0.6;
+    opacity: 0.5;
   }
 
   .player-shield,
   .team-logo,
   .nationality-flag {
-    opacity: 0.6;
+    opacity: 0.5;
   }
 
   // Allow expand button to still work
@@ -112,6 +166,7 @@
 
 .player-name {
   font-weight: 600;
+  color: #f1f5f9;
 }
 
 .team-info, .nationality-info {

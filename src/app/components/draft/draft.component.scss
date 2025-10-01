@@ -3,6 +3,11 @@
   min-height: 100vh;
   max-width: 100%;
   overflow-x: auto;
+  background:
+    radial-gradient(circle at 20% 50%, rgba(59, 130, 246, 0.1), transparent 50%),
+    radial-gradient(circle at 80% 80%, rgba(34, 197, 94, 0.1), transparent 50%),
+    radial-gradient(circle at 40% 20%, rgba(168, 85, 247, 0.08), transparent 50%),
+    linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
 }
 
 .draft-header {
@@ -10,6 +15,14 @@
 }
 
 .draft-info-card {
+  background: #1e293b;
+  border: 1px solid rgba(59, 130, 246, 0.2);
+  border-radius: 12px;
+
+  ::ng-deep .p-card-body {
+    padding: 1.5rem;
+  }
+
   .draft-info {
     display: flex;
     justify-content: space-between;
@@ -24,7 +37,9 @@
 
       h2 {
         margin: 0;
-        color: var(--primary-color);
+        color: #3b82f6;
+        font-weight: 700;
+        font-size: 1.5rem;
       }
     }
 
@@ -37,7 +52,7 @@
 
       label {
         font-weight: 600;
-        color: var(--text-color-secondary);
+        color: #cbd5e1;
       }
     }
 
@@ -105,6 +120,25 @@
 .managers-overview {
   margin-top: 1rem;
 
+  .overview-card {
+    background: #1e293b;
+    border: 1px solid rgba(59, 130, 246, 0.2);
+    border-radius: 12px;
+
+    ::ng-deep .p-card-header {
+      background: linear-gradient(135deg, #334155 0%, #1e293b 100%);
+      color: #f1f5f9;
+      padding: 1rem 1.5rem;
+      font-size: 1.25rem;
+      font-weight: 700;
+      border-bottom: 2px solid rgba(59, 130, 246, 0.3);
+    }
+
+    ::ng-deep .p-card-body {
+      padding: 1.5rem;
+    }
+  }
+
   .managers-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -112,15 +146,20 @@
 
     .manager-card {
       padding: 1rem;
-      border: 2px solid var(--surface-border);
-      border-radius: var(--border-radius);
-      background: var(--surface-card);
+      border: 2px solid #334155;
+      border-radius: 8px;
+      background: #0f172a;
       transition: all 0.3s ease;
 
+      &:hover {
+        transform: translateY(-2px);
+        border-color: #475569;
+      }
+
       &.current-manager {
-        border-color: var(--primary-color);
-        background: var(--primary-50);
-        box-shadow: 0 0 10px rgba(var(--primary-color-rgb), 0.3);
+        border-color: #3b82f6;
+        background: linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(37, 99, 235, 0.1) 100%);
+        box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
       }
 
       .manager-header {
@@ -131,12 +170,13 @@
 
         h4 {
           margin: 0;
-          color: var(--text-color);
+          color: #f1f5f9;
+          font-weight: 600;
         }
       }
 
       .manager-stats {
-        color: var(--text-color-secondary);
+        color: #94a3b8;
         font-size: 0.875rem;
       }
     }
