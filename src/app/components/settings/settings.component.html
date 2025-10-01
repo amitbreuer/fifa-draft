@@ -1,6 +1,41 @@
 <div class="settings-container">
   <h1 class="main-title">⚽ FIFA Draft 🏆</h1>
 
+  @if (hasSavedDrafts()) {
+  <p-card header="Continue Draft" class="settings-card saved-drafts-card">
+    <div class="settings-content">
+      <div class="field">
+        <p-select
+          id="savedDraft"
+          [options]="savedDrafts"
+          [(ngModel)]="selectedSavedDraft"
+          placeholder="Choose a saved draft"
+          [style]="{'width': '100%'}"
+        ></p-select>
+      </div>
+
+      <div class="actions">
+        <p-button
+          label="Continue"
+          icon="pi pi-arrow-right"
+          [disabled]="!selectedSavedDraft"
+          (onClick)="continueDraft()"
+          severity="primary"
+          [raised]="true"
+        ></p-button>
+        <p-button
+          label="Delete"
+          icon="pi pi-trash"
+          [disabled]="!selectedSavedDraft"
+          (onClick)="deleteSavedDraft()"
+          severity="danger"
+          [outlined]="true"
+        ></p-button>
+      </div>
+    </div>
+  </p-card>
+  }
+
   <p-card header="Draft Settings" class="settings-card">
     <div class="settings-content">
       <div class="field">
@@ -30,11 +65,10 @@
       <p-divider></p-divider>
 
       <div class="managers-section">
-        <h3>Manager Names</h3>
+        <h3>Managers Names</h3>
         <div class="manager-inputs">
           @for (manager of managerNames; track $index; let i = $index) {
           <div class="field">
-            <label [for]="'manager' + i">Manager {{ i + 1 }}</label>
             <input
               [id]="'manager' + i"
               type="text"

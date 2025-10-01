@@ -13,7 +13,7 @@
 }
 
 .main-title {
-  font-size: 3.5rem;
+  font-size: 3rem;
   font-weight: 900;
   color: #ffffff;
   margin-bottom: 2rem;
@@ -42,12 +42,54 @@
   }
 
   ::ng-deep .p-card-body {
-    padding: 2rem;
     background: #1e293b;
   }
 
   ::ng-deep .p-card-content {
     padding: 0;
+  }
+}
+
+.saved-drafts-card {
+  margin-bottom: 2rem;
+
+  .actions {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 1rem;
+
+    ::ng-deep .p-button {
+      padding: 0.75rem 2rem;
+      font-size: 1rem;
+      font-weight: 600;
+      border-radius: 10px;
+      transition: all 0.2s;
+
+      &.p-button-primary {
+        box-shadow: 0 4px 14px rgba(59, 130, 246, 0.3);
+
+        &:hover:not(:disabled) {
+          box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+          transform: translateY(-2px);
+        }
+      }
+
+      &.p-button-danger {
+        &:hover:not(:disabled) {
+          transform: translateY(-2px);
+        }
+      }
+
+      &:active:not(:disabled) {
+        transform: translateY(0);
+      }
+
+      &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+    }
   }
 }
 
@@ -123,8 +165,6 @@
 }
 
 ::ng-deep .p-divider {
-  margin: 2rem 0;
-
   &::before {
     border-top: 1px solid #334155;
   }
@@ -132,6 +172,7 @@
 
 .managers-section {
   h3 {
+    margin-top: 0;
     margin-bottom: 1.5rem;
     color: #f1f5f9;
     font-size: 1.25rem;
@@ -169,7 +210,7 @@
 
 .actions {
   text-align: center;
-  margin-top: 2rem;
+  //margin-top: 2rem;
 
   ::ng-deep .p-button {
     padding: 0.875rem 2.5rem;
