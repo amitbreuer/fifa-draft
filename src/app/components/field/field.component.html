@@ -58,14 +58,13 @@
             (dragenter)="onDragEnter($event)"
             (dragleave)="onDragLeave($event)"
           >
-            <div class="player-shirt">
+            <div class="player-shield">
               <img
-                src="assets/images/shirt.svg"
-                alt="Player shirt"
-                class="shirt-image"
-                (error)="onShirtImageError($event)"
+                [src]="position.player.shieldUrl"
+                [alt]="playerName"
+                class="shield-image"
+                (error)="onImageError($event)"
               />
-              <span class="player-number">{{ getPlayerNumber(position.player) }}</span>
             </div>
             <div class="player-name">{{ playerName }}</div>
             <div class="player-rating">{{ position.player.overallRating }}</div>
@@ -119,14 +118,13 @@
       >
         @let playerName = player.commonName || `${player.firstName} ${player.lastName}`;
         <div class="player-item">
-          <div class="player-shirt">
+          <div class="player-shield">
             <img
-              src="assets/images/shirt.svg"
-              alt="Player shirt"
-              class="shirt-image"
-              (error)="onShirtImageError($event)"
+              [src]="player.shieldUrl"
+              [alt]="playerName"
+              class="shield-image"
+              (error)="onImageError($event)"
             />
-            <span class="player-number">{{ getPlayerNumber(player) }}</span>
           </div>
           <div class="player-name">{{ playerName }}</div>
           <div class="player-rating">{{ player.overallRating }}</div>

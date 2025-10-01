@@ -221,24 +221,8 @@ export class FieldComponent implements OnInit, OnDestroy {
     }
   }
 
-  onShirtImageError(event: any): void {
-    // Fallback to a colored rectangle if shirt image fails
-    event.target.style.display = 'none';
-    const parent = event.target.parentElement;
-    if (parent && !parent.querySelector('.fallback-shirt')) {
-      const fallback = document.createElement('div');
-      fallback.className = 'fallback-shirt';
-      fallback.style.cssText = `
-        width: 50px;
-        height: 50px;
-        background: linear-gradient(45deg, #007ad9, #0056b3);
-        border-radius: 8px;
-        position: absolute;
-        top: 0;
-        left: 0;
-      `;
-      parent.appendChild(fallback);
-    }
+  onImageError(event: any): void {
+    event.target.src = 'iniesta.jpg';
   }
 
   onFormationChange(): void {
