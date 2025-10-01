@@ -38,11 +38,13 @@ export class DraftService {
   placedPlayerIdsThisTurn$ = this.placedPlayerIdsThisTurnSubject.asObservable();
   actionHistory$ = this.actionHistorySubject.asObservable();
 
+  private readonly LOCALSTORAGE_KEY = 'fifa-draft';
+
   constructor(private playerService: PlayerService) {
     this.initializeFieldPositions();
   }
 
-  initializeDraft(managerNames: string[]): void {
+  initializeDraft(managerNames: string[], draftName: string): void {
     const managers: DraftManager[] = managerNames.map((name, index) => ({
       id: index,
       name,
@@ -54,7 +56,8 @@ export class DraftService {
       currentManagerIndex: 0,
       currentRound: 1,
       isSnakeDirection: false,
-      maxRounds: 18
+      maxRounds: 18,
+      draftName
     };
 
     this.draftSettingsSubject.next(draftSettings);
@@ -452,6 +455,9 @@ export class DraftService {
       }
     });
 
+    // Save to localStorage
+    this.saveDraftToLocalStorage();
+
     // Move to next turn
     this.moveToNextTurn();
   }
@@ -610,6 +616,89 @@ export class DraftService {
     if (settings) {
       const completedSettings = { ...settings, currentRound: settings.maxRounds + 1 };
       this.draftSettingsSubject.next(completedSettings);
+      this.saveDraftToLocalStorage();
+    }
+  }
+
+  private saveDraftToLocalStorage(): void {
+    const settings = this.draftSettingsSubject.value;
+    if (!settings || !settings.draftName) return;
+
+    try {
+      // Get existing drafts
+      const existingData = localStorage.getItem(this.LOCALSTORAGE_KEY);
+      const drafts: Record<string, DraftSettings> = existingData ? JSON.parse(existingData) : {};
+
+      // Save current draft
+      drafts[settings.draftName] = settings;
+
+      // Store back to localStorage
+      localStorage.setItem(this.LOCALSTORAGE_KEY, JSON.stringify(drafts));
+    } catch (error) {
+      console.error('Error saving draft to localStorage:', error);
+    }
+  }
+
+  loadDraftFromLocalStorage(draftName: string): boolean {
+    try {
+      const existingData = localStorage.getItem(this.LOCALSTORAGE_KEY);
+      if (!existingData) return false;
+
+      const drafts: Record<string, DraftSettings> = JSON.parse(existingData);
+      const savedDraft = drafts[draftName];
+
+      if (!savedDraft) return false;
+
+      // Restore draft settings
+      this.draftSettingsSubject.next(savedDraft);
+
+      // Restore selected players
+      const allSelectedPlayerIds: number[] = [];
+      savedDraft.managers.forEach(manager => {
+        manager.team.forEach(player => {
+          allSelectedPlayerIds.push(player.id);
+        });
+      });
+
+      // Mark all players as selected in player service
+      allSelectedPlayerIds.forEach(id => {
+        this.playerService.selectPlayer(id);
+      });
+
+      // Reset current manager state
+      this.resetCurrentManagerState();
+
+      return true;
+    } catch (error) {
+      console.error('Error loading draft from localStorage:', error);
+      return false;
+    }
+  }
+
+  getAllSavedDrafts(): string[] {
+    try {
+      const existingData = localStorage.getItem(this.LOCALSTORAGE_KEY);
+      if (!existingData) return [];
+
+      const drafts: Record<string, DraftSettings> = JSON.parse(existingData);
+      return Object.keys(drafts);
+    } catch (error) {
+      console.error('Error loading saved drafts:', error);
+      return [];
+    }
+  }
+
+  deleteDraft(draftName: string): void {
+    try {
+      const existingData = localStorage.getItem(this.LOCALSTORAGE_KEY);
+      if (!existingData) return;
+
+      const drafts: Record<string, DraftSettings> = JSON.parse(existingData);
+      delete drafts[draftName];
+
+      localStorage.setItem(this.LOCALSTORAGE_KEY, JSON.stringify(drafts));
+    } catch (error) {
+      console.error('Error deleting draft:', error);
     }
   }
 }

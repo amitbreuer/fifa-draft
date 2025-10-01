@@ -8,6 +8,7 @@ import { CardModule } from 'primeng/card';
 import { DividerModule } from 'primeng/divider';
 import { SelectButtonModule } from 'primeng/selectbutton';
 import { DraftService } from '../../services/draft.service';
+import { Select } from 'primeng/select';
 
 @Component({
   selector: 'app-settings',
@@ -19,7 +20,8 @@ import { DraftService } from '../../services/draft.service';
     InputTextModule,
     CardModule,
     DividerModule,
-    SelectButtonModule
+    SelectButtonModule,
+    Select
   ],
   templateUrl: './settings.component.html',
   styleUrl: './settings.component.scss'
@@ -36,10 +38,16 @@ export class SettingsComponent {
     { label: '6', value: 6 }
   ];
 
+  // Saved drafts
+  savedDrafts: string[] = [];
+  selectedSavedDraft: string | null = null;
+
   constructor(
     private draftService: DraftService,
     private router: Router
-  ) {}
+  ) {
+    this.loadSavedDrafts();
+  }
 
   updateManagerNames(): void {
     const newNames: string[] = [];
@@ -58,8 +66,37 @@ export class SettingsComponent {
 
   startDraft(): void {
     if (this.canStartDraft()) {
-      this.draftService.initializeDraft(this.managerNames);
+      this.draftService.initializeDraft(this.managerNames, this.draftName);
       this.router.navigate(['/draft']);
+    }
+  }
+
+  loadSavedDrafts(): void {
+    this.savedDrafts = this.draftService.getAllSavedDrafts();
+  }
+
+  hasSavedDrafts(): boolean {
+    return this.savedDrafts.length > 0;
+  }
+
+  continueDraft(): void {
+    if (!this.selectedSavedDraft) return;
+
+    const success = this.draftService.loadDraftFromLocalStorage(this.selectedSavedDraft);
+    if (success) {
+      this.router.navigate(['/draft']);
+    } else {
+      console.error('Failed to load draft');
+    }
+  }
+
+  deleteSavedDraft(): void {
+    if (!this.selectedSavedDraft) return;
+
+    if (confirm(`Are you sure you want to delete "${this.selectedSavedDraft}"?`)) {
+      this.draftService.deleteDraft(this.selectedSavedDraft);
+      this.selectedSavedDraft = null;
+      this.loadSavedDrafts();
     }
   }
 }

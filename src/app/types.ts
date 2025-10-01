@@ -66,6 +66,7 @@ export interface DraftSettings {
   currentRound: number;
   isSnakeDirection: boolean;
   maxRounds: number;
+  draftName?: string;
 }
 
 export interface FieldPosition {
