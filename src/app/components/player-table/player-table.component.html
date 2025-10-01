@@ -240,8 +240,8 @@
                 </div>
                 <p-progressbar
                   [value]="mainStats[mainStat]"
-                  [color]="mainStats[mainStat] | statSeverity"
                   [showValue]="false"
+                  [style]="{'--progress-bar-color': mainStats[mainStat] | statSeverity}"
                   [class]="'main-stat-progress'"
                 ></p-progressbar>
               </div>
@@ -257,8 +257,8 @@
                         </div>
                         <p-progressbar
                           [value]="statValue"
-                          [color]="statValue | statSeverity"
                           [showValue]="false"
+                          [style]="{'--progress-bar-color': statValue | statSeverity}"
                           [class]="'sub-stat-progress'"
                         ></p-progressbar>
                       </div>

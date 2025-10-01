@@ -5,9 +5,9 @@ import { Pipe, PipeTransform } from '@angular/core';
   standalone: true
 })
 export class RatingSeverityPipe implements PipeTransform {
-  transform(rating: number): string {
-    if (rating >= 85) return 'success';
-    if (rating >= 70) return 'warning';
-    return 'danger';
+  transform(rating: number): 'success' | 'warn' | 'danger' {
+    if (rating >= 85) return 'success'; // Green
+    if (rating >= 70) return 'warn'; // Yellow/Orange
+    return 'danger'; // Red
   }
 }

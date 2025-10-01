@@ -244,6 +244,7 @@
 
 .main-stat-progress ::ng-deep .p-progressbar-value {
   border-radius: 4px;
+  background-color: var(--progress-bar-color, #22c55e) !important;
 }
 
 .sub-stats {
@@ -287,6 +288,7 @@
 
 .sub-stat-progress ::ng-deep .p-progressbar-value {
   border-radius: 2px;
+  background-color: var(--progress-bar-color, #22c55e) !important;
 }
 
 .player-shield-section {
