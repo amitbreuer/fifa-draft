@@ -5,6 +5,7 @@ import { Subject, takeUntil, combineLatest } from 'rxjs';
 import { TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
 import { SelectModule } from 'primeng/select';
+import { MultiSelectModule } from 'primeng/multiselect';
 import { CheckboxModule } from 'primeng/checkbox';
 import { CardModule } from 'primeng/card';
 import { TagModule } from 'primeng/tag';
@@ -29,6 +30,7 @@ import { MainStatNamePipe } from '../../pipes/main-stat-name.pipe';
     TableModule,
     ButtonModule,
     SelectModule,
+    MultiSelectModule,
     CheckboxModule,
     CardModule,
     TagModule,
@@ -53,15 +55,12 @@ export class PlayerTableComponent implements OnInit, OnDestroy {
   showPlayerDialog = false;
   placedPlayerIdsThisTurn: Set<number> = new Set();
 
-  selectedPosition: PositionFilter = 'ALL';
+  selectedPositions: PositionFilter[] = [];
   selectedTeamId: number | null = null;
   selectedNationalityId: number | null = null;
   showSelectedPlayers = false;
 
-  positionOptions = [
-    { label: 'All Positions', value: 'ALL' },
-    ...AVAILABLE_POSITIONS.map(pos => ({ label: pos, value: pos }))
-  ];
+  positionOptions = AVAILABLE_POSITIONS.map(pos => ({ label: pos, value: pos }));
 
   teamOptions: { label: string; value: number }[] = [];
   nationalityOptions: { label: string; value: number }[] = [];
@@ -120,7 +119,7 @@ export class PlayerTableComponent implements OnInit, OnDestroy {
   }
 
   clearFilters(): void {
-    this.selectedPosition = 'ALL';
+    this.selectedPositions = [];
     this.selectedTeamId = null;
     this.selectedNationalityId = null;
     this.showSelectedPlayers = false;
@@ -128,7 +127,7 @@ export class PlayerTableComponent implements OnInit, OnDestroy {
   }
 
   hasActiveFilters(): boolean {
-    return this.selectedPosition !== 'ALL' ||
+    return this.selectedPositions.length > 0 ||
            this.selectedTeamId !== null ||
            this.selectedNationalityId !== null ||
            this.showSelectedPlayers;
@@ -148,8 +147,8 @@ export class PlayerTableComponent implements OnInit, OnDestroy {
   }
 
   private updateFilteredPlayers(): void {
-    this.filteredPlayers = this.playerService.getFilteredPlayers(
-      this.selectedPosition,
+    this.filteredPlayers = this.playerService.getFilteredPlayersByMultiplePositions(
+      this.selectedPositions,
       this.showSelectedPlayers,
       this.selectedTeamId ?? undefined,
       this.selectedNationalityId ?? undefined

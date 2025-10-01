@@ -64,6 +64,47 @@ export class PlayerService {
     return filteredPlayers;
   }
 
+  getFilteredPlayersByMultiplePositions(
+    positionFilters: PositionFilter[],
+    showSelected: boolean,
+    teamId?: number,
+    nationalityId?: number
+  ): Player[] {
+    const allPlayers = this.playersSubject.value;
+    const selectedIds = this.selectedPlayerIdsSubject.value;
+
+    let filteredPlayers = allPlayers;
+
+    // Filter by multiple positions
+    if (positionFilters.length > 0) {
+      filteredPlayers = filteredPlayers.filter(player =>
+        positionFilters.some(position =>
+          player.position.shortLabel === position ||
+          player.alternatePositions?.some(pos => pos.shortLabel === position)
+        )
+      );
+    }
+
+    // Filter by team
+    if (teamId !== undefined && teamId !== null) {
+      filteredPlayers = filteredPlayers.filter(player => player.team.id === teamId);
+    }
+
+    // Filter by nationality
+    if (nationalityId !== undefined && nationalityId !== null) {
+      filteredPlayers = filteredPlayers.filter(player => player.nationality.id === nationalityId);
+    }
+
+    // Filter by selected/unselected
+    if (showSelected) {
+      filteredPlayers = filteredPlayers.filter(player => selectedIds.has(player.id));
+    } else {
+      filteredPlayers = filteredPlayers.filter(player => !selectedIds.has(player.id));
+    }
+
+    return filteredPlayers;
+  }
+
   getAllTeams(): { id: number; label: string; imageUrl: string }[] {
     const allPlayers = this.playersSubject.value;
     const teamsMap = new Map<number, { id: number; label: string; imageUrl: string }>();

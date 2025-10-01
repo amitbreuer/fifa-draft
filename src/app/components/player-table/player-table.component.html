@@ -55,14 +55,16 @@
           ></p-select>
         </th>
         <th>
-          <p-select
+          <p-multiSelect
             [options]="positionOptions"
-            [(ngModel)]="selectedPosition"
+            [(ngModel)]="selectedPositions"
             (onChange)="onFilterChange()"
             placeholder="All Positions"
             [style]="{'width': '100%'}"
             appendTo="body"
-          ></p-select>
+            [maxSelectedLabels]="2"
+            selectedItemsLabel="{0} positions"
+          ></p-multiSelect>
         </th>
         <th colspan="3">
           <p-select

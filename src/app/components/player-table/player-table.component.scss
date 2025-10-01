@@ -102,16 +102,23 @@
   color: #cbd5e1;
 }
 
-::ng-deep .p-multiselect {
+::ng-deep .p-multiselect,
+::ng-deep .p-select {
   background: #0f172a;
   border: 2px solid #334155;
   color: #f1f5f9;
+
+  .p-select-label,
+  .p-multiselect-label {
+    color: #f1f5f9;
+  }
 
   &:hover {
     border-color: #475569;
   }
 
-  &:focus {
+  &:focus,
+  &.p-focus {
     border-color: #3b82f6;
     box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
   }
