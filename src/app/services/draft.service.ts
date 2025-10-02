@@ -509,7 +509,7 @@ export class DraftService {
     // Load current manager's team state
     const currentManager = this.getCurrentManager();
     if (currentManager) {
-      // Restore saved formation, field positions, and bench
+      // Restore saved formation
       if (currentManager.formation) {
         this.currentFormationSubject.next(currentManager.formation);
       }
@@ -518,11 +518,11 @@ export class DraftService {
         // Restore saved field positions
         this.fieldPositionsSubject.next([...currentManager.fieldPositions]);
       } else {
-        // Initialize empty field positions
-        this.initializeFieldPositions();
+        // Initialize empty field positions for this manager
+        this.initializeEmptyFieldPositions();
       }
 
-      if (currentManager.benchPlayers) {
+      if (currentManager.benchPlayers && currentManager.benchPlayers.length > 0) {
         // Restore saved bench
         this.benchPlayersSubject.next([...currentManager.benchPlayers]);
       } else {
@@ -531,7 +531,7 @@ export class DraftService {
       }
     } else {
       // No current manager, initialize empty state
-      this.initializeFieldPositions();
+      this.initializeEmptyFieldPositions();
       this.benchPlayersSubject.next([]);
     }
   }
@@ -539,6 +539,51 @@ export class DraftService {
   private initializeFieldPositions(): void {
     const formation = this.currentFormationSubject.value;
     this.setFormation(formation);
+  }
+
+  private initializeEmptyFieldPositions(): void {
+    const formation = this.currentFormationSubject.value;
+    const positions = FORMATIONS[formation];
+    const newFieldPositions: FieldPosition[] = [];
+    const positionCounts = new Map<string, number>();
+
+    positions.forEach((positionType, index) => {
+      const count = positionCounts.get(positionType) || 0;
+      const positionId = count === 0 ? positionType.toLowerCase() : `${positionType.toLowerCase()}_${count}`;
+      positionCounts.set(positionType, count + 1);
+
+      const baseCoords = POSITION_COORDINATES[positionType];
+
+      // Calculate position with slight adjustments for multiple players in same position
+      let x = baseCoords.x;
+      let y = baseCoords.y;
+
+      // Count how many of this position type we've seen so far (for spacing)
+      const positionsProcessedSoFar = positions.slice(0, index + 1).filter(p => p === positionType).length;
+      const totalSamePositions = positions.filter(p => p === positionType).length;
+
+      // Adjust x coordinate for multiple positions of the same type
+      if (totalSamePositions > 1) {
+        const currentIndex = positionsProcessedSoFar - 1;
+
+        if (totalSamePositions === 2) {
+          x = baseCoords.x + (currentIndex === 0 ? -12 : 12);
+        } else if (totalSamePositions === 3) {
+          x = baseCoords.x + (currentIndex === 0 ? -18 : currentIndex === 1 ? 0 : 18);
+        } else if (totalSamePositions === 4) {
+          x = baseCoords.x + (currentIndex * 12 - 18);
+        }
+      }
+
+      newFieldPositions.push({
+        id: positionId,
+        x,
+        y,
+        player: undefined
+      });
+    });
+
+    this.fieldPositionsSubject.next(newFieldPositions);
   }
 
   setFormation(formationName: FormationName): void {
