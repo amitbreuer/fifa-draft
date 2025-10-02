@@ -1,13 +1,11 @@
 // Main container for field component
 :host {
   display: flex;
-  flex-direction: column;
   height: 100%;
 }
 
 .field-card {
   flex: 1; // Take remaining space
-  margin-bottom: 1rem;
   display: flex;
   flex-direction: column;
 
@@ -76,17 +74,34 @@
 }
 
 .bench-card {
-  flex: 0 0 auto; // Don't grow or shrink, auto height
-  margin-bottom: 1rem;
+  flex: 0.2; // Take remaining space
+  height: 100%;
+  align-items: center;
+  display: flex;
+  flex-direction: column;
 
   ::ng-deep .p-card {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
     background: #1e293b;
     border: 1px solid rgba(59, 130, 246, 0.2);
     border-radius: 12px;
   }
 
+  ::ng-deep .p-card-header {
+    flex: 0 0 auto;
+  }
+
+  ::ng-deep .p-card-content {
+    height: 100%;
+  }
+
   ::ng-deep .p-card-body {
-    padding: 1rem;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 0.5rem;
   }
 }
 
@@ -97,7 +112,7 @@
   gap: 1rem;
   width: 100%;
   font-weight: 600;
-  padding: 0.5rem 1rem;
+  padding: 0.5rem;
   color: #f1f5f9;
 }
 
@@ -392,8 +407,12 @@
 }
 
 .bench-container {
-  min-height: 120px;
-  padding: 1rem;
+  flex: 1;
+  height: 98%;
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  padding: 0.5rem;
   border: 2px dashed #334155;
   border-radius: 8px;
   transition: all 0.2s;
@@ -418,10 +437,12 @@
 }
 
 .bench-slots {
+  flex: 1;
   display: flex;
   flex-wrap: wrap;
-  gap: 1rem;
-  align-items: center;
+  gap: 0.75rem;
+  align-items: flex-start;
+  align-content: flex-start;
 }
 
 .bench-player {
@@ -435,6 +456,8 @@
 
 .bench-empty-state {
   width: 100%;
+  flex: 1;
+  text-align: center;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -442,10 +465,10 @@
   gap: 0.5rem;
   color: #64748b;
   font-size: 14px;
-  padding: 0.8rem;
+  padding: 0.5rem;
 
   i {
-    font-size: 2rem;
+    font-size: 1.5rem;
     color: #475569;
   }
 }

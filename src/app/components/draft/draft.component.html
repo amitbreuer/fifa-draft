@@ -3,11 +3,11 @@
   <div class="draft-header">
     <p-card class="overview-card">
       <div class="overview-content">
-<!--        <p-tag-->
-<!--          [value]="'Round ' + draftSettings.currentRound + ' of ' + draftSettings.maxRounds"-->
-<!--          severity="info"-->
-<!--          class="round-tag"-->
-<!--        ></p-tag>-->
+        <p-tag
+          [value]="'Round ' + draftSettings.currentRound + ' of ' + draftSettings.maxRounds"
+          severity="info"
+          class="round-tag"
+        ></p-tag>
         <div class="managers-grid">
           @for (manager of draftSettings.managers; track manager.id; let i = $index) {
           <div
@@ -23,11 +23,6 @@
           </div>
           }
         </div>
-        <p-tag
-          [value]="'Round ' + draftSettings.currentRound + ' of ' + draftSettings.maxRounds"
-          severity="info"
-          class="round-tag"
-        ></p-tag>
         <div class="turn-actions">
           <p-button
             label="Undo"

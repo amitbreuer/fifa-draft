@@ -106,16 +106,6 @@
 
       ::ng-deep app-field {
         height: 100%;
-
-        .field-card,
-        .bench-card,
-        .current-pick-card {
-          margin-bottom: 1rem;
-
-          &:last-child {
-            margin-bottom: 0;
-          }
-        }
       }
     }
   }
