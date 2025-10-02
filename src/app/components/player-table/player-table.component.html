@@ -306,18 +306,47 @@
         <div class="comparison-header">
           <!-- Player 1 -->
           <div class="comparison-player-header">
-            <img
-              [src]="comparisonPlayer1.shieldUrl"
-              [alt]="comparisonPlayer1.commonName || comparisonPlayer1.firstName + ' ' + comparisonPlayer1.lastName"
-              class="player-shield-large"
-              (error)="onImageError($event)"
-            />
-            <div class="player-header-info">
-              <h3>{{ comparisonPlayer1.commonName || comparisonPlayer1.firstName + ' ' + comparisonPlayer1.lastName }}</h3>
-              <p-tag
-                [value]="comparisonPlayer1.overallRating.toString()"
-                [severity]="comparisonPlayer1.overallRating | ratingSeverity"
-              ></p-tag>
+            <div class="player-image-section">
+              <img
+                [src]="comparisonPlayer1.shieldUrl"
+                [alt]="comparisonPlayer1.commonName || comparisonPlayer1.firstName + ' ' + comparisonPlayer1.lastName"
+                class="player-shield-large"
+                (error)="onImageError($event)"
+              />
+              <div class="player-header-info">
+                <h3>{{ comparisonPlayer1.commonName || comparisonPlayer1.firstName + ' ' + comparisonPlayer1.lastName }}</h3>
+                <p-tag
+                  [value]="comparisonPlayer1.overallRating.toString()"
+                  [severity]="comparisonPlayer1.overallRating | ratingSeverity"
+                ></p-tag>
+              </div>
+            </div>
+            <!-- Player 1 Details -->
+            <div class="player-details-info">
+              <div class="detail-row">
+                <span class="detail-label">Position:</span>
+                <div class="positions-inline">
+                  <p-tag [value]="comparisonPlayer1.position.shortLabel" severity="info"></p-tag>
+                  @if (comparisonPlayer1.alternatePositions && comparisonPlayer1.alternatePositions.length > 0) {
+                    @for (pos of comparisonPlayer1.alternatePositions; track pos.id) {
+                      <p-tag [value]="pos.shortLabel" severity="secondary"></p-tag>
+                    }
+                  }
+                </div>
+              </div>
+              <div class="detail-row">
+                <span class="detail-label">Preferred Foot:</span>
+                <span class="detail-value">{{ comparisonPlayer1.preferredFoot }}</span>
+              </div>
+              <div class="detail-row">
+                <span class="detail-label">Weak Foot:</span>
+                <p-rating
+                  [ngModel]="comparisonPlayer1.weakFootAbility"
+                  [readonly]="true"
+                  [stars]="5"
+                  class="weak-foot-rating-inline"
+                ></p-rating>
+              </div>
             </div>
           </div>
 
@@ -327,18 +356,47 @@
           <!-- Player 2 Selection -->
           <div class="comparison-player-header">
             @if (comparisonPlayer2) {
-              <img
-                [src]="comparisonPlayer2.shieldUrl"
-                [alt]="comparisonPlayer2.commonName || comparisonPlayer2.firstName + ' ' + comparisonPlayer2.lastName"
-                class="player-shield-large"
-                (error)="onImageError($event)"
-              />
-              <div class="player-header-info">
-                <h3>{{ comparisonPlayer2.commonName || comparisonPlayer2.firstName + ' ' + comparisonPlayer2.lastName }}</h3>
-                <p-tag
-                  [value]="comparisonPlayer2.overallRating.toString()"
-                  [severity]="comparisonPlayer2.overallRating | ratingSeverity"
-                ></p-tag>
+              <div class="player-image-section">
+                <img
+                  [src]="comparisonPlayer2.shieldUrl"
+                  [alt]="comparisonPlayer2.commonName || comparisonPlayer2.firstName + ' ' + comparisonPlayer2.lastName"
+                  class="player-shield-large"
+                  (error)="onImageError($event)"
+                />
+                <div class="player-header-info">
+                  <h3>{{ comparisonPlayer2.commonName || comparisonPlayer2.firstName + ' ' + comparisonPlayer2.lastName }}</h3>
+                  <p-tag
+                    [value]="comparisonPlayer2.overallRating.toString()"
+                    [severity]="comparisonPlayer2.overallRating | ratingSeverity"
+                  ></p-tag>
+                </div>
+              </div>
+              <!-- Player 2 Details -->
+              <div class="player-details-info">
+                <div class="detail-row">
+                  <span class="detail-label">Position:</span>
+                  <div class="positions-inline">
+                    <p-tag [value]="comparisonPlayer2.position.shortLabel" severity="info"></p-tag>
+                    @if (comparisonPlayer2.alternatePositions && comparisonPlayer2.alternatePositions.length > 0) {
+                      @for (pos of comparisonPlayer2.alternatePositions; track pos.id) {
+                        <p-tag [value]="pos.shortLabel" severity="secondary"></p-tag>
+                      }
+                    }
+                  </div>
+                </div>
+                <div class="detail-row">
+                  <span class="detail-label">Preferred Foot:</span>
+                  <span class="detail-value">{{ comparisonPlayer2.preferredFoot }}</span>
+                </div>
+                <div class="detail-row">
+                  <span class="detail-label">Weak Foot:</span>
+                  <p-rating
+                    [ngModel]="comparisonPlayer2.weakFootAbility"
+                    [readonly]="true"
+                    [stars]="5"
+                    class="weak-foot-rating-inline"
+                  ></p-rating>
+                </div>
               </div>
             } @else {
               <div class="player-select-container">
