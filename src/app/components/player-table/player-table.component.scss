@@ -504,6 +504,7 @@
   grid-template-columns: auto 1fr;
   gap: 1.5rem;
   align-items: center;
+  margin-left: 100px;
 
   h3 {
     margin: 0;
@@ -632,6 +633,13 @@
 .player-stat-side {
   flex: 1;
   min-width: 0;
+}
+
+.player-stat-right {
+  .main-stat-title,
+  .sub-stat-header {
+    justify-content: flex-end;
+  }
 }
 
 .stat-name-middle {
