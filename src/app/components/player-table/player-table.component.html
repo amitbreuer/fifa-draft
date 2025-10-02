@@ -99,13 +99,13 @@
       @let playerName = player.commonName || `${player.firstName} ${player.lastName}`;
       @let mainStats = getMainStats(player);
       <tr
-        [class.disabled-row]="isPlayerPlacedThisTurn(player.id)"
+        [class.disabled-row]="isPlayerPlacedThisTurn(player.id) || hasPlacedPlayerThisTurn"
         style="cursor: pointer;"
       >
         <td>
           <p-tableRadioButton
             [value]="player"
-            [disabled]="isPlayerPlacedThisTurn(player.id)"
+            [disabled]="isPlayerPlacedThisTurn(player.id) || hasPlacedPlayerThisTurn"
           ></p-tableRadioButton>
         </td>
         <td (click)="onRowClick(player, $event)">

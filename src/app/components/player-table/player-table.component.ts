@@ -56,6 +56,7 @@ export class PlayerTableComponent implements OnInit, OnDestroy {
   selectedPlayerForDialog: Player | null = null;
   showPlayerDialog = false;
   placedPlayerIdsThisTurn: Set<number> = new Set();
+  hasPlacedPlayerThisTurn = false;
 
   // Comparison dialog
   showComparisonDialog = false;
@@ -116,6 +117,13 @@ export class PlayerTableComponent implements OnInit, OnDestroy {
     ).subscribe(placedIds => {
       this.placedPlayerIdsThisTurn = placedIds;
     });
+
+    // Subscribe to hasPlacedPlayerThisTurn to disable all selections
+    this.draftService.hasPlacedPlayerThisTurn$.pipe(
+      takeUntil(this.destroy$)
+    ).subscribe(hasPlaced => {
+      this.hasPlacedPlayerThisTurn = hasPlaced;
+    });
   }
 
   ngOnDestroy(): void {
@@ -145,6 +153,12 @@ export class PlayerTableComponent implements OnInit, OnDestroy {
   onSelectionChange(event: Player | null): void {
     // Don't allow selecting players that are already placed this turn
     if (event && this.isPlayerPlacedThisTurn(event.id)) {
+      this.selectedPlayer = null;
+      return;
+    }
+
+    // Don't allow selecting a new player if one has already been placed this turn
+    if (event && this.hasPlacedPlayerThisTurn) {
       this.selectedPlayer = null;
       return;
     }

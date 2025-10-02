@@ -148,10 +148,6 @@ Player data includes FIFA ratings, stats, positions, and club information.
 - Team export to image
 - Draft history and statistics
 
-## License
-
-This project is for educational and entertainment purposes.
-
 ---
 
 **Enjoy your draft!** ⚽🏆
