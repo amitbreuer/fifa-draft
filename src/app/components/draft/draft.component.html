@@ -8,6 +8,7 @@
           severity="info"
           class="round-tag"
         ></p-tag>
+        <p-divider layout="vertical" />
         <div class="managers-grid">
           @for (manager of draftSettings.managers; track manager.id; let i = $index) {
           <div
@@ -23,6 +24,7 @@
           </div>
           }
         </div>
+        <p-divider layout="vertical" />
         <div class="turn-actions">
           <p-button
             label="Undo"
