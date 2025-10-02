@@ -545,18 +545,21 @@ export class DraftService {
     const positions = FORMATIONS[formationName];
     const currentPositions = this.fieldPositionsSubject.value;
 
-    // Create a map of existing players by position type
-    const existingPlayers = new Map<string, Player>();
+    // Collect all existing players with their positions
+    const existingPlayersByPosition = new Map<string, Player>();
+    const existingPlayers: Player[] = [];
     currentPositions.forEach(pos => {
       if (pos.player) {
-        const positionLabel = pos.id.toUpperCase().replace(/\d+$/, '');
-        existingPlayers.set(pos.id, pos.player);
+        // Extract base position type (e.g., "CB" from "cb" or "cb_1")
+        existingPlayersByPosition.set(pos.id, pos.player);
+        existingPlayers.push(pos.player);
       }
     });
 
     // Create new field positions based on the formation
     const newFieldPositions: FieldPosition[] = [];
     const positionCounts = new Map<string, number>();
+    const placedPlayers = new Set<number>();
 
     positions.forEach((positionType, index) => {
       const count = positionCounts.get(positionType) || 0;
@@ -593,6 +596,104 @@ export class DraftService {
         player: undefined
       });
     });
+
+    // Now try to place existing players in similar positions
+    // Priority 1: Try to place in exact same position type
+    currentPositions.forEach(oldPos => {
+      if (oldPos.player && !placedPlayers.has(oldPos.player.id)) {
+        const basePosition = oldPos.id.replace(/_\d+$/, '').toUpperCase();
+
+        // Find a matching position in the new formation
+        const matchingNewPos = newFieldPositions.find(newPos => {
+          const newBasePosition = newPos.id.replace(/_\d+$/, '').toUpperCase();
+          return newBasePosition === basePosition && !newPos.player;
+        });
+
+        if (matchingNewPos) {
+          matchingNewPos.player = oldPos.player;
+          placedPlayers.add(oldPos.player.id);
+        }
+      }
+    });
+
+    // Priority 2: Try to place in player's alternate positions
+    currentPositions.forEach(oldPos => {
+      if (oldPos.player && !placedPlayers.has(oldPos.player.id)) {
+        const player = oldPos.player;
+
+        // Check if player can play in any available position
+        if (player.alternatePositions && player.alternatePositions.length > 0) {
+          for (const altPos of player.alternatePositions) {
+            const matchingNewPos = newFieldPositions.find(newPos => {
+              const newBasePosition = newPos.id.replace(/_\d+$/, '').toUpperCase();
+              return newBasePosition === altPos.shortLabel && !newPos.player;
+            });
+
+            if (matchingNewPos) {
+              matchingNewPos.player = player;
+              placedPlayers.add(player.id);
+              break;
+            }
+          }
+        }
+      }
+    });
+
+    // Priority 3: Try to place in similar positions (defensive, midfield, attack)
+    const positionGroups = {
+      defensive: ['GK', 'CB', 'LB', 'RB', 'LWB', 'RWB'],
+      midfield: ['CDM', 'CM', 'LCM', 'RCM', 'CAM', 'LAM', 'RAM', 'LM', 'RM'],
+      attack: ['LW', 'RW', 'ST', 'CF']
+    };
+
+    const getPositionGroup = (position: string): string | null => {
+      const basePos = position.replace(/_\d+$/, '').toUpperCase();
+      for (const [group, positions] of Object.entries(positionGroups)) {
+        if (positions.includes(basePos)) return group;
+      }
+      return null;
+    };
+
+    currentPositions.forEach(oldPos => {
+      if (oldPos.player && !placedPlayers.has(oldPos.player.id)) {
+        const oldGroup = getPositionGroup(oldPos.id);
+
+        if (oldGroup) {
+          // Find any available position in the same group
+          const matchingNewPos = newFieldPositions.find(newPos => {
+            const newGroup = getPositionGroup(newPos.id);
+            return newGroup === oldGroup && !newPos.player;
+          });
+
+          if (matchingNewPos) {
+            matchingNewPos.player = oldPos.player;
+            placedPlayers.add(oldPos.player.id);
+          }
+        }
+      }
+    });
+
+    // Priority 4: Place remaining players in any available spot
+    const unplacedPlayers = existingPlayers.filter(p => !placedPlayers.has(p.id));
+    unplacedPlayers.forEach(player => {
+      const availablePos = newFieldPositions.find(pos => !pos.player);
+      if (availablePos) {
+        availablePos.player = player;
+        placedPlayers.add(player.id);
+      }
+    });
+
+    // Any players that couldn't be placed go to the bench
+    const remainingPlayers = existingPlayers.filter(p => !placedPlayers.has(p.id));
+    if (remainingPlayers.length > 0) {
+      const currentBench = [...this.benchPlayersSubject.value];
+      remainingPlayers.forEach(player => {
+        if (!currentBench.find(p => p.id === player.id) && currentBench.length < 7) {
+          currentBench.push(player);
+        }
+      });
+      this.benchPlayersSubject.next(currentBench);
+    }
 
     this.currentFormationSubject.next(formationName);
     this.fieldPositionsSubject.next(newFieldPositions);
