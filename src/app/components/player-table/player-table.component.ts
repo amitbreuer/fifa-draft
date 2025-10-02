@@ -13,6 +13,7 @@ import { ProgressBarModule } from 'primeng/progressbar';
 import { RatingModule } from 'primeng/rating';
 import { SpeedDialModule } from 'primeng/speeddial';
 import { DialogModule } from 'primeng/dialog';
+import { TooltipModule } from 'primeng/tooltip';
 import { Player, AVAILABLE_POSITIONS, PositionFilter, mainStatsMap, MainStats } from '../../types';
 import { PlayerService } from '../../services/player.service';
 import { DraftService } from '../../services/draft.service';
@@ -38,6 +39,7 @@ import { MainStatNamePipe } from '../../pipes/main-stat-name.pipe';
     RatingModule,
     SpeedDialModule,
     DialogModule,
+    TooltipModule,
     RatingSeverityPipe,
     StatSeverityPipe,
     StatNamePipe,
@@ -54,6 +56,12 @@ export class PlayerTableComponent implements OnInit, OnDestroy {
   selectedPlayerForDialog: Player | null = null;
   showPlayerDialog = false;
   placedPlayerIdsThisTurn: Set<number> = new Set();
+
+  // Comparison dialog
+  showComparisonDialog = false;
+  comparisonPlayer1: Player | null = null;
+  comparisonPlayer2: Player | null = null;
+  playerOptions: { label: string; value: Player }[] = [];
 
   selectedPositions: PositionFilter[] = [];
   selectedTeamId: number | null = null;
@@ -90,6 +98,7 @@ export class PlayerTableComponent implements OnInit, OnDestroy {
       takeUntil(this.destroy$)
     ).subscribe(() => {
       this.updateFilteredPlayers();
+      this.updatePlayerOptions();
     });
 
     // Subscribe to current picked player to clear selection after placement
@@ -207,5 +216,28 @@ export class PlayerTableComponent implements OnInit, OnDestroy {
   closePlayerDialog(): void {
     this.showPlayerDialog = false;
     this.selectedPlayerForDialog = null;
+  }
+
+  openComparisonDialog(): void {
+    if (this.selectedPlayerForDialog) {
+      this.comparisonPlayer1 = this.selectedPlayerForDialog;
+      this.comparisonPlayer2 = null;
+      this.showPlayerDialog = false;
+      this.showComparisonDialog = true;
+    }
+  }
+
+  closeComparisonDialog(): void {
+    this.showComparisonDialog = false;
+    this.comparisonPlayer1 = null;
+    this.comparisonPlayer2 = null;
+  }
+
+  private updatePlayerOptions(): void {
+    const allPlayers = this.playerService.getPlayers();
+    this.playerOptions = allPlayers.map(player => ({
+      label: player.commonName || `${player.firstName} ${player.lastName}`,
+      value: player
+    }));
   }
 }

@@ -2,7 +2,7 @@
   <p-table
     [value]="filteredPlayers"
     [paginator]="true"
-    [rows]="25"
+    [rows]="50"
     [showCurrentPageReport]="true"
     currentPageReportTemplate="Showing {first} to {last} of {totalRecords} players"
     [rowsPerPageOptions]="[25, 50, 100]"
@@ -164,9 +164,23 @@
     [modal]="true"
     [closable]="true"
     [closeOnEscape]="true"
-    [style]="{'width': '800px', 'max-width': '95vw'}"
-    [header]="selectedPlayerForDialog ? (selectedPlayerForDialog.commonName || selectedPlayerForDialog.firstName + ' ' + selectedPlayerForDialog.lastName) : ''"
+    [style]="{'width': '800px', 'max-width': '95vw', 'max-height': '92vh'}"
   >
+    @let playerName = selectedPlayerForDialog ? (selectedPlayerForDialog.commonName || `${selectedPlayerForDialog.firstName} ${selectedPlayerForDialog.lastName}`) : '';
+    <ng-template pTemplate="header">
+      <div style="display: flex; gap: 1rem; align-items: center;">
+        <h2 style="margin: 0">{{playerName}}</h2>
+        <button
+          pButton
+          type="button"
+          icon="pi pi-users"
+          severity="info"
+          (click)="openComparisonDialog()"
+          class="p-dialog-header-icon p-link"
+          pTooltip="Compare"
+        ></button>
+      </div>
+    </ng-template>
     @if (selectedPlayerForDialog) {
       <div class="player-dialog-content">
         <!-- Additional Info Section -->
@@ -175,7 +189,7 @@
           <div class="player-shield-section">
             <img
               [src]="selectedPlayerForDialog.shieldUrl"
-              [alt]="selectedPlayerForDialog.commonName || selectedPlayerForDialog.firstName + ' ' + selectedPlayerForDialog.lastName"
+              [alt]="playerName"
               class="player-shield-large"
               (error)="onImageError($event)"
             />
@@ -274,6 +288,171 @@
             </div>
           }
         </div>
+      </div>
+    }
+  </p-dialog>
+
+  <!-- Player Comparison Dialog -->
+  <p-dialog
+    [(visible)]="showComparisonDialog"
+    [modal]="true"
+    [closable]="true"
+    [closeOnEscape]="true"
+    [style]="{'width': '1200px', 'max-width': '95vw'}"
+  >
+    @if (comparisonPlayer1) {
+      <div class="comparison-dialog-content">
+        <!-- Players Header -->
+        <div class="comparison-header">
+          <!-- Player 1 -->
+          <div class="comparison-player-header">
+            <img
+              [src]="comparisonPlayer1.shieldUrl"
+              [alt]="comparisonPlayer1.commonName || comparisonPlayer1.firstName + ' ' + comparisonPlayer1.lastName"
+              class="player-shield-large"
+              (error)="onImageError($event)"
+            />
+            <div class="player-header-info">
+              <h3>{{ comparisonPlayer1.commonName || comparisonPlayer1.firstName + ' ' + comparisonPlayer1.lastName }}</h3>
+              <p-tag
+                [value]="comparisonPlayer1.overallRating.toString()"
+                [severity]="comparisonPlayer1.overallRating | ratingSeverity"
+              ></p-tag>
+            </div>
+          </div>
+
+          <!-- VS Divider -->
+          <div class="vs-divider">VS</div>
+
+          <!-- Player 2 Selection -->
+          <div class="comparison-player-header">
+            @if (comparisonPlayer2) {
+              <img
+                [src]="comparisonPlayer2.shieldUrl"
+                [alt]="comparisonPlayer2.commonName || comparisonPlayer2.firstName + ' ' + comparisonPlayer2.lastName"
+                class="player-shield-large"
+                (error)="onImageError($event)"
+              />
+              <div class="player-header-info">
+                <h3>{{ comparisonPlayer2.commonName || comparisonPlayer2.firstName + ' ' + comparisonPlayer2.lastName }}</h3>
+                <p-tag
+                  [value]="comparisonPlayer2.overallRating.toString()"
+                  [severity]="comparisonPlayer2.overallRating | ratingSeverity"
+                ></p-tag>
+              </div>
+            } @else {
+              <div class="player-select-container">
+                <p-select
+                  [options]="playerOptions"
+                  [(ngModel)]="comparisonPlayer2"
+                  optionLabel="label"
+                  optionValue="value"
+                  [filter]="true"
+                  filterBy="label"
+                  placeholder="Select a player to compare"
+                  [style]="{'width': '100%'}"
+                  appendTo="body"
+                ></p-select>
+              </div>
+            }
+          </div>
+        </div>
+
+        <!-- Stats Comparison -->
+        @if (comparisonPlayer2) {
+          <div class="comparison-stats">
+            @let mainStats1 = getMainStats(comparisonPlayer1);
+            @let mainStats2 = getMainStats(comparisonPlayer2);
+            @for (mainStat of getMainStatsKeys(); track mainStat) {
+              <div class="comparison-stat-group">
+                <div class="comparison-main-stat">
+                  <!-- Player 1 Main Stat -->
+                  <div class="player-stat-side">
+                    <div class="main-stat-header">
+                      <div class="main-stat-title">
+                        <span class="main-stat-value">{{ mainStats1[mainStat] }}</span>
+                      </div>
+                      <p-progressbar
+                        [value]="mainStats1[mainStat]"
+                        [showValue]="false"
+                        [style]="{'--progress-bar-color': mainStats1[mainStat] | statSeverity}"
+                        [class]="'main-stat-progress'"
+                      ></p-progressbar>
+                    </div>
+                  </div>
+
+                  <!-- Stat Name in Middle -->
+                  <div class="stat-name-middle">
+                    <span class="main-stat-name">{{ mainStat | mainStatName }}</span>
+                  </div>
+
+                  <!-- Player 2 Main Stat -->
+                  <div class="player-stat-side">
+                    <div class="main-stat-header">
+                      <div class="main-stat-title">
+                        <span class="main-stat-value">{{ mainStats2[mainStat] }}</span>
+                      </div>
+                      <p-progressbar
+                        [value]="mainStats2[mainStat]"
+                        [showValue]="false"
+                        [style]="{'--progress-bar-color': mainStats2[mainStat] | statSeverity}"
+                        [class]="'main-stat-progress'"
+                      ></p-progressbar>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Sub Stats -->
+                <div class="comparison-sub-stats">
+                  @for (subStat of getSubStatsForMainStat(mainStat); track subStat) {
+                    @if (!subStat.startsWith('gk') || comparisonPlayer1.position.shortLabel === 'GK' || comparisonPlayer2.position.shortLabel === 'GK') {
+                      @let statValue1 = comparisonPlayer1.stats[subStat]?.value;
+                      @let statValue2 = comparisonPlayer2.stats[subStat]?.value;
+                      @if (statValue1 !== undefined && statValue2 !== undefined) {
+                        <div class="comparison-sub-stat">
+                          <!-- Player 1 Sub Stat -->
+                          <div class="player-stat-side">
+                            <div class="sub-stat-item">
+                              <div class="sub-stat-header">
+                                <span class="sub-stat-value">{{ statValue1 }}</span>
+                              </div>
+                              <p-progressbar
+                                [value]="statValue1"
+                                [showValue]="false"
+                                [style]="{'--progress-bar-color': statValue1 | statSeverity}"
+                                [class]="'sub-stat-progress'"
+                              ></p-progressbar>
+                            </div>
+                          </div>
+
+                          <!-- Stat Name in Middle -->
+                          <div class="stat-name-middle">
+                            <span class="sub-stat-name">{{ subStat | statName }}</span>
+                          </div>
+
+                          <!-- Player 2 Sub Stat -->
+                          <div class="player-stat-side">
+                            <div class="sub-stat-item">
+                              <div class="sub-stat-header">
+                                <span class="sub-stat-value">{{ statValue2 }}</span>
+                              </div>
+                              <p-progressbar
+                                [value]="statValue2"
+                                [showValue]="false"
+                                [style]="{'--progress-bar-color': statValue2 | statSeverity}"
+                                [class]="'sub-stat-progress'"
+                              ></p-progressbar>
+                            </div>
+                          </div>
+                        </div>
+                      }
+                    }
+                  }
+                </div>
+              </div>
+            }
+          </div>
+        }
       </div>
     }
   </p-dialog>
