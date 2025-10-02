@@ -13,7 +13,7 @@
     size="small"
     class="p-datatable-striped"
     [scrollable]="true"
-    scrollHeight="720px"
+    scrollHeight="75vh"
   >
     <ng-template pTemplate="header">
       <tr>
@@ -164,7 +164,7 @@
     [modal]="true"
     [closable]="true"
     [closeOnEscape]="true"
-    [style]="{'width': '800px', 'max-width': '95vw', 'max-height': '92vh'}"
+    [style]="{'width': '800px', 'max-width': '95vw', 'max-height': '93vh'}"
   >
     @let playerName = selectedPlayerForDialog ? (selectedPlayerForDialog.commonName || `${selectedPlayerForDialog.firstName} ${selectedPlayerForDialog.lastName}`) : '';
     <ng-template pTemplate="header">
