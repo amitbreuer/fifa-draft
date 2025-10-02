@@ -188,8 +188,8 @@ export class DraftService {
     this.fieldPositionsSubject.next(positions);
     this.benchPlayersSubject.next(bench);
 
-    // Check if this is a new player being placed (from placedPlayerIdsThisTurn)
-    const isNewPlayer = this.placedPlayerIdsThisTurnSubject.value.has(player.id);
+    // Moving an existing player is not a new placement
+    const isNewPlayer = false;
 
     // Track the action
     const action: DraftAction = {
@@ -231,8 +231,8 @@ export class DraftService {
     this.fieldPositionsSubject.next(positions);
     this.benchPlayersSubject.next(bench);
 
-    // Check if this is a new player being placed (from placedPlayerIdsThisTurn)
-    const isNewPlayer = this.placedPlayerIdsThisTurnSubject.value.has(player.id);
+    // Moving an existing player is not a new placement
+    const isNewPlayer = false;
 
     // Track the action
     const action: DraftAction = {
