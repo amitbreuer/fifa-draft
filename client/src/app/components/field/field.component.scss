@@ -1,0 +1,524 @@
+// Main container for field component
+:host {
+  display: flex;
+  height: 100%;
+}
+
+.field-card {
+  flex: 1; // Take remaining space
+  display: flex;
+  flex-direction: column;
+
+  ::ng-deep .p-card {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    background: #1e293b;
+    border: 1px solid rgba(59, 130, 246, 0.2);
+    border-radius: 12px;
+  }
+
+  ::ng-deep .p-card-header {
+    background: linear-gradient(135deg, #334155 0%, #1e293b 100%);
+    color: #f1f5f9;
+    padding: 1rem 1.5rem;
+    font-size: 1.25rem;
+    font-weight: 700;
+    border-bottom: 2px solid rgba(59, 130, 246, 0.3);
+  }
+
+  ::ng-deep .p-card-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 1.5rem;
+  }
+
+  ::ng-deep .p-card-title {
+    flex: 0 0 auto; // Fixed height for title
+  }
+
+  ::ng-deep .p-card-content {
+    flex: 1; // Take remaining space after title
+    display: flex;
+    flex-direction: column;
+  }
+}
+
+.formation-selector {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  padding: 0.5rem 0;
+
+  label {
+    font-weight: 600;
+    color: #cbd5e1;
+  }
+
+  ::ng-deep .p-select {
+    background: #0f172a;
+    border: 2px solid #334155;
+    color: #f1f5f9;
+
+    &:hover {
+      border-color: #475569;
+    }
+
+    &:focus {
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+    }
+  }
+}
+
+.bench-card {
+  flex: 0.2; // Take remaining space
+  height: 100%;
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+
+  ::ng-deep .p-card {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    background: #1e293b;
+    border: 1px solid rgba(59, 130, 246, 0.2);
+    border-radius: 12px;
+  }
+
+  ::ng-deep .p-card-header {
+    flex: 0 0 auto;
+  }
+
+  ::ng-deep .p-card-content {
+    height: 100%;
+  }
+
+  ::ng-deep .p-card-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 0.5rem;
+  }
+}
+
+.bench-header {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 1rem;
+  width: 100%;
+  font-weight: 600;
+  padding: 0.5rem;
+  color: #f1f5f9;
+}
+
+.current-pick-card {
+  flex: 0 0 auto; // Don't grow or shrink, auto height
+}
+
+.field-container {
+  position: relative;
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+  flex: 1; // Take remaining space in the card
+  display: flex;
+  flex-direction: column;
+}
+
+.field-pitch {
+  position: relative;
+  width: 100%;
+  flex: 1; // Take remaining space in container
+  min-height: 60vh; // Minimum height for functionality
+  background:
+    // Grass pattern stripes (horizontal stripes)
+    repeating-linear-gradient(
+      90deg,
+      #2d7a2d 0px,
+      #2d7a2d 40px,
+      #3a8f3a 40px,
+      #3a8f3a 80px
+    );
+  border: 3px solid #fff;
+  border-radius: 4px;
+  overflow: hidden;
+
+  // Drag over effect for field
+  &.drag-over {
+    background: repeating-linear-gradient(
+      90deg,
+      rgba(0,122,217,0.3) 0px,
+      rgba(0,122,217,0.3) 40px,
+      rgba(0,122,217,0.4) 40px,
+      rgba(0,122,217,0.4) 80px
+    );
+    border-color: #007ad9;
+  }
+}
+
+// Half-way line (horizontal line dividing top and bottom)
+.half-line {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 2px;
+  background: rgba(255,255,255,0.9);
+  transform: translateY(-50%);
+  pointer-events: none;
+  z-index: 1;
+}
+
+// Center circle
+.center-circle {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 20%;
+  aspect-ratio: 1;
+  border: 2px solid rgba(255,255,255,0.9);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  z-index: 1;
+}
+
+// Center spot
+.center-spot {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 8px;
+  height: 8px;
+  background: rgba(255,255,255,0.9);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  z-index: 2;
+}
+
+// Penalty areas (large boxes)
+.penalty-area {
+  position: absolute;
+  left: 50%;
+  width: 50%;
+  height: 20%;
+  border: 2px solid rgba(255,255,255,0.9);
+  transform: translateX(-50%);
+  pointer-events: none;
+  z-index: 1;
+
+  &.top {
+    top: 0;
+    border-top: none;
+  }
+
+  &.bottom {
+    bottom: 0;
+    border-bottom: none;
+  }
+}
+
+// Goal areas (small boxes)
+.goal-area {
+  position: absolute;
+  left: 50%;
+  width: 30%;
+  height: 6%;
+  border: 2px solid rgba(255,255,255,0.9);
+  transform: translateX(-50%);
+  pointer-events: none;
+  z-index: 1;
+
+  &.top {
+    top: 0;
+    border-top: none;
+  }
+
+  &.bottom {
+    bottom: 0;
+    border-bottom: none;
+  }
+}
+
+// Penalty marks
+.penalty-mark {
+  position: absolute;
+  left: 50%;
+  width: 6px;
+  height: 6px;
+  background: rgba(255,255,255,0.9);
+  border-radius: 50%;
+  transform: translateX(-50%);
+  pointer-events: none;
+  z-index: 2;
+
+  &.top {
+    top: 13%;
+  }
+
+  &.bottom {
+    bottom: 13%;
+  }
+}
+
+// Corner arcs
+.corner-arc {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(255,255,255,0.9);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 1;
+
+  &.top-left {
+    top: -10px;
+    left: -10px;
+    clip-path: polygon(50% 50%, 100% 50%, 100% 100%, 50% 100%);
+  }
+
+  &.top-right {
+    top: -10px;
+    right: -10px;
+    clip-path: polygon(0 50%, 50% 50%, 50% 100%, 0 100%);
+  }
+
+  &.bottom-left {
+    bottom: -10px;
+    left: -10px;
+    clip-path: polygon(50% 0, 100% 0, 100% 50%, 50% 50%);
+  }
+
+  &.bottom-right {
+    bottom: -10px;
+    right: -10px;
+    clip-path: polygon(0 0, 50% 0, 50% 50%, 0 50%);
+  }
+}
+
+.field-position {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  z-index: 10;
+}
+
+.free-positioned-player {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  z-index: 15; // Higher than fixed positions
+}
+
+.position-slot {
+  width: 80px;
+  height: 80px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.player-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: grab;
+  transition: transform 0.2s;
+}
+
+.player-item:hover {
+  transform: scale(1.05);
+}
+
+.player-item:active {
+  cursor: grabbing;
+}
+
+.player-shield {
+  width: 50px !important;
+  height: 50px !important;
+  margin-bottom: 4px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+  flex-shrink: 0;
+}
+
+.shield-image {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+  max-width: 50px !important;
+  max-height: 50px !important;
+  object-fit: cover;
+}
+
+.player-name {
+  font-size: 10px;
+  font-weight: 600;
+  color: white;
+  text-align: center;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+  max-width: 80px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.player-rating {
+  font-size: 9px;
+  color: #ffeb3b;
+  font-weight: bold;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+}
+
+.empty-slot {
+  width: 60px;
+  height: 60px;
+  border: 2px dashed rgba(255,255,255,0.5);
+  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255,255,255,0.7);
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.empty-slot:hover,
+.can-place .empty-slot {
+  border-color: #ffeb3b;
+  color: #ffeb3b;
+  background-color: rgba(255,235,59,0.1);
+}
+
+.position-label {
+  font-size: 8px;
+  margin-top: 2px;
+  text-align: center;
+}
+
+.bench-container {
+  flex: 1;
+  height: 98%;
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  padding: 0.5rem;
+  border: 2px dashed #334155;
+  border-radius: 8px;
+  transition: all 0.2s;
+  cursor: pointer;
+  background: #0f172a;
+
+  &.drag-over {
+    border-color: #3b82f6;
+    background-color: rgba(59, 130, 246, 0.15);
+  }
+
+  &.can-place:hover {
+    border-color: #3b82f6;
+    background-color: rgba(59, 130, 246, 0.08);
+  }
+
+  &.bench-full {
+    border-color: #ef4444;
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+.bench-slots {
+  flex: 1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: flex-start;
+  align-content: flex-start;
+}
+
+.bench-player {
+  flex-shrink: 0;
+  cursor: grab;
+
+  &:active {
+    cursor: grabbing;
+  }
+}
+
+.bench-empty-state {
+  width: 100%;
+  flex: 1;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  color: #64748b;
+  font-size: 14px;
+  padding: 0.5rem;
+
+  i {
+    font-size: 1.5rem;
+    color: #475569;
+  }
+}
+
+.field-actions {
+  flex: 0 0 auto; // Don't grow or shrink, auto height
+  margin-top: 1rem;
+}
+
+.current-pick-info {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.picked-player {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.pick-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.pick-actions p-button {
+  flex: 1;
+}
+
+.drag-over {
+  background-color: rgba(0,122,217,0.1) !important;
+}
+
+@media (max-width: 768px) {
+  .field-pitch {
+    min-height: 300px;
+  }
+
+  .position-slot {
+    width: 60px;
+    height: 60px;
+  }
+
+  .player-shirt {
+    width: 40px;
+    height: 40px;
+  }
+
+  .bench-slots {
+    justify-content: center;
+  }
+}
