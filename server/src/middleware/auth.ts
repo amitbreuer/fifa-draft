@@ -1,8 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
-import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'dev-secret';
 const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN || '';
 
 export interface AuthenticatedRequest extends Request {
@@ -45,21 +43,9 @@ export function validateInitData(initData: string): { telegramId: number; userna
   }
 }
 
-/** Auth middleware — validates JWT or initData */
+/** Auth middleware — validates Telegram initData */
 export function authMiddleware(req: AuthenticatedRequest, res: Response, next: NextFunction): void {
-  const authHeader = req.headers.authorization;
-
-  // Try JWT first
-  if (authHeader?.startsWith('Bearer ')) {
-    try {
-      const payload = jwt.verify(authHeader.slice(7), JWT_SECRET) as any;
-      req.user = { telegramId: payload.telegramId, username: payload.username, firstName: payload.firstName };
-      next();
-      return;
-    } catch { /* fall through to initData */ }
-  }
-
-  // Try initData from header
+  // Validate initData from header
   const initData = req.headers['x-telegram-init-data'] as string;
   if (initData) {
     const user = validateInitData(initData);
@@ -82,9 +68,4 @@ export function authMiddleware(req: AuthenticatedRequest, res: Response, next: N
   }
 
   res.status(401).json({ error: 'Unauthorized' });
-}
-
-/** Generate JWT from validated user */
-export function generateToken(user: { telegramId: number; username?: string; firstName?: string }): string {
-  return jwt.sign(user, JWT_SECRET, { expiresIn: '24h' });
 }

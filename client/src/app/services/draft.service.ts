@@ -751,6 +751,27 @@ export class DraftService {
     }));
   }
 
+  // Accessors for multiplayer integration
+  getPlacedPlayerIdsThisTurn(): Set<number> {
+    return this.placedPlayerIdsThisTurnSubject.value;
+  }
+
+  getFieldPositions(): FieldPosition[] {
+    return this.fieldPositionsSubject.value;
+  }
+
+  getBenchPlayers(): Player[] {
+    return this.benchPlayersSubject.value;
+  }
+
+  getCurrentFormation(): FormationName {
+    return this.currentFormationSubject.value;
+  }
+
+  resetTurnState(): void {
+    this.resetCurrentManagerState();
+  }
+
   isDraftComplete(): boolean {
     const settings = this.draftSettingsSubject.value;
     return settings ? settings.currentRound > settings.maxRounds : false;

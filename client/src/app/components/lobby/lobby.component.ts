@@ -145,6 +145,10 @@ export class LobbyComponent implements OnInit, OnDestroy {
     this.api.getDraftState(code).subscribe(state => this.draftState = state);
   }
 
+  goSinglePlayer(): void {
+    this.router.navigate(['/settings']);
+  }
+
   copyCode(): void {
     navigator.clipboard.writeText(this.joinCode);
     this.telegram.hapticNotification('success');

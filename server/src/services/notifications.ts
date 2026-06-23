@@ -32,6 +32,8 @@ export async function notifyNextManager(
       }
     }
 
+    if (!bot) return; // Bot not configured
+
     // Get user's chat_id
     const [user] = await db.select().from(users).where(eq(users.id, manager.userId));
     if (!user?.telegramChatId) return;
