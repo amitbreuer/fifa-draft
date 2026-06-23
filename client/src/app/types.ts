@@ -7,6 +7,7 @@ export {
   type PositionFilter,
   type FormationName,
   type MainStats,
+  type Dataset,
   AVAILABLE_POSITIONS,
   FORMATIONS,
   POSITION_COORDINATES,

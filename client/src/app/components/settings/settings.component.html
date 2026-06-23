@@ -39,6 +39,20 @@
   <p-card header="Draft Settings" class="settings-card">
     <div class="settings-content">
       <div class="field">
+        <label for="dataset">Player Data</label>
+        <p-select
+          id="dataset"
+          [options]="datasets"
+          [(ngModel)]="selectedDatasetId"
+          optionLabel="label"
+          optionValue="id"
+          [style]="{'width': '100%'}"
+        ></p-select>
+      </div>
+
+      <p-divider></p-divider>
+
+      <div class="field">
         <input
           id="draftName"
           type="text"

@@ -1,6 +1,8 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
-import { Player, PositionFilter } from '../types';
+import { HttpClient } from '@angular/common/http';
+import { BehaviorSubject, Observable, tap } from 'rxjs';
+import { Player, PositionFilter, Dataset } from '../types';
+import { environment } from '../../environments/environment';
 import playersData from '../../assets/data/2026.json';
 
 @Injectable({
@@ -9,11 +11,47 @@ import playersData from '../../assets/data/2026.json';
 export class PlayerService {
   private playersSubject = new BehaviorSubject<Player[]>(playersData);
   private selectedPlayerIdsSubject = new BehaviorSubject<Set<number>>(new Set());
+  private datasetsSubject = new BehaviorSubject<Dataset[]>([
+    { id: 'fc-2026', label: 'EA FC 25/26', file: 'fc-2026.json', default: true }
+  ]);
+  private currentDatasetSubject = new BehaviorSubject<string>('fc-2026');
 
   players$ = this.playersSubject.asObservable();
   selectedPlayerIds$ = this.selectedPlayerIdsSubject.asObservable();
+  datasets$ = this.datasetsSubject.asObservable();
+  currentDataset$ = this.currentDatasetSubject.asObservable();
 
-  constructor() {}
+  constructor(private http: HttpClient) {}
+
+  /** Fetch available datasets from server */
+  loadDatasets(): Observable<Dataset[]> {
+    return this.http.get<Dataset[]>(`${environment.apiUrl}/api/players/datasets`).pipe(
+      tap(datasets => this.datasetsSubject.next(datasets))
+    );
+  }
+
+  /** Load a specific dataset's players */
+  loadDataset(datasetId: string): Observable<Player[]> {
+    if (datasetId === 'fc-2026' && this.currentDatasetSubject.value === 'fc-2026') {
+      // Already loaded from bundled data
+      return new Observable(sub => {
+        sub.next(this.playersSubject.value);
+        sub.complete();
+      });
+    }
+
+    return this.http.get<Player[]>(`${environment.apiUrl}/api/players/${datasetId}`).pipe(
+      tap(players => {
+        this.playersSubject.next(players);
+        this.currentDatasetSubject.next(datasetId);
+        this.selectedPlayerIdsSubject.next(new Set()); // reset selections
+      })
+    );
+  }
+
+  get currentDatasetId(): string {
+    return this.currentDatasetSubject.value;
+  }
 
   getPlayers(): Player[] {
     return this.playersSubject.value;

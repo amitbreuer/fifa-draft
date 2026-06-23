@@ -26,7 +26,7 @@ function generateShortCode(): string {
 // Create a new draft
 draftRouter.post('/', async (req: AuthenticatedRequest, res: Response) => {
   try {
-    const { name, maxManagers = 4, maxRounds = 18 } = req.body;
+    const { name, maxManagers = 4, maxRounds = 18, datasetId = 'fc-2026' } = req.body;
     const telegramId = req.user!.telegramId;
 
     // Find or create user
@@ -46,6 +46,7 @@ draftRouter.post('/', async (req: AuthenticatedRequest, res: Response) => {
       creatorId: user.id,
       maxManagers,
       maxRounds,
+      datasetId,
     }).returning();
 
     // Creator auto-joins as first manager

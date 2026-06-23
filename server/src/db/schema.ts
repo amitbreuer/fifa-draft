@@ -17,6 +17,7 @@ export const drafts = pgTable('drafts', {
   status: varchar('status', { length: 20 }).default('waiting').notNull(),
   maxManagers: integer('max_managers').default(4).notNull(),
   maxRounds: integer('max_rounds').default(18).notNull(),
+  datasetId: varchar('dataset_id', { length: 50 }).default('fc-2026').notNull(),
   currentManagerIndex: integer('current_manager_index').default(0).notNull(),
   currentRound: integer('current_round').default(1).notNull(),
   isSnakeDirection: boolean('is_snake_direction').default(false).notNull(),

@@ -75,10 +75,10 @@ export class DraftApiService {
     return headers;
   }
 
-  createDraft(name: string, maxManagers: number, maxRounds: number): Observable<DraftResponse> {
+  createDraft(name: string, maxManagers: number, maxRounds: number, datasetId: string = 'fc-2026'): Observable<DraftResponse> {
     return this.http.post<DraftResponse>(
       `${this.baseUrl}/api/drafts`,
-      { name, maxManagers, maxRounds },
+      { name, maxManagers, maxRounds, datasetId },
       { headers: this.getHeaders() }
     );
   }

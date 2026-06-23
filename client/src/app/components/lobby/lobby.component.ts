@@ -5,6 +5,8 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { Subject, takeUntil, interval, switchMap } from 'rxjs';
 import { DraftApiService, DraftState } from '../../services/draft-api.service';
 import { TelegramService } from '../../services/telegram.service';
+import { PlayerService } from '../../services/player.service';
+import { Dataset } from '../../types';
 
 type LobbyMode = 'home' | 'create' | 'join' | 'waiting';
 
@@ -30,14 +32,25 @@ export class LobbyComponent implements OnInit, OnDestroy {
   draftState: DraftState | null = null;
   isCreator = false;
 
+  // Dataset selection
+  datasets: Dataset[] = [{ id: 'fc-2026', label: 'EA FC 25/26', file: 'fc-2026.json', default: true }];
+  selectedDatasetId = 'fc-2026';
+
   constructor(
     private router: Router,
     private route: ActivatedRoute,
     private api: DraftApiService,
-    private telegram: TelegramService
+    private telegram: TelegramService,
+    private playerService: PlayerService
   ) {}
 
   ngOnInit(): void {
+    // Load available datasets
+    this.playerService.loadDatasets().subscribe({
+      next: (datasets) => this.datasets = datasets,
+      error: () => {} // keep defaults
+    });
+
     // Check query params or Telegram start param
     const queryMode = this.route.snapshot.queryParamMap.get('mode');
     const queryCode = this.route.snapshot.queryParamMap.get('code');
@@ -83,7 +96,7 @@ export class LobbyComponent implements OnInit, OnDestroy {
 
   onCreateDraft(): void {
     this.error = '';
-    this.api.createDraft(this.draftName || 'FIFA Draft', this.maxManagers, this.maxRounds)
+    this.api.createDraft(this.draftName || 'FIFA Draft', this.maxManagers, this.maxRounds, this.selectedDatasetId)
       .subscribe({
         next: (res) => {
           this.joinCode = res.shortCode;

@@ -10,14 +10,14 @@
   ::ng-deep .p-card-header {
     background: linear-gradient(135deg, #334155 0%, #1e293b 100%);
     color: #f1f5f9;
-    padding: 1rem 1.5rem;
-    font-size: 1.25rem;
+    padding: 0.5rem 0.75rem;
+    font-size: 1rem;
     font-weight: 700;
     border-bottom: 2px solid rgba(59, 130, 246, 0.3);
   }
 
   ::ng-deep .p-card-body {
-    padding: 1.5rem;
+    padding: 0.5rem;
   }
 
   ::ng-deep .p-datatable {
@@ -31,10 +31,11 @@
       background: #0f172a;
       color: #cbd5e1;
       border-color: #334155;
-      padding: 0.5rem 0.75rem;
+      padding: 0.3rem 0.4rem;
       white-space: nowrap;
       width: auto;
       font-weight: 600;
+      font-size: 0.8rem;
     }
 
     .p-datatable-tbody > tr {
@@ -46,18 +47,20 @@
       }
 
       > td {
-        padding: 0.5rem 0.75rem;
+        padding: 0.35rem 0.4rem;
         white-space: nowrap;
         width: auto;
         border-color: #334155;
+        border-bottom: 1px solid #2d3a4d;
       }
     }
 
     // Specific column widths
     .p-datatable-thead > tr > th:first-child,
     .p-datatable-tbody > tr > td:first-child {
-      width: 3rem;
+      width: 2.2rem;
       text-align: center;
+      padding: 0.25rem 0.2rem;
     }
 
     // All columns except checkbox should be compact
@@ -105,12 +108,28 @@
 ::ng-deep .p-multiselect,
 ::ng-deep .p-select {
   background: #0f172a;
-  border: 2px solid #334155;
+  border: 1px solid #334155;
   color: #f1f5f9;
+  font-size: 0.75rem;
 
   .p-select-label,
   .p-multiselect-label {
     color: #f1f5f9;
+    padding: 0.25rem 0.4rem;
+    font-size: 0.7rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .p-select-trigger,
+  .p-multiselect-trigger {
+    width: 1.5rem;
+
+    .p-icon {
+      width: 0.65rem;
+      height: 0.65rem;
+    }
   }
 
   &:hover {
@@ -120,7 +139,70 @@
   &:focus,
   &.p-focus {
     border-color: #3b82f6;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+  }
+}
+
+// Dropdown overlay panels
+::ng-deep .p-select-overlay,
+::ng-deep .p-multiselect-overlay {
+  background: #1e293b;
+  border: 1px solid #334155;
+  font-size: 0.8rem;
+
+  .p-select-items .p-select-item,
+  .p-multiselect-items .p-multiselect-item {
+    padding: 0.4rem 0.6rem;
+    font-size: 0.8rem;
+    color: #f1f5f9;
+  }
+
+  .p-select-filter,
+  .p-multiselect-filter {
+    font-size: 0.75rem;
+    padding: 0.3rem 0.5rem;
+  }
+}
+
+// Pagination
+::ng-deep .p-paginator {
+  background: #0f172a !important;
+  border: 1px solid #334155 !important;
+  border-top: none !important;
+  padding: 0.4rem;
+  gap: 0.2rem;
+  display: flex !important;
+  justify-content: center;
+
+  .p-paginator-page,
+  .p-paginator-first,
+  .p-paginator-prev,
+  .p-paginator-next,
+  .p-paginator-last {
+    min-width: 2rem;
+    height: 2rem;
+    font-size: 0.8rem;
+    color: #cbd5e1 !important;
+    border-radius: 4px;
+    background: transparent;
+    border: 1px solid #475569;
+  }
+
+  .p-paginator-page.p-highlight {
+    background: #3b82f6 !important;
+    color: #fff !important;
+    border-color: #3b82f6 !important;
+  }
+
+  .p-paginator-current {
+    display: none;
+  }
+
+  .p-paginator-rpp-options {
+    font-size: 0.75rem;
+    background: #0f172a;
+    color: #cbd5e1;
+    border: 1px solid #475569;
   }
 }
 
@@ -171,9 +253,117 @@
   object-fit: cover;
 }
 
+// New compact row layout
+.player-row {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.player-row-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  flex: 1;
+  min-width: 0;
+}
+
+.player-row-top {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.player-shield-sm {
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
 .player-name {
   font-weight: 600;
   color: #f1f5f9;
+  font-size: 0.85rem;
+}
+
+.player-positions {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 0.65rem;
+  background: rgba(51, 65, 85, 0.5);
+  padding: 1px 5px;
+  border-radius: 4px;
+
+  .main-pos {
+    color: #38bdf8;
+    font-weight: 700;
+  }
+
+  .alt-pos {
+    color: #94a3b8;
+    font-weight: 400;
+
+    &::before {
+      content: '/';
+      margin-right: 2px;
+      color: #94a3b8;
+    }
+  }
+}
+
+.player-ovr {
+  font-size: 0.75rem;
+  font-weight: 700;
+  margin-left: auto;
+  padding: 0.1rem 0.4rem;
+  border-radius: 4px;
+
+  &.ovr-high { color: #22c55e; }
+  &.ovr-mid { color: #eab308; }
+  &.ovr-low { color: #94a3b8; }
+}
+
+.player-row-stats {
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: nowrap;
+
+  .stat {
+    font-size: 0.65rem;
+    color: #94a3b8;
+
+    b {
+      color: #64748b;
+      font-weight: 600;
+      margin-right: 1px;
+    }
+  }
+}
+
+.filter-row {
+  display: flex;
+  gap: 0.3rem;
+  align-items: center;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+}
+
+.filter-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 0.2rem;
+  white-space: nowrap;
+  flex-shrink: 0;
+
+  label {
+    font-size: 0.7rem;
+    color: #cbd5e1;
+    cursor: pointer;
+    margin: 0;
+  }
 }
 
 .team-info, .nationality-info {
@@ -439,6 +629,36 @@
 
   .filters {
     justify-content: center;
+  }
+
+  .player-table-card {
+    ::ng-deep .p-card-body {
+      padding: 0.4rem !important;
+    }
+
+    ::ng-deep .p-card-header {
+      padding: 0.4rem 0.6rem !important;
+      font-size: 0.85rem !important;
+    }
+  }
+
+  // Compact filters
+  ::ng-deep .p-select {
+    font-size: 0.75rem !important;
+
+    .p-select-label {
+      padding: 0.3rem 0.5rem !important;
+      font-size: 0.75rem !important;
+    }
+  }
+
+  ::ng-deep .p-checkbox {
+    width: 1rem;
+    height: 1rem;
+  }
+
+  ::ng-deep label[for="showSelected"] {
+    font-size: 0.7rem !important;
   }
 
   .details-grid {

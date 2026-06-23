@@ -193,6 +193,12 @@ export class PlayerTableComponent implements OnInit, OnDestroy {
     event.target.src = 'iniesta.jpg';
   }
 
+  getOvrClass(rating: number): string {
+    if (rating >= 85) return 'high';
+    if (rating >= 75) return 'mid';
+    return 'low';
+  }
+
   getMainStats(player: Player): MainStats {
     return Object.entries(mainStatsMap).reduce((mainStats, [mainKey, subKeys]) => {
       const { sum, count } = subKeys.reduce(

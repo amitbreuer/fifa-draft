@@ -164,3 +164,10 @@ export const mainStatsMap = {
 };
 
 export type MainStats = Record<keyof typeof mainStatsMap, number>;
+
+export interface Dataset {
+  id: string;
+  label: string;
+  file: string;
+  default: boolean;
+}

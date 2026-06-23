@@ -56,7 +56,7 @@
           ></p-button>
 
           <p-button
-            [label]="submittingPick ? 'Submitting...' : 'Finish Turn'"
+            [label]="submittingPick ? 'Submitting...' : 'Next'"
             icon="pi pi-check"
             severity="primary"
             [disabled]="!canFinishTurn()"
@@ -65,11 +65,10 @@
 
           @if (!isMultiplayer) {
             <p-button
-              label="Finish Draft"
+              label="Finish"
               icon="pi pi-flag"
               severity="danger"
               (onClick)="confirmFinishDraft()"
-              class="p-button-warning"
             ></p-button>
           }
         </div>

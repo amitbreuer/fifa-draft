@@ -43,7 +43,8 @@
         [style.top.%]="position.y"
         (click)="onPositionClick(position.id)"
         [class.has-player]="position.player"
-        [class.can-place]="canPlacePlayer()"
+        [class.can-place]="canPlacePlayer() || selectedBenchPlayer || selectedPositionId"
+        [class.selected]="isPositionSelected(position.id)"
       >
         @let playerName = position?.player?.commonName || `${position?.player?.firstName} ${position?.player?.lastName}`;
         <div class="position-slot">
@@ -114,7 +115,8 @@
         draggable="true"
         (dragstart)="onDragStart($event, player, true)"
         (dragend)="onDragEnd($event)"
-        (click)="$event.stopPropagation()"
+        (click)="onBenchPlayerClick(player); $event.stopPropagation()"
+        [class.selected]="isBenchPlayerSelected(player)"
       >
         @let playerName = player.commonName || `${player.firstName} ${player.lastName}`;
         <div class="player-item">

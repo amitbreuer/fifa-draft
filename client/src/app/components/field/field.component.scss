@@ -306,6 +306,18 @@
   position: absolute;
   transform: translate(-50%, -50%);
   z-index: 10;
+
+  &.selected .position-slot {
+    outline: 2px solid #ffeb3b;
+    outline-offset: 2px;
+    border-radius: 50%;
+    animation: pulse-select 1s ease-in-out infinite;
+  }
+}
+
+@keyframes pulse-select {
+  0%, 100% { outline-color: #ffeb3b; }
+  50% { outline-color: #ff9800; }
 }
 
 .free-positioned-player {
@@ -447,10 +459,16 @@
 
 .bench-player {
   flex-shrink: 0;
-  cursor: grab;
+  cursor: pointer;
 
   &:active {
     cursor: grabbing;
+  }
+
+  &.selected {
+    outline: 2px solid #ffeb3b;
+    outline-offset: 2px;
+    border-radius: 8px;
   }
 }
 
@@ -505,17 +523,42 @@
 
 @media (max-width: 768px) {
   .field-pitch {
-    min-height: 300px;
+    min-height: 350px;
   }
 
   .position-slot {
-    width: 60px;
-    height: 60px;
+    width: 70px;
+    height: 70px;
   }
 
-  .player-shirt {
-    width: 40px;
-    height: 40px;
+  .empty-slot {
+    width: 48px;
+    height: 48px;
+    min-width: 44px;
+    min-height: 44px;
+  }
+
+  .player-shield {
+    width: 40px !important;
+    height: 40px !important;
+  }
+
+  .shield-image {
+    max-width: 40px !important;
+    max-height: 40px !important;
+  }
+
+  .player-name {
+    font-size: 9px;
+    max-width: 65px;
+  }
+
+  .player-rating {
+    font-size: 8px;
+  }
+
+  .player-item {
+    cursor: pointer;
   }
 
   .bench-slots {

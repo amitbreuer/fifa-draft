@@ -36,6 +36,10 @@ export class FieldComponent implements OnInit, OnDestroy {
   private draggedFromBench = false;
   isDragOverBench = false;
 
+  // Tap-to-move state
+  selectedPositionId: string | null = null;
+  selectedBenchPlayer: Player | null = null;
+
   // Formation dropdown
   selectedFormation: FormationName = '4-3-3 Attack';
   formations: { label: string; value: FormationName }[] = [];
@@ -86,9 +90,78 @@ export class FieldComponent implements OnInit, OnDestroy {
   }
 
   onPositionClick(positionId: string): void {
-    if (this.canPlacePlayer()) {
+    const position = this.fieldPositions.find(p => p.id === positionId);
+    if (!position) return;
+
+    // Priority 1: Place newly picked player
+    if (this.currentPickedPlayer) {
       this.draftService.placePlayerOnField(positionId);
+      this.clearSelection();
+      return;
     }
+
+    // Priority 2: Move selected bench player to this position
+    if (this.selectedBenchPlayer) {
+      this.draftService.movePlayerFromBenchToField(this.selectedBenchPlayer, positionId);
+      this.clearSelection();
+      return;
+    }
+
+    // Priority 3: If another field position is selected, swap them
+    if (this.selectedPositionId && this.selectedPositionId !== positionId) {
+      const fromPos = this.fieldPositions.find(p => p.id === this.selectedPositionId);
+      if (fromPos?.player) {
+        this.draftService.swapFieldPositions(this.selectedPositionId, positionId);
+      }
+      this.clearSelection();
+      return;
+    }
+
+    // Priority 4: Select this position (if it has a player)
+    if (position.player) {
+      if (this.selectedPositionId === positionId) {
+        this.clearSelection(); // Deselect on second tap
+      } else {
+        this.selectedPositionId = positionId;
+        this.selectedBenchPlayer = null;
+      }
+      return;
+    }
+
+    this.clearSelection();
+  }
+
+  onBenchPlayerClick(player: Player): void {
+    // If a field position is selected, swap bench player to that position
+    if (this.selectedPositionId) {
+      const fieldPos = this.fieldPositions.find(p => p.id === this.selectedPositionId);
+      if (fieldPos) {
+        this.draftService.movePlayerFromBenchToField(player, this.selectedPositionId);
+      }
+      this.clearSelection();
+      return;
+    }
+
+    // Toggle bench player selection
+    if (this.selectedBenchPlayer?.id === player.id) {
+      this.clearSelection();
+    } else {
+      this.selectedBenchPlayer = player;
+      this.selectedPositionId = null;
+    }
+  }
+
+  isPositionSelected(positionId: string): boolean {
+    return this.selectedPositionId === positionId;
+  }
+
+  isBenchPlayerSelected(player: Player): boolean {
+    return this.selectedBenchPlayer?.id === player.id;
+  }
+
+  private clearSelection(): void {
+    this.selectedPositionId = null;
+    this.selectedBenchPlayer = null;
   }
 
   canPlacePlayer(): boolean {

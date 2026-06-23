@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -8,7 +8,9 @@ import { CardModule } from 'primeng/card';
 import { DividerModule } from 'primeng/divider';
 import { SelectButtonModule } from 'primeng/selectbutton';
 import { DraftService } from '../../services/draft.service';
+import { PlayerService } from '../../services/player.service';
 import { Select } from 'primeng/select';
+import { Dataset } from '../../types';
 
 @Component({
   selector: 'app-settings',
@@ -26,7 +28,7 @@ import { Select } from 'primeng/select';
   templateUrl: './settings.component.html',
   styleUrl: './settings.component.scss'
 })
-export class SettingsComponent {
+export class SettingsComponent implements OnInit {
   draftName = '';
   numManagers = 4;
   managerNames: string[] = ['Manager 1', 'Manager 2', 'Manager 3', 'Manager 4'];
@@ -38,15 +40,30 @@ export class SettingsComponent {
     { label: '6', value: 6 }
   ];
 
+  // Dataset selection
+  datasets: Dataset[] = [];
+  selectedDatasetId = 'fc-2026';
+
   // Saved drafts
   savedDrafts: string[] = [];
   selectedSavedDraft: string | null = null;
 
   constructor(
     private draftService: DraftService,
+    private playerService: PlayerService,
     private router: Router
   ) {
     this.loadSavedDrafts();
+  }
+
+  ngOnInit(): void {
+    // Load datasets from server, fall back to default
+    this.playerService.loadDatasets().subscribe({
+      next: (datasets) => this.datasets = datasets,
+      error: () => {
+        this.datasets = [{ id: 'fc-2026', label: 'EA FC 25/26', file: 'fc-2026.json', default: true }];
+      }
+    });
   }
 
   updateManagerNames(): void {
@@ -66,8 +83,11 @@ export class SettingsComponent {
 
   startDraft(): void {
     if (this.canStartDraft()) {
-      this.draftService.initializeDraft(this.managerNames, this.draftName);
-      this.router.navigate(['/draft']);
+      // Load dataset if changed from default
+      this.playerService.loadDataset(this.selectedDatasetId).subscribe(() => {
+        this.draftService.initializeDraft(this.managerNames, this.draftName);
+        this.router.navigate(['/draft']);
+      });
     }
   }
 
