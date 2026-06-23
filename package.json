@@ -3,16 +3,16 @@
   "version": "1.0.0",
   "private": true,
   "workspaces": [
-    "shared",
-    "client",
-    "server"
+    "projects/shared",
+    "projects/client",
+    "projects/server"
   ],
   "scripts": {
-    "dev:server": "npm run dev -w server",
-    "dev:client": "npm run start -w client",
-    "build:server": "npm run build -w server",
-    "build:client": "npm run build -w client",
-    "db:generate": "npm run db:generate -w server",
-    "db:push": "npm run db:push -w server"
+    "dev:server": "npm run dev -w @fifa-draft/server",
+    "dev:client": "npm run start -w @fifa-draft/client",
+    "build:server": "npm run build -w @fifa-draft/server",
+    "build:client": "npm run build -w @fifa-draft/client",
+    "db:generate": "npm run db:generate -w @fifa-draft/server",
+    "db:push": "npm run db:push -w @fifa-draft/server"
   }
 }
