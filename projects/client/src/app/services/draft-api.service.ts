@@ -51,6 +51,22 @@ export interface PickResponse {
   status: string;
 }
 
+export interface MyDraft {
+  id: string;
+  shortCode: string;
+  name: string;
+  status: 'waiting' | 'active' | 'complete';
+  maxManagers: number;
+  maxRounds: number;
+  currentManagerIndex: number;
+  currentRound: number;
+  managerCount: number;
+  currentTurnName: string | null;
+  isMyTurn: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -125,6 +141,13 @@ export class DraftApiService {
     return this.http.put(
       `${this.baseUrl}/api/drafts/${code}/squad`,
       data,
+      { headers: this.getHeaders() }
+    );
+  }
+
+  getMyDrafts(): Observable<MyDraft[]> {
+    return this.http.get<MyDraft[]>(
+      `${this.baseUrl}/api/drafts/mine`,
       { headers: this.getHeaders() }
     );
   }

@@ -91,7 +91,7 @@ export class TelegramService {
   }
 
   get isInTelegram(): boolean {
-    return !!this.webApp;
+    return !!this.webApp?.initData;
   }
 
   get initData(): string {

@@ -772,6 +772,26 @@ export class DraftService {
     this.resetCurrentManagerState();
   }
 
+  /** Temporarily show another manager's team on the field */
+  viewManagerTeam(manager: DraftManager): void {
+    if (manager.fieldPositions?.length) {
+      this.fieldPositionsSubject.next([...manager.fieldPositions]);
+    }
+    if (manager.benchPlayers?.length) {
+      this.benchPlayersSubject.next([...manager.benchPlayers]);
+    } else {
+      this.benchPlayersSubject.next([]);
+    }
+    if (manager.formation) {
+      this.currentFormationSubject.next(manager.formation);
+    }
+  }
+
+  /** Restore the current manager's view */
+  restoreCurrentManagerView(): void {
+    this.resetCurrentManagerState();
+  }
+
   isDraftComplete(): boolean {
     const settings = this.draftSettingsSubject.value;
     return settings ? settings.currentRound > settings.maxRounds : false;

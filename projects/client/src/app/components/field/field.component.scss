@@ -4,6 +4,13 @@
   height: 100%;
 }
 
+@media (max-width: 768px) {
+  :host {
+    flex-direction: column;
+    height: auto;
+  }
+}
+
 .field-card {
   flex: 1; // Take remaining space
   display: flex;
@@ -561,7 +568,18 @@
     cursor: pointer;
   }
 
+  .bench-card {
+    flex: none;
+    height: auto;
+
+    ::ng-deep .p-card {
+      height: auto;
+    }
+  }
+
   .bench-slots {
+    flex-direction: row;
+    flex-wrap: wrap;
     justify-content: center;
   }
 }

@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Subject, takeUntil, combineLatest } from 'rxjs';
@@ -50,6 +50,8 @@ import { MainStatNamePipe } from '../../pipes/main-stat-name.pipe';
 })
 export class PlayerTableComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
+
+  @Output() playerSelected = new EventEmitter<void>();
 
   filteredPlayers: Player[] = [];
   selectedPlayer: Player | null = null;
@@ -166,6 +168,7 @@ export class PlayerTableComponent implements OnInit, OnDestroy {
     this.selectedPlayer = event;
     if (event) {
       this.draftService.pickPlayer(event);
+      this.playerSelected.emit();
     }
   }
 

@@ -1,8 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import crypto from 'crypto';
 
-const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN || '';
-
 export interface AuthenticatedRequest extends Request {
   user?: {
     telegramId: number;
@@ -14,6 +12,9 @@ export interface AuthenticatedRequest extends Request {
 /** Validate Telegram Mini App initData and extract user info */
 export function validateInitData(initData: string): { telegramId: number; username?: string; firstName?: string } | null {
   try {
+    const botToken = process.env.TELEGRAM_BOT_TOKEN || '';
+    if (!botToken) return null;
+
     const params = new URLSearchParams(initData);
     const hash = params.get('hash');
     if (!hash) return null;
@@ -24,7 +25,7 @@ export function validateInitData(initData: string): { telegramId: number; userna
       .map(([key, val]) => `${key}=${val}`)
       .join('\n');
 
-    const secretKey = crypto.createHmac('sha256', 'WebAppData').update(BOT_TOKEN).digest();
+    const secretKey = crypto.createHmac('sha256', 'WebAppData').update(botToken).digest();
     const expectedHash = crypto.createHmac('sha256', secretKey).update(dataCheckString).digest('hex');
 
     if (hash !== expectedHash) return null;

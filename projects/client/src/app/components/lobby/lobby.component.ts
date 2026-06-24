@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { Subject, takeUntil, interval, switchMap } from 'rxjs';
-import { DraftApiService, DraftState } from '../../services/draft-api.service';
+import { DraftApiService, DraftState, MyDraft } from '../../services/draft-api.service';
 import { TelegramService } from '../../services/telegram.service';
 import { PlayerService } from '../../services/player.service';
 import { Dataset } from '../../types';
@@ -36,6 +36,10 @@ export class LobbyComponent implements OnInit, OnDestroy {
   datasets: Dataset[] = [{ id: 'fc-2026', label: 'EA FC 25/26', file: 'fc-2026.json', default: true }];
   selectedDatasetId = 'fc-2026';
 
+  // My Drafts
+  myDrafts: MyDraft[] = [];
+  loadingMyDrafts = false;
+
   constructor(
     private router: Router,
     private route: ActivatedRoute,
@@ -50,6 +54,9 @@ export class LobbyComponent implements OnInit, OnDestroy {
       next: (datasets) => this.datasets = datasets,
       error: () => {} // keep defaults
     });
+
+    // Load user's drafts
+    this.loadMyDrafts();
 
     // Check query params or Telegram start param
     const queryMode = this.route.snapshot.queryParamMap.get('mode');
@@ -156,6 +163,30 @@ export class LobbyComponent implements OnInit, OnDestroy {
 
     // Also fetch initial state immediately
     this.api.getDraftState(code).subscribe(state => this.draftState = state);
+  }
+
+  loadMyDrafts(): void {
+    this.loadingMyDrafts = true;
+    this.api.getMyDrafts().subscribe({
+      next: (drafts) => {
+        this.myDrafts = drafts;
+        this.loadingMyDrafts = false;
+      },
+      error: () => {
+        this.loadingMyDrafts = false;
+      }
+    });
+  }
+
+  openDraft(draft: MyDraft): void {
+    if (draft.status === 'waiting') {
+      this.joinCode = draft.shortCode;
+      this.mode = 'waiting';
+      this.isCreator = false; // Will be determined by polling
+      this.startWaitingPolling(draft.shortCode);
+    } else {
+      this.router.navigate(['/draft'], { queryParams: { code: draft.shortCode } });
+    }
   }
 
   goSinglePlayer(): void {

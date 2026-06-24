@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, ActivatedRoute } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
@@ -52,6 +52,10 @@ export class DraftComponent implements OnInit, OnDestroy {
   isMyTurn = false;
   myManagerIndex = -1;
   submittingPick = false;
+
+  @ViewChild('teamSection') teamSection!: ElementRef;
+
+  viewingManagerIndex: number | null = null;
 
   constructor(
     private draftService: DraftService,
@@ -112,6 +116,10 @@ export class DraftComponent implements OnInit, OnDestroy {
     this.polling.stopPolling();
     this.telegram.hideBackButton();
     this.telegram.hideMainButton();
+  }
+
+  goBack(): void {
+    this.router.navigate(['/']);
   }
 
   /** Initialize multiplayer mode with server polling */
@@ -248,6 +256,36 @@ export class DraftComponent implements OnInit, OnDestroy {
 
   undoPlacement(): void {
     this.draftService.undoPlayerPlacement();
+  }
+
+  onPlayerSelected(): void {
+    if (this.teamSection?.nativeElement) {
+      this.teamSection.nativeElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }
+
+  viewManagerTeam(index: number): void {
+    if (!this.draftSettings) return;
+    const manager = this.draftSettings.managers[index];
+    if (!manager) return;
+
+    // Toggle: click same manager again to go back to current
+    if (this.viewingManagerIndex === index) {
+      this.viewingManagerIndex = null;
+      this.restoreCurrentManagerView();
+      return;
+    }
+
+    this.viewingManagerIndex = index;
+
+    // Load this manager's field/bench into the field component (read-only view)
+    if (manager.fieldPositions?.length) {
+      this.draftService.viewManagerTeam(manager);
+    }
+  }
+
+  private restoreCurrentManagerView(): void {
+    this.draftService.restoreCurrentManagerView();
   }
 
   finishTurn(): void {

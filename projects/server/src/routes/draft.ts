@@ -23,6 +23,78 @@ function generateShortCode(): string {
   return code;
 }
 
+// Get user's drafts
+draftRouter.get('/mine', async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const telegramId = req.user!.telegramId;
+    const [user] = await db.select().from(users).where(eq(users.telegramId, telegramId));
+    if (!user) { res.json([]); return; }
+
+    // Find all drafts where this user is a manager
+    const myDraftManagers = await db.select({
+      draftId: draftManagers.draftId,
+      slotIndex: draftManagers.slotIndex,
+    }).from(draftManagers).where(eq(draftManagers.userId, user.id));
+
+    if (myDraftManagers.length === 0) { res.json([]); return; }
+
+    const draftIds = myDraftManagers.map(dm => dm.draftId);
+
+    // Get all those drafts with their managers
+    const myDrafts = await db.select({
+      id: drafts.id,
+      shortCode: drafts.shortCode,
+      name: drafts.name,
+      status: drafts.status,
+      maxManagers: drafts.maxManagers,
+      maxRounds: drafts.maxRounds,
+      currentManagerIndex: drafts.currentManagerIndex,
+      currentRound: drafts.currentRound,
+      createdAt: drafts.createdAt,
+      updatedAt: drafts.updatedAt,
+    }).from(drafts).where(sql`${drafts.id} IN (${sql.join(draftIds.map(id => sql`${id}`), sql`, `)})`);
+
+    // Get manager count + current turn manager for each draft
+    const result = await Promise.all(myDrafts.map(async (draft) => {
+      const managers = await db.select({
+        id: draftManagers.id,
+        slotIndex: draftManagers.slotIndex,
+        userId: draftManagers.userId,
+        firstName: users.firstName,
+        username: users.username,
+      }).from(draftManagers)
+        .innerJoin(users, eq(draftManagers.userId, users.id))
+        .where(eq(draftManagers.draftId, draft.id));
+
+      const currentManager = managers.find(m => m.slotIndex === draft.currentManagerIndex);
+      const mySlot = myDraftManagers.find(dm => dm.draftId === draft.id);
+      const isMyTurn = draft.status === 'active' && mySlot?.slotIndex === draft.currentManagerIndex;
+
+      return {
+        ...draft,
+        managerCount: managers.length,
+        currentTurnName: currentManager?.firstName || currentManager?.username || null,
+        isMyTurn,
+      };
+    }));
+
+    // Sort: my turn first, then active, then waiting, then complete
+    result.sort((a, b) => {
+      if (a.isMyTurn && !b.isMyTurn) return -1;
+      if (!a.isMyTurn && b.isMyTurn) return 1;
+      const statusOrder = { active: 0, waiting: 1, complete: 2 };
+      const aOrder = statusOrder[a.status as keyof typeof statusOrder] ?? 3;
+      const bOrder = statusOrder[b.status as keyof typeof statusOrder] ?? 3;
+      return aOrder - bOrder;
+    });
+
+    res.json(result);
+  } catch (err) {
+    console.error('Get my drafts error:', err);
+    res.status(500).json({ error: 'Failed to get drafts' });
+  }
+});
+
 // Create a new draft
 draftRouter.post('/', async (req: AuthenticatedRequest, res: Response) => {
   try {

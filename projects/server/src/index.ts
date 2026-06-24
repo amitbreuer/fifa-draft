@@ -1,6 +1,4 @@
-import dotenv from 'dotenv';
-dotenv.config({ path: '.env.local' });
-dotenv.config({ path: '.env' });
+import './env.js';
 import express from 'express';
 import cors from 'cors';
 import { draftRouter } from './routes/draft.js';

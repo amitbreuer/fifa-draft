@@ -56,6 +56,10 @@ export class SettingsComponent implements OnInit {
     this.loadSavedDrafts();
   }
 
+  goBack(): void {
+    this.router.navigate(['/']);
+  }
+
   ngOnInit(): void {
     // Load datasets from server, fall back to default
     this.playerService.loadDatasets().subscribe({

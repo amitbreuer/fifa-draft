@@ -18,6 +18,20 @@
   gap: 1rem;
 }
 
+.back-btn {
+  align-self: flex-start;
+  background: none;
+  border: none;
+  color: #3b82f6;
+  font-size: 0.9rem;
+  cursor: pointer;
+  padding: 0.25rem 0;
+
+  &:active {
+    opacity: 0.6;
+  }
+}
+
 .draft-info-card {
   background: #1e293b;
   border: 1px solid rgba(59, 130, 246, 0.2);
@@ -290,6 +304,59 @@
 .my-manager {
   border-color: #8b5cf6 !important;
   background: linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(109, 40, 217, 0.05) 100%) !important;
+}
+
+.manager-card.viewing {
+  border-color: #f59e0b !important;
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.15) 0%, rgba(217, 119, 6, 0.05) 100%) !important;
+}
+
+// Floating action buttons
+.fab-container {
+  position: fixed;
+  bottom: 1.5rem;
+  left: 1.5rem;
+  right: 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  z-index: 100;
+  pointer-events: none;
+}
+
+.fab {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  transition: transform 0.15s, opacity 0.15s;
+  pointer-events: auto;
+
+  i {
+    font-size: 1.1rem;
+    color: #fff;
+  }
+
+  &:active {
+    transform: scale(0.9);
+  }
+
+  &:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+  }
+}
+
+.fab-undo {
+  background: #475569;
+}
+
+.fab-next {
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
 }
 
 // Responsive adjustments

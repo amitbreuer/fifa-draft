@@ -1,6 +1,7 @@
 <div class="draft-container">
   @if (draftSettings) {
   <div class="draft-header">
+    <button class="back-btn" (click)="goBack()">←</button>
     <p-card class="overview-card">
       <div class="overview-content">
         <p-tag
@@ -27,6 +28,8 @@
             class="manager-card"
             [class.current-manager]="i === draftSettings.currentManagerIndex"
             [class.my-manager]="isMultiplayer && i === myManagerIndex"
+            [class.viewing]="viewingManagerIndex === i"
+            (click)="viewManagerTeam(i)"
           >
             <div class="manager-header" >
               <h4>
@@ -47,22 +50,6 @@
         </div>
         <p-divider layout="vertical" />
         <div class="turn-actions">
-          <p-button
-            label="Undo"
-            icon="pi pi-undo"
-            severity="secondary"
-            [disabled]="!canUndo()"
-            (onClick)="undoPlacement()"
-          ></p-button>
-
-          <p-button
-            [label]="submittingPick ? 'Submitting...' : 'Next'"
-            icon="pi pi-check"
-            severity="primary"
-            [disabled]="!canFinishTurn()"
-            (onClick)="finishTurn()"
-          ></p-button>
-
           @if (!isMultiplayer) {
             <p-button
               label="Finish"
@@ -80,14 +67,26 @@
   <div class="draft-content">
     <div class="content-row">
       <div class="players-section">
-        <app-player-table></app-player-table>
+        <app-player-table (playerSelected)="onPlayerSelected()"></app-player-table>
       </div>
 
-      <div class="team-section">
+      <div class="team-section" #teamSection>
         <app-field></app-field>
       </div>
     </div>
   </div>
+
+  <!-- Floating action buttons (only visible after a move) -->
+  @if (canUndo() || canFinishTurn()) {
+    <div class="fab-container">
+      <button class="fab fab-undo" [disabled]="!canUndo()" (click)="undoPlacement()" title="Undo">
+        <i class="pi pi-undo"></i>
+      </button>
+      <button class="fab fab-next" [disabled]="!canFinishTurn()" (click)="finishTurn()" title="Next">
+        <i class="pi pi-check"></i>
+      </button>
+    </div>
+  }
 </div>
 
 <p-confirmDialog></p-confirmDialog>

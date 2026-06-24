@@ -173,6 +173,17 @@ export class FieldComponent implements OnInit, OnDestroy {
   }
 
   onBenchClick(): void {
+    // Move selected field player to bench
+    if (this.selectedPositionId && !this.isBenchFull()) {
+      const pos = this.fieldPositions.find(p => p.id === this.selectedPositionId);
+      if (pos?.player) {
+        this.draftService.movePlayerFromFieldToBench(pos.player, this.selectedPositionId);
+        this.clearSelection();
+        return;
+      }
+    }
+
+    // Place newly picked player on bench
     if (this.canPlacePlayer() && !this.isBenchFull()) {
       this.placeOnBench();
     }
