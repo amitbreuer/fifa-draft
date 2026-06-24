@@ -70,6 +70,7 @@ export class PlayerTableComponent implements OnInit, OnDestroy {
   selectedTeamId: number | null = null;
   selectedNationalityId: number | null = null;
   showSelectedPlayers = false;
+  searchText = '';
 
   positionOptions = AVAILABLE_POSITIONS.map(pos => ({ label: pos, value: pos }));
 
@@ -142,6 +143,7 @@ export class PlayerTableComponent implements OnInit, OnDestroy {
     this.selectedTeamId = null;
     this.selectedNationalityId = null;
     this.showSelectedPlayers = false;
+    this.searchText = '';
     this.updateFilteredPlayers();
   }
 
@@ -149,7 +151,8 @@ export class PlayerTableComponent implements OnInit, OnDestroy {
     return this.selectedPositions.length > 0 ||
            this.selectedTeamId !== null ||
            this.selectedNationalityId !== null ||
-           this.showSelectedPlayers;
+           this.showSelectedPlayers ||
+           this.searchText.trim().length > 0;
   }
 
   onSelectionChange(event: Player | null): void {
@@ -177,7 +180,8 @@ export class PlayerTableComponent implements OnInit, OnDestroy {
       this.selectedPositions,
       this.showSelectedPlayers,
       this.selectedTeamId ?? undefined,
-      this.selectedNationalityId ?? undefined
+      this.selectedNationalityId ?? undefined,
+      this.searchText
     );
   }
 

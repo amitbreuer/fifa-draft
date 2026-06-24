@@ -64,6 +64,87 @@ body {
   background-color: #f8f9fa;
 }
 
+// Global dropdown overlay styles (appendTo="body" renders these outside component scope)
+.p-select-overlay,
+.p-multiselect-overlay {
+  background: #1e293b !important;
+  border: 1px solid #334155 !important;
+  border-radius: 8px !important;
+  font-size: 0.8rem;
+  max-width: 90vw;
+
+  .p-select-list-container,
+  .p-multiselect-list-container {
+    max-height: 250px;
+  }
+
+  .p-select-list,
+  .p-multiselect-list {
+    padding: 0.25rem;
+  }
+
+  .p-select-option,
+  .p-multiselect-option {
+    padding: 0.4rem 0.75rem;
+    font-size: 0.8rem;
+    color: #f1f5f9;
+    white-space: nowrap;
+    border-radius: 4px;
+    margin: 1px 0;
+
+    &:hover {
+      background: #334155;
+    }
+
+    &.p-select-option-selected,
+    &.p-highlight {
+      background: rgba(59, 130, 246, 0.2);
+      color: #93c5fd;
+    }
+  }
+
+  .p-select-filter-container,
+  .p-multiselect-filter-container {
+    padding: 0.4rem;
+  }
+
+  .p-select-filter,
+  .p-multiselect-filter {
+    font-size: 0.75rem;
+    padding: 0.35rem 0.5rem;
+    background: #0f172a;
+    border: 1px solid #334155;
+    color: #f1f5f9;
+    border-radius: 6px;
+    width: 100%;
+  }
+
+  .p-select-header,
+  .p-multiselect-header {
+    padding: 0.4rem;
+    background: #1e293b;
+    border-bottom: 1px solid #334155;
+  }
+
+  .p-checkbox {
+    width: 1rem;
+    height: 1rem;
+  }
+}
+
+// Force multiselect overlay to fit content (overrides PrimeNG inline min-width)
+.p-multiselect-overlay[style],
+.p-multiselect-overlay {
+  min-width: auto !important;
+  width: fit-content !important;
+}
+
+.pos-filter-panel {
+  min-width: auto !important;
+  width: auto !important;
+  max-width: 100px !important;
+}
+
 // Mobile-specific overrides
 @media (max-width: 768px) {
   body {

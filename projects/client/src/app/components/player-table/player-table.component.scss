@@ -109,8 +109,10 @@
 ::ng-deep .p-select {
   background: #0f172a;
   border: 1px solid #334155;
+  border-radius: 8px;
   color: #f1f5f9;
   font-size: 0.75rem;
+  height: 1.75rem;
 
   .p-select-label,
   .p-multiselect-label {
@@ -120,6 +122,7 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    line-height: 1.25rem;
   }
 
   .p-select-trigger,
@@ -140,27 +143,6 @@
   &.p-focus {
     border-color: #3b82f6;
     box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
-  }
-}
-
-// Dropdown overlay panels
-::ng-deep .p-select-overlay,
-::ng-deep .p-multiselect-overlay {
-  background: #1e293b;
-  border: 1px solid #334155;
-  font-size: 0.8rem;
-
-  .p-select-items .p-select-item,
-  .p-multiselect-items .p-multiselect-item {
-    padding: 0.4rem 0.6rem;
-    font-size: 0.8rem;
-    color: #f1f5f9;
-  }
-
-  .p-select-filter,
-  .p-multiselect-filter {
-    font-size: 0.75rem;
-    padding: 0.3rem 0.5rem;
   }
 }
 
@@ -343,6 +325,27 @@
   }
 }
 
+.search-input {
+  width: 100%;
+  padding: 0.35rem 0.6rem;
+  margin-bottom: 0.35rem;
+  font-size: 0.75rem;
+  background: #0f172a;
+  border: 1px solid #334155;
+  border-radius: 8px;
+  color: #f1f5f9;
+  outline: none;
+
+  &::placeholder {
+    color: #64748b;
+  }
+
+  &:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+  }
+}
+
 .filter-row {
   display: flex;
   gap: 0.3rem;
@@ -351,18 +354,55 @@
   overflow-x: auto;
 }
 
-.filter-checkbox {
-  display: flex;
-  align-items: center;
-  gap: 0.2rem;
+.filter-pill {
+  padding: 0.2rem 0.5rem;
+  font-size: 0.7rem;
+  border-radius: 12px;
+  border: 1px solid #334155;
+  background: #0f172a;
+  color: #94a3b8;
+  cursor: pointer;
   white-space: nowrap;
   flex-shrink: 0;
+  transition: all 0.15s;
 
-  label {
-    font-size: 0.7rem;
-    color: #cbd5e1;
-    cursor: pointer;
-    margin: 0;
+  &.active {
+    background: rgba(59, 130, 246, 0.2);
+    border-color: #3b82f6;
+    color: #93c5fd;
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
+}
+
+.filter-clear-btn {
+  width: 1.4rem;
+  height: 1.4rem;
+  border-radius: 50%;
+  border: 1px solid #475569;
+  background: #1e293b;
+  color: #94a3b8;
+  font-size: 0.65rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  padding: 0;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s;
+
+  &.visible {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  &:active {
+    transform: scale(0.9);
+    background: #334155;
   }
 }
 
@@ -664,15 +704,6 @@
       padding: 0.3rem 0.5rem !important;
       font-size: 0.75rem !important;
     }
-  }
-
-  ::ng-deep .p-checkbox {
-    width: 1rem;
-    height: 1rem;
-  }
-
-  ::ng-deep label[for="showSelected"] {
-    font-size: 0.7rem !important;
   }
 
   .details-grid {

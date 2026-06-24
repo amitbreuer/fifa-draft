@@ -106,12 +106,22 @@ export class PlayerService {
     positionFilters: PositionFilter[],
     showSelected: boolean,
     teamId?: number,
-    nationalityId?: number
+    nationalityId?: number,
+    nameSearch?: string
   ): Player[] {
     const allPlayers = this.playersSubject.value;
     const selectedIds = this.selectedPlayerIdsSubject.value;
 
     let filteredPlayers = allPlayers;
+
+    // Filter by name search
+    if (nameSearch && nameSearch.trim()) {
+      const search = nameSearch.trim().toLowerCase();
+      filteredPlayers = filteredPlayers.filter(player => {
+        const name = (player.commonName || `${player.firstName} ${player.lastName}`).toLowerCase();
+        return name.includes(search);
+      });
+    }
 
     // Filter by multiple positions
     if (positionFilters.length > 0) {
