@@ -282,6 +282,11 @@ export class DraftComponent implements OnInit, OnDestroy {
     if (manager.fieldPositions?.length) {
       this.draftService.viewManagerTeam(manager);
     }
+
+    // Scroll to the pitch
+    if (this.teamSection?.nativeElement) {
+      this.teamSection.nativeElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
   }
 
   private restoreCurrentManagerView(): void {
@@ -295,6 +300,7 @@ export class DraftComponent implements OnInit, OnDestroy {
       this.finishTurnMultiplayer();
     } else {
       this.draftService.finishTurn();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   }
 
@@ -326,6 +332,7 @@ export class DraftComponent implements OnInit, OnDestroy {
             this.telegram.hapticNotification('success');
             // Reset turn state — polling will update with new server state
             this.draftService.resetTurnState();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
           },
           error: () => {
             this.submittingPick = false;

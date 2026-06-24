@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { Subject, takeUntil, interval, switchMap } from 'rxjs';
 import { DraftApiService, DraftState, MyDraft } from '../../services/draft-api.service';
+import { DraftService } from '../../services/draft.service';
 import { TelegramService } from '../../services/telegram.service';
 import { PlayerService } from '../../services/player.service';
 import { Dataset } from '../../types';
@@ -38,12 +39,14 @@ export class LobbyComponent implements OnInit, OnDestroy {
 
   // My Drafts
   myDrafts: MyDraft[] = [];
+  localDrafts: { name: string; currentRound: number; maxRounds: number; managerCount: number; currentManagerName: string }[] = [];
   loadingMyDrafts = false;
 
   constructor(
     private router: Router,
     private route: ActivatedRoute,
     private api: DraftApiService,
+    private draftService: DraftService,
     private telegram: TelegramService,
     private playerService: PlayerService
   ) {}
@@ -167,6 +170,7 @@ export class LobbyComponent implements OnInit, OnDestroy {
 
   loadMyDrafts(): void {
     this.loadingMyDrafts = true;
+    this.localDrafts = this.draftService.getSavedDraftDetails();
     this.api.getMyDrafts().subscribe({
       next: (drafts) => {
         this.myDrafts = drafts;
@@ -191,6 +195,13 @@ export class LobbyComponent implements OnInit, OnDestroy {
 
   goSinglePlayer(): void {
     this.router.navigate(['/settings']);
+  }
+
+  openLocalDraft(name: string): void {
+    const success = this.draftService.loadDraftFromLocalStorage(name);
+    if (success) {
+      this.router.navigate(['/draft']);
+    }
   }
 
   copyCode(): void {

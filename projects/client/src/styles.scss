@@ -20,6 +20,24 @@ body {
   padding-bottom: env(safe-area-inset-bottom);
 }
 
+.back-btn {
+  position: fixed;
+  top: calc(env(safe-area-inset-top, 0px) + 12px);
+  left: 12px;
+  z-index: 100;
+  background: none;
+  border: none;
+  color: var(--tg-theme-link-color, #3b82f6);
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 0.25rem 0.5rem;
+  line-height: 1;
+
+  &:active {
+    opacity: 0.6;
+  }
+}
+
 // Custom utility classes
 .text-center {
   text-align: center;

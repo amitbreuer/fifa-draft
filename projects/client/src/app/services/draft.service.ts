@@ -875,6 +875,24 @@ export class DraftService {
     }
   }
 
+  getSavedDraftDetails(): { name: string; currentRound: number; maxRounds: number; managerCount: number; currentManagerName: string }[] {
+    try {
+      const existingData = localStorage.getItem(this.LOCALSTORAGE_KEY);
+      if (!existingData) return [];
+
+      const drafts: Record<string, DraftSettings> = JSON.parse(existingData);
+      return Object.entries(drafts).map(([name, d]) => ({
+        name,
+        currentRound: d.currentRound,
+        maxRounds: d.maxRounds,
+        managerCount: d.managers.length,
+        currentManagerName: d.managers[d.currentManagerIndex]?.name || '',
+      }));
+    } catch (error) {
+      return [];
+    }
+  }
+
   deleteDraft(draftName: string): void {
     try {
       const existingData = localStorage.getItem(this.LOCALSTORAGE_KEY);

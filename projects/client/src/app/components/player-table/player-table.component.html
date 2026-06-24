@@ -149,9 +149,8 @@
     </ng-template>
     @if (selectedPlayerForDialog) {
       <div class="player-dialog-content">
-        <!-- Additional Info Section -->
-        <div class="additional-info">
-          <!-- Player Shield Image -->
+        <!-- Top: Picture left, Info right -->
+        <div class="player-info-header">
           <div class="player-shield-section">
             <img
               [src]="selectedPlayerForDialog.shieldUrl"
@@ -160,58 +159,66 @@
               (error)="onImageError($event)"
             />
           </div>
-
-          <!-- Player Info & Alternative Positions Combined -->
-          <div class="detail-section">
-            <h4>Player Info</h4>
-            <div class="player-info-details">
-              <div class="info-item">
-                <span class="info-label">Preferred Foot:</span>
-                <span class="info-value">{{ selectedPlayerForDialog.preferredFoot }}</span>
-              </div>
-              <div class="info-item">
-                <span class="info-label">Weak Foot:</span>
-                <p-rating
-                  [ngModel]="selectedPlayerForDialog.weakFootAbility"
-                  [readonly]="true"
-                  [stars]="5"
-                  class="weak-foot-rating"
-                ></p-rating>
-              </div>
+          <div class="player-info-right">
+            <div class="info-item">
+              <span class="info-label">Preferred Foot:</span>
+              <span class="info-value">{{ selectedPlayerForDialog.preferredFoot }}</span>
             </div>
-
+            <div class="info-item">
+              <span class="info-label">Weak Foot:</span>
+              <p-rating
+                [ngModel]="selectedPlayerForDialog.weakFootAbility"
+                [readonly]="true"
+                [stars]="5"
+                class="weak-foot-rating"
+              ></p-rating>
+            </div>
             @if (selectedPlayerForDialog.alternatePositions && selectedPlayerForDialog.alternatePositions.length > 0) {
-              <div style="margin-top: 1rem;">
-                <h4>Alternative Positions</h4>
+              <div class="info-item">
+                <span class="info-label">Positions:</span>
                 <div class="positions">
+                  <p-tag
+                    [value]="selectedPlayerForDialog.position.shortLabel"
+                    severity="info"
+                    class="position-tag"
+                  ></p-tag>
                   @for (pos of selectedPlayerForDialog.alternatePositions; track pos.id) {
                     <p-tag
                       [value]="pos.shortLabel"
-                      severity="info"
+                      severity="secondary"
                       class="position-tag"
                     ></p-tag>
                   }
                 </div>
               </div>
+            } @else {
+              <div class="info-item">
+                <span class="info-label">Position:</span>
+                <p-tag
+                  [value]="selectedPlayerForDialog.position.shortLabel"
+                  severity="info"
+                  class="position-tag"
+                ></p-tag>
+              </div>
             }
           </div>
-
-          <!-- Player Abilities Section -->
-          @if (selectedPlayerForDialog.playerAbilities && selectedPlayerForDialog.playerAbilities.length > 0) {
-            <div class="detail-section">
-              <h4>Player Abilities</h4>
-              <div class="abilities">
-                @for (ability of selectedPlayerForDialog.playerAbilities; track ability.id) {
-                  <p-tag
-                    [value]="ability.label"
-                    severity="warn"
-                    class="ability-tag"
-                  ></p-tag>
-                }
-              </div>
-            </div>
-          }
         </div>
+
+        <!-- Abilities -->
+        @if (selectedPlayerForDialog.playerAbilities && selectedPlayerForDialog.playerAbilities.length > 0) {
+          <div class="abilities-section">
+            <h4>Abilities</h4>
+            <div class="abilities">
+              @for (ability of selectedPlayerForDialog.playerAbilities; track ability.id) {
+                <p-tag
+                  [value]="ability.label"
+                  severity="warn"
+                  class="ability-tag"
+                ></p-tag>
+              }
+            </div>
+          </div>
+        }
 
         <!-- Player Stats Section - Grid Layout -->
         <div class="stats-grid">

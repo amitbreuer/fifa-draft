@@ -22,7 +22,7 @@
         <div class="my-drafts-section">
           <p class="loading-text">Loading drafts...</p>
         </div>
-      } @else if (myDrafts.length > 0) {
+      } @else if (myDrafts.length > 0 || localDrafts.length > 0) {
         <div class="my-drafts-section">
           <h3>My Drafts</h3>
           <div class="draft-list">
@@ -49,6 +49,19 @@
                 </div>
               </button>
             }
+            @for (draft of localDrafts; track draft.name) {
+              <button class="draft-item" (click)="openLocalDraft(draft.name)">
+                <div class="draft-item-top">
+                  <span class="draft-name">{{ draft.name }}</span>
+                  <span class="draft-badge badge-local">Local</span>
+                </div>
+                <div class="draft-item-bottom">
+                  <span class="draft-meta">{{ draft.managerCount }} managers</span>
+                  <span class="draft-meta">Round {{ draft.currentRound }}/{{ draft.maxRounds }}</span>
+                  <span class="draft-meta">{{ draft.currentManagerName }}'s turn</span>
+                </div>
+              </button>
+            }
           </div>
         </div>
       }
@@ -57,8 +70,8 @@
 
   <!-- Create Screen -->
   @if (mode === 'create') {
+    <button class="back-btn" (click)="onBack()">←</button>
     <div class="lobby-create">
-      <button class="back-btn" (click)="onBack()">←</button>
       <h2>Create Draft</h2>
 
       <div class="form-group">
@@ -103,8 +116,8 @@
 
   <!-- Join Screen -->
   @if (mode === 'join') {
+    <button class="back-btn" (click)="onBack()">←</button>
     <div class="lobby-join">
-      <button class="back-btn" (click)="onBack()">←</button>
       <h2>Join Draft</h2>
 
       <div class="form-group">
@@ -129,8 +142,8 @@
 
   <!-- Waiting Room -->
   @if (mode === 'waiting') {
+    <button class="back-btn" (click)="onBack()">←</button>
     <div class="lobby-waiting">
-      <button class="back-btn" (click)="onBack()">←</button>
       <h2>Waiting Room</h2>
 
       <div class="code-display">
@@ -156,11 +169,12 @@
       }
 
       @if (isCreator && draftState && draftState.managers.length >= 2) {
+        <p class="waiting-text">Waiting for others to join or start now</p>
         <button class="btn btn-primary btn-start" (click)="onStartDraft()">
           🚀 Start Draft
         </button>
       } @else if (isCreator) {
-        <p class="waiting-text">Waiting for more players to join...</p>
+        <p class="waiting-text">Waiting for others to join...</p>
       } @else {
         <p class="waiting-text">Waiting for the creator to start...</p>
       }

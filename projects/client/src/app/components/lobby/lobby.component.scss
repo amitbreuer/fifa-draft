@@ -10,21 +10,6 @@
   background: var(--tg-theme-bg-color, #1a1a2e);
 }
 
-.back-btn {
-  align-self: flex-start;
-  background: none;
-  border: none;
-  color: var(--tg-theme-link-color, #3390ec);
-  font-size: 0.9rem;
-  cursor: pointer;
-  padding: 0.25rem 0;
-  margin-bottom: 0.75rem;
-
-  &:active {
-    opacity: 0.6;
-  }
-}
-
 .lobby-home {
   text-align: center;
 
@@ -316,6 +301,11 @@
   &.badge-complete {
     background: #555;
     color: #ccc;
+  }
+
+  &.badge-local {
+    background: #1565c0;
+    color: #bbdefb;
   }
 }
 

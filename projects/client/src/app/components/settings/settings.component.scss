@@ -12,21 +12,6 @@
     linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
 }
 
-.back-btn {
-  align-self: flex-start;
-  background: none;
-  border: none;
-  color: #3b82f6;
-  font-size: 0.9rem;
-  cursor: pointer;
-  padding: 0.25rem 0;
-  margin-bottom: 0.5rem;
-
-  &:active {
-    opacity: 0.6;
-  }
-}
-
 .main-title {
   font-size: 3rem;
   font-weight: 900;
