@@ -14,6 +14,7 @@ import { RatingModule } from 'primeng/rating';
 import { SpeedDialModule } from 'primeng/speeddial';
 import { DialogModule } from 'primeng/dialog';
 import { TooltipModule } from 'primeng/tooltip';
+import { ChipModule } from 'primeng/chip';
 import { Player, AVAILABLE_POSITIONS, PositionFilter, mainStatsMap, MainStats } from '../../types';
 import { PlayerService } from '../../services/player.service';
 import { DraftService } from '../../services/draft.service';
@@ -40,6 +41,7 @@ import { MainStatNamePipe } from '../../pipes/main-stat-name.pipe';
     SpeedDialModule,
     DialogModule,
     TooltipModule,
+    ChipModule,
     RatingSeverityPipe,
     StatSeverityPipe,
     StatNamePipe,
@@ -67,8 +69,8 @@ export class PlayerTableComponent implements OnInit, OnDestroy {
   playerOptions: { label: string; value: Player }[] = [];
 
   selectedPositions: PositionFilter[] = [];
-  selectedTeamId: number | null = null;
-  selectedNationalityId: number | null = null;
+  selectedTeamIds: number[] = [];
+  selectedNationalityIds: number[] = [];
   showSelectedPlayers = false;
   searchText = '';
 
@@ -140,8 +142,8 @@ export class PlayerTableComponent implements OnInit, OnDestroy {
 
   clearFilters(): void {
     this.selectedPositions = [];
-    this.selectedTeamId = null;
-    this.selectedNationalityId = null;
+    this.selectedTeamIds = [];
+    this.selectedNationalityIds = [];
     this.showSelectedPlayers = false;
     this.searchText = '';
     this.updateFilteredPlayers();
@@ -149,10 +151,37 @@ export class PlayerTableComponent implements OnInit, OnDestroy {
 
   hasActiveFilters(): boolean {
     return this.selectedPositions.length > 0 ||
-           this.selectedTeamId !== null ||
-           this.selectedNationalityId !== null ||
+           this.selectedTeamIds.length > 0 ||
+           this.selectedNationalityIds.length > 0 ||
            this.showSelectedPlayers ||
            this.searchText.trim().length > 0;
+  }
+
+  getActiveChips(): { label: string; type: 'position' | 'team' | 'nationality'; value: any }[] {
+    const chips: { label: string; type: 'position' | 'team' | 'nationality'; value: any }[] = [];
+    for (const pos of this.selectedPositions) {
+      chips.push({ label: pos, type: 'position', value: pos });
+    }
+    for (const teamId of this.selectedTeamIds) {
+      const team = this.teamOptions.find(t => t.value === teamId);
+      if (team) chips.push({ label: team.label, type: 'team', value: teamId });
+    }
+    for (const natId of this.selectedNationalityIds) {
+      const nat = this.nationalityOptions.find(n => n.value === natId);
+      if (nat) chips.push({ label: nat.label, type: 'nationality', value: natId });
+    }
+    return chips;
+  }
+
+  removeChip(chip: { type: 'position' | 'team' | 'nationality'; value: any }): void {
+    if (chip.type === 'position') {
+      this.selectedPositions = this.selectedPositions.filter(p => p !== chip.value);
+    } else if (chip.type === 'team') {
+      this.selectedTeamIds = this.selectedTeamIds.filter(id => id !== chip.value);
+    } else if (chip.type === 'nationality') {
+      this.selectedNationalityIds = this.selectedNationalityIds.filter(id => id !== chip.value);
+    }
+    this.onFilterChange();
   }
 
   onSelectionChange(event: Player | null): void {
@@ -179,8 +208,8 @@ export class PlayerTableComponent implements OnInit, OnDestroy {
     this.filteredPlayers = this.playerService.getFilteredPlayersByMultiplePositions(
       this.selectedPositions,
       this.showSelectedPlayers,
-      this.selectedTeamId ?? undefined,
-      this.selectedNationalityId ?? undefined,
+      this.selectedTeamIds.length > 0 ? this.selectedTeamIds : undefined,
+      this.selectedNationalityIds.length > 0 ? this.selectedNationalityIds : undefined,
       this.searchText
     );
   }

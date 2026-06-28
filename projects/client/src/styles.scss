@@ -145,6 +145,13 @@ body {
   max-width: 100px !important;
 }
 
+.team-filter-panel,
+.nat-filter-panel {
+  min-width: auto !important;
+  width: auto !important;
+  max-width: 200px !important;
+}
+
 // Mobile-specific overrides
 @media (max-width: 768px) {
   body {

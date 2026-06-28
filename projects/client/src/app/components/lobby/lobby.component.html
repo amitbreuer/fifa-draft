@@ -27,40 +27,46 @@
           <h3>My Drafts</h3>
           <div class="draft-list">
             @for (draft of myDrafts; track draft.id) {
-              <button class="draft-item" (click)="openDraft(draft)">
-                <div class="draft-item-top">
-                  <span class="draft-name">{{ draft.name }}</span>
-                  <span class="draft-badge" [class]="'badge-' + draft.status">
-                    @if (draft.isMyTurn) {
-                      Your Turn
-                    } @else {
-                      {{ draft.status }}
+              <div class="draft-item-wrapper">
+                <button class="draft-item" (click)="openDraft(draft)">
+                  <div class="draft-item-top">
+                    <span class="draft-name">{{ draft.name }}</span>
+                    <span class="draft-badge" [class]="'badge-' + draft.status">
+                      @if (draft.isMyTurn) {
+                        Your Turn
+                      } @else {
+                        {{ draft.status }}
+                      }
+                    </span>
+                  </div>
+                  <div class="draft-item-bottom">
+                    <span class="draft-meta">{{ draft.managerCount }} players</span>
+                    @if (draft.status === 'active' && !draft.isMyTurn) {
+                      <span class="draft-meta">⏳ {{ draft.currentTurnName }}'s turn</span>
                     }
-                  </span>
-                </div>
-                <div class="draft-item-bottom">
-                  <span class="draft-meta">{{ draft.managerCount }}/{{ draft.maxManagers }} players</span>
-                  @if (draft.status === 'active' && !draft.isMyTurn) {
-                    <span class="draft-meta">⏳ {{ draft.currentTurnName }}'s turn</span>
-                  }
-                  @if (draft.status === 'active') {
-                    <span class="draft-meta">Round {{ draft.currentRound }}/{{ draft.maxRounds }}</span>
-                  }
-                </div>
-              </button>
+                    @if (draft.status === 'active') {
+                      <span class="draft-meta">Round {{ draft.currentRound }}/{{ draft.maxRounds }}</span>
+                    }
+                  </div>
+                </button>
+                <button class="draft-delete-btn" (click)="deleteOnlineDraft(draft.shortCode)">🗑</button>
+              </div>
             }
             @for (draft of localDrafts; track draft.name) {
-              <button class="draft-item" (click)="openLocalDraft(draft.name)">
-                <div class="draft-item-top">
-                  <span class="draft-name">{{ draft.name }}</span>
-                  <span class="draft-badge badge-local">Local</span>
-                </div>
-                <div class="draft-item-bottom">
-                  <span class="draft-meta">{{ draft.managerCount }} managers</span>
-                  <span class="draft-meta">Round {{ draft.currentRound }}/{{ draft.maxRounds }}</span>
-                  <span class="draft-meta">{{ draft.currentManagerName }}'s turn</span>
-                </div>
-              </button>
+              <div class="draft-item-wrapper">
+                <button class="draft-item" (click)="openLocalDraft(draft.name)">
+                  <div class="draft-item-top">
+                    <span class="draft-name">{{ draft.name }}</span>
+                    <span class="draft-badge badge-local">Local</span>
+                  </div>
+                  <div class="draft-item-bottom">
+                    <span class="draft-meta">{{ draft.managerCount }} managers</span>
+                    <span class="draft-meta">Round {{ draft.currentRound }}/{{ draft.maxRounds }}</span>
+                    <span class="draft-meta">{{ draft.currentManagerName }}'s turn</span>
+                  </div>
+                </button>
+                <button class="draft-delete-btn" (click)="deleteLocalDraft(draft.name)">🗑</button>
+              </div>
             }
           </div>
         </div>
@@ -86,15 +92,6 @@
       <div class="form-group">
         <label>Draft Name</label>
         <input type="text" [(ngModel)]="draftName" placeholder="FIFA Draft" class="input" />
-      </div>
-
-      <div class="form-group">
-        <label>Managers</label>
-        <div class="stepper">
-          <button (click)="maxManagers = Math.max(2, maxManagers - 1)">−</button>
-          <span>{{ maxManagers }}</span>
-          <button (click)="maxManagers = Math.min(8, maxManagers + 1)">+</button>
-        </div>
       </div>
 
       <div class="form-group">
@@ -155,11 +152,11 @@
 
       @if (draftState) {
         <div class="managers-list">
-          <h3>Players ({{ draftState.managers.length }}/{{ draftState.maxRounds ? maxManagers : 4 }})</h3>
+          <h3>Players ({{ draftState.managers.length }})</h3>
           @for (manager of draftState.managers; track manager.id) {
             <div class="manager-item">
               <span class="manager-avatar">👤</span>
-              <span class="manager-name">{{ manager.firstName || manager.username }}</span>
+              <span class="manager-name">{{ manager.username ? '@' + manager.username : manager.firstName }}</span>
               @if (manager.slotIndex === 0) {
                 <span class="badge">Creator</span>
               }
@@ -168,7 +165,7 @@
         </div>
       }
 
-      @if (isCreator && draftState && draftState.managers.length >= 2) {
+      @if (isCreator && draftState && draftState.managers.length >= 1) {
         <p class="waiting-text">Waiting for others to join or start now</p>
         <button class="btn btn-primary btn-start" (click)="onStartDraft()">
           🚀 Start Draft

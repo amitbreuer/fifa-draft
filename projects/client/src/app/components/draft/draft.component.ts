@@ -188,7 +188,7 @@ export class DraftComponent implements OnInit, OnDestroy {
     return {
       managers: state.managers.map(m => ({
         id: m.id,
-        name: m.firstName || m.username || `Manager ${m.slotIndex + 1}`,
+        name: m.username ? `@${m.username}` : m.firstName || `Manager ${m.slotIndex + 1}`,
         team: state.picks
           .filter(p => p.managerId === m.id)
           .map(p => this.playerService.getPlayerById(p.playerId))

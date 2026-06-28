@@ -23,7 +23,6 @@ export class LobbyComponent implements OnInit, OnDestroy {
 
   mode: LobbyMode = 'home';
   draftName = '';
-  maxManagers = 4;
   maxRounds = 18;
   joinCode = '';
   error = '';
@@ -106,7 +105,7 @@ export class LobbyComponent implements OnInit, OnDestroy {
 
   onCreateDraft(): void {
     this.error = '';
-    this.api.createDraft(this.draftName || 'FIFA Draft', this.maxManagers, this.maxRounds, this.selectedDatasetId)
+    this.api.createDraft(this.draftName || 'FIFA Draft', this.maxRounds, this.selectedDatasetId)
       .subscribe({
         next: (res) => {
           this.joinCode = res.shortCode;
@@ -202,6 +201,20 @@ export class LobbyComponent implements OnInit, OnDestroy {
     if (success) {
       this.router.navigate(['/draft']);
     }
+  }
+
+  deleteOnlineDraft(code: string): void {
+    this.api.deleteDraft(code).subscribe({
+      next: () => {
+        this.myDrafts = this.myDrafts.filter(d => d.shortCode !== code);
+      },
+      error: () => {}
+    });
+  }
+
+  deleteLocalDraft(name: string): void {
+    this.draftService.deleteDraft(name);
+    this.localDrafts = this.draftService.getSavedDraftDetails();
   }
 
   copyCode(): void {

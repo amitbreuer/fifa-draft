@@ -92,11 +92,9 @@ export class PlayerService {
       filteredPlayers = filteredPlayers.filter(player => player.nationality.id === nationalityId);
     }
 
-    // Filter by selected/unselected
+    // Filter by selected/unselected (only when explicitly filtering)
     if (showSelected) {
       filteredPlayers = filteredPlayers.filter(player => selectedIds.has(player.id));
-    } else {
-      filteredPlayers = filteredPlayers.filter(player => !selectedIds.has(player.id));
     }
 
     return filteredPlayers;
@@ -105,8 +103,8 @@ export class PlayerService {
   getFilteredPlayersByMultiplePositions(
     positionFilters: PositionFilter[],
     showSelected: boolean,
-    teamId?: number,
-    nationalityId?: number,
+    teamIds?: number[],
+    nationalityIds?: number[],
     nameSearch?: string
   ): Player[] {
     const allPlayers = this.playersSubject.value;
@@ -133,21 +131,19 @@ export class PlayerService {
       );
     }
 
-    // Filter by team
-    if (teamId !== undefined && teamId !== null) {
-      filteredPlayers = filteredPlayers.filter(player => player.team.id === teamId);
+    // Filter by teams
+    if (teamIds && teamIds.length > 0) {
+      filteredPlayers = filteredPlayers.filter(player => teamIds.includes(player.team.id));
     }
 
-    // Filter by nationality
-    if (nationalityId !== undefined && nationalityId !== null) {
-      filteredPlayers = filteredPlayers.filter(player => player.nationality.id === nationalityId);
+    // Filter by nationalities
+    if (nationalityIds && nationalityIds.length > 0) {
+      filteredPlayers = filteredPlayers.filter(player => nationalityIds.includes(player.nationality.id));
     }
 
-    // Filter by selected/unselected
+    // Filter by selected/unselected (only when explicitly filtering)
     if (showSelected) {
       filteredPlayers = filteredPlayers.filter(player => selectedIds.has(player.id));
-    } else {
-      filteredPlayers = filteredPlayers.filter(player => !selectedIds.has(player.id));
     }
 
     return filteredPlayers;

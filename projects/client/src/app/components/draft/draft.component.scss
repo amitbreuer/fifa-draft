@@ -159,9 +159,10 @@
     }
 
     &.current-manager {
-      border-color: #3b82f6;
-      background: linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(37, 99, 235, 0.1) 100%);
-      box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
+      border-color: #22c55e;
+      background: linear-gradient(135deg, rgba(34, 197, 94, 0.15) 0%, rgba(22, 163, 74, 0.1) 100%);
+      box-shadow: 0 0 12px rgba(34, 197, 94, 0.4);
+      animation: pulse-border 1.5s ease-in-out infinite;
     }
 
     .manager-header {
@@ -242,27 +243,9 @@
   }
 }
 
-.turn-indicator {
-  display: flex;
-  align-items: center;
-  white-space: nowrap;
-
-  .your-turn {
-    font-size: 1.1rem;
-    font-weight: 700;
-    color: #22c55e;
-    animation: pulse-text 1.5s ease-in-out infinite;
-  }
-
-  .waiting-turn {
-    font-size: 1rem;
-    color: #94a3b8;
-  }
-}
-
-@keyframes pulse-text {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.6; }
+@keyframes pulse-border {
+  0%, 100% { box-shadow: 0 0 12px rgba(34, 197, 94, 0.4); }
+  50% { box-shadow: 0 0 6px rgba(34, 197, 94, 0.15); }
 }
 
 .online-dot {
@@ -457,19 +440,6 @@
       .manager-stats small {
         font-size: 0.65rem;
       }
-    }
-  }
-
-  .turn-indicator {
-    width: 100%;
-    text-align: center;
-
-    .your-turn {
-      font-size: 0.9rem;
-    }
-
-    .waiting-turn {
-      font-size: 0.8rem;
     }
   }
 

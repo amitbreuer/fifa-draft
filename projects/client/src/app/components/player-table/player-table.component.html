@@ -33,17 +33,19 @@
             class="search-input"
           />
           <div class="filter-row">
-            <p-select
+            <p-multiSelect
               [options]="teamOptions"
-              [(ngModel)]="selectedTeamId"
+              [(ngModel)]="selectedTeamIds"
               (onChange)="onFilterChange()"
               placeholder="Team"
-              [showClear]="true"
               [filter]="true"
               filterPlaceholder="Search"
               [style]="{'width': '90px'}"
               appendTo="body"
-            ></p-select>
+              [maxSelectedLabels]="1"
+              selectedItemsLabel="{0}"
+              panelStyleClass="team-filter-panel"
+            ></p-multiSelect>
             <p-multiSelect
               [options]="positionOptions"
               [(ngModel)]="selectedPositions"
@@ -55,22 +57,34 @@
               selectedItemsLabel="{0}"
               panelStyleClass="pos-filter-panel"
             ></p-multiSelect>
-            <p-select
+            <p-multiSelect
               [options]="nationalityOptions"
-              [(ngModel)]="selectedNationalityId"
+              [(ngModel)]="selectedNationalityIds"
               (onChange)="onFilterChange()"
               placeholder="Nationality"
-              [showClear]="true"
               [filter]="true"
               filterPlaceholder="Search"
               [style]="{'width': '123px'}"
               appendTo="body"
-            ></p-select>
+              [maxSelectedLabels]="1"
+              selectedItemsLabel="{0}"
+              panelStyleClass="nat-filter-panel"
+            ></p-multiSelect>
             <!-- <button
               class="filter-pill"
               (click)="showSelectedPlayers = !showSelectedPlayers; onFilterChange()"
             >{{ showSelectedPlayers ? 'Picked' : 'Unpicked' }}</button> -->
           </div>
+          @if (getActiveChips().length > 0) {
+            <div class="filter-chips-container">
+              @for (chip of getActiveChips(); track chip.type + chip.value) {
+                <span class="filter-chip" [class]="'chip-' + chip.type">
+                  {{ chip.label }}
+                  <button class="chip-remove" (click)="removeChip(chip)">✕</button>
+                </span>
+              }
+            </div>
+          }
         </th>
       </tr>
     </ng-template>

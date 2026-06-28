@@ -46,7 +46,6 @@ draftRouter.get('/mine', async (req: AuthenticatedRequest, res: Response) => {
       shortCode: drafts.shortCode,
       name: drafts.name,
       status: drafts.status,
-      maxManagers: drafts.maxManagers,
       maxRounds: drafts.maxRounds,
       currentManagerIndex: drafts.currentManagerIndex,
       currentRound: drafts.currentRound,
@@ -73,7 +72,7 @@ draftRouter.get('/mine', async (req: AuthenticatedRequest, res: Response) => {
       return {
         ...draft,
         managerCount: managers.length,
-        currentTurnName: currentManager?.firstName || currentManager?.username || null,
+        currentTurnName: currentManager?.username ? `@${currentManager.username}` : currentManager?.firstName || null,
         isMyTurn,
       };
     }));
@@ -95,10 +94,35 @@ draftRouter.get('/mine', async (req: AuthenticatedRequest, res: Response) => {
   }
 });
 
+// Delete a draft
+draftRouter.delete('/:code', async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const telegramId = req.user!.telegramId;
+    const [user] = await db.select().from(users).where(eq(users.telegramId, telegramId));
+    if (!user) { res.status(404).json({ error: 'User not found' }); return; }
+
+    const [draft] = await db.select().from(drafts).where(eq(drafts.shortCode, getCode(req)));
+    if (!draft) { res.status(404).json({ error: 'Draft not found' }); return; }
+
+    // Only creator can delete
+    if (draft.creatorId !== user.id) { res.status(403).json({ error: 'Only creator can delete' }); return; }
+
+    // Delete in order: picks → managers → draft
+    await db.delete(picks).where(eq(picks.draftId, draft.id));
+    await db.delete(draftManagers).where(eq(draftManagers.draftId, draft.id));
+    await db.delete(drafts).where(eq(drafts.id, draft.id));
+
+    res.json({ message: 'Draft deleted' });
+  } catch (err) {
+    console.error('Delete draft error:', err);
+    res.status(500).json({ error: 'Failed to delete draft' });
+  }
+});
+
 // Create a new draft
 draftRouter.post('/', async (req: AuthenticatedRequest, res: Response) => {
   try {
-    const { name, maxManagers = 4, maxRounds = 18, datasetId = 'fc-2026' } = req.body;
+    const { name, maxRounds = 18, datasetId = 'fc-2026' } = req.body;
     const telegramId = req.user!.telegramId;
 
     // Find or create user
@@ -116,7 +140,7 @@ draftRouter.post('/', async (req: AuthenticatedRequest, res: Response) => {
       shortCode,
       name: name || 'FIFA Draft',
       creatorId: user.id,
-      maxManagers,
+      maxManagers: 10,
       maxRounds,
       datasetId,
     }).returning();
@@ -184,9 +208,9 @@ draftRouter.post('/:code/join', async (req: AuthenticatedRequest, res: Response)
       .where(and(eq(draftManagers.draftId, draft.id), eq(draftManagers.userId, user.id)));
     if (existing) { res.json({ message: 'Already joined', slotIndex: existing.slotIndex }); return; }
 
-    // Check capacity
+    // Check capacity (max 10 participants)
     const currentManagers = await db.select().from(draftManagers).where(eq(draftManagers.draftId, draft.id));
-    if (currentManagers.length >= draft.maxManagers) { res.status(400).json({ error: 'Draft is full' }); return; }
+    if (currentManagers.length >= 10) { res.status(400).json({ error: 'Draft is full (max 10)' }); return; }
 
     const [manager] = await db.insert(draftManagers).values({
       draftId: draft.id,
@@ -216,7 +240,7 @@ draftRouter.post('/:code/start', async (req: AuthenticatedRequest, res: Response
     if (draft.status !== 'waiting') { res.status(400).json({ error: 'Draft already started' }); return; }
 
     const managers = await db.select().from(draftManagers).where(eq(draftManagers.draftId, draft.id));
-    if (managers.length < 2) { res.status(400).json({ error: 'Need at least 2 managers' }); return; }
+    if (managers.length < 1) { res.status(400).json({ error: 'Need at least 1 manager' }); return; }
 
     await db.update(drafts).set({ status: 'active', updatedAt: new Date() }).where(eq(drafts.id, draft.id));
 

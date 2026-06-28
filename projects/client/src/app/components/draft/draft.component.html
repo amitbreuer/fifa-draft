@@ -12,13 +12,6 @@
         <p-divider layout="vertical" />
 
         @if (isMultiplayer) {
-          <div class="turn-indicator">
-            @if (isMyTurn) {
-              <span class="your-turn">🎯 Your turn!</span>
-            } @else {
-              <span class="waiting-turn">⏳ {{ getCurrentManagerName() }}'s turn</span>
-            }
-          </div>
           <p-divider layout="vertical" />
         }
 
