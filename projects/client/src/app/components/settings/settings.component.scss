@@ -173,7 +173,7 @@
 .managers-section {
   h3 {
     margin-top: 0;
-    margin-bottom: 1.5rem;
+    margin-bottom: 1rem;
     color: #f1f5f9;
     font-size: 1.25rem;
     font-weight: 700;
@@ -189,22 +189,73 @@
 }
 
 .manager-inputs {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
 
-  .field {
+.manager-input-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+
+  input {
+    flex: 1;
     background: #0f172a;
-    padding: 1rem;
-    border-radius: 8px;
     border: 1px solid #334155;
-    transition: all 0.2s;
+    border-radius: 8px;
+    padding: 0.6rem 0.8rem;
+    color: #f1f5f9;
+    font-size: 0.9rem;
 
-    &:hover {
-      background: #1a1f2e;
-      border-color: #475569;
-      transform: translateY(-1px);
+    &::placeholder {
+      color: #64748b;
     }
+
+    &:focus {
+      border-color: #3b82f6;
+      outline: none;
+      box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+    }
+  }
+}
+
+.btn-remove-manager {
+  width: 1.8rem;
+  height: 1.8rem;
+  border-radius: 50%;
+  border: 1px solid #475569;
+  background: #1e293b;
+  color: #ef4444;
+  font-size: 0.75rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.15s;
+
+  &:hover {
+    background: rgba(239, 68, 68, 0.15);
+    border-color: #ef4444;
+  }
+}
+
+.btn-add-manager {
+  margin-top: 0.6rem;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  border: 1px dashed #475569;
+  background: transparent;
+  color: #94a3b8;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.15s;
+
+  &:hover {
+    border-color: #3b82f6;
+    color: #93c5fd;
+    background: rgba(59, 130, 246, 0.05);
   }
 }
 
@@ -257,10 +308,6 @@
     ::ng-deep .p-card-body {
       padding: 1.5rem;
     }
-  }
-
-  .manager-inputs {
-    grid-template-columns: 1fr;
   }
 
   ::ng-deep .p-selectbutton {

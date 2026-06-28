@@ -65,35 +65,27 @@
 
       <p-divider></p-divider>
 
-      <div class="field">
-        <label for="numManagers">Number of Managers</label>
-        <p-selectButton
-          id="numManagers"
-          [options]="managerOptions"
-          [(ngModel)]="numManagers"
-          (onChange)="updateManagerNames()"
-          optionLabel="label"
-          optionValue="value"
-        ></p-selectButton>
-      </div>
-
-      <p-divider></p-divider>
-
       <div class="managers-section">
-        <h3>Managers Names</h3>
+        <h3>Managers</h3>
         <div class="manager-inputs">
           @for (manager of managerNames; track $index; let i = $index) {
-          <div class="field">
+          <div class="manager-input-row">
             <input
               [id]="'manager' + i"
               type="text"
               pInputText
               [(ngModel)]="managerNames[i]"
-              [placeholder]="'Enter manager name'"
+              [placeholder]="'Manager ' + (i + 1)"
             />
+            @if (managerNames.length > 2) {
+              <button class="btn-remove-manager" (click)="removeManager(i)" title="Remove">✕</button>
+            }
           </div>
           }
         </div>
+        @if (managerNames.length < 10) {
+          <button class="btn-add-manager" (click)="addManager()">+ Add Manager</button>
+        }
       </div>
 
       <p-divider></p-divider>

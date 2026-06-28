@@ -30,15 +30,7 @@ import { Dataset } from '../../types';
 })
 export class SettingsComponent implements OnInit {
   draftName = '';
-  numManagers = 4;
-  managerNames: string[] = ['Manager 1', 'Manager 2', 'Manager 3', 'Manager 4'];
-  managerOptions = [
-    { label: '2', value: 2 },
-    { label: '3', value: 3 },
-    { label: '4', value: 4 },
-    { label: '5', value: 5 },
-    { label: '6', value: 6 }
-  ];
+  managerNames: string[] = ['', ''];
 
   // Dataset selection
   datasets: Dataset[] = [];
@@ -70,18 +62,21 @@ export class SettingsComponent implements OnInit {
     });
   }
 
-  updateManagerNames(): void {
-    const newNames: string[] = [];
-    for (let i = 0; i < this.numManagers; i++) {
-      newNames.push(this.managerNames[i] || `Manager ${i + 1}`);
+  addManager(): void {
+    if (this.managerNames.length < 10) {
+      this.managerNames.push('');
     }
-    this.managerNames = newNames;
+  }
+
+  removeManager(index: number): void {
+    if (this.managerNames.length > 2) {
+      this.managerNames.splice(index, 1);
+    }
   }
 
   canStartDraft(): boolean {
     return this.draftName.trim().length > 0 &&
-           this.numManagers >= 2 &&
-           this.managerNames.length === this.numManagers &&
+           this.managerNames.length >= 2 &&
            this.managerNames.every(name => name.trim().length > 0);
   }
 
