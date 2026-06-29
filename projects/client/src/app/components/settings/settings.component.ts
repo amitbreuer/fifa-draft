@@ -2,11 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { ButtonModule } from 'primeng/button';
-import { InputTextModule } from 'primeng/inputtext';
-import { CardModule } from 'primeng/card';
-import { DividerModule } from 'primeng/divider';
-import { SelectButtonModule } from 'primeng/selectbutton';
 import { DraftService } from '../../services/draft.service';
 import { PlayerService } from '../../services/player.service';
 import { Select } from 'primeng/select';
@@ -18,11 +13,6 @@ import { Dataset } from '../../types';
   imports: [
     CommonModule,
     FormsModule,
-    ButtonModule,
-    InputTextModule,
-    CardModule,
-    DividerModule,
-    SelectButtonModule,
     Select
   ],
   templateUrl: './settings.component.html',
@@ -31,6 +21,8 @@ import { Dataset } from '../../types';
 export class SettingsComponent implements OnInit {
   draftName = '';
   managerNames: string[] = ['', ''];
+  maxRounds = 18;
+  Math = Math;
 
   // Dataset selection
   datasets: Dataset[] = [];
@@ -76,15 +68,18 @@ export class SettingsComponent implements OnInit {
 
   canStartDraft(): boolean {
     return this.draftName.trim().length > 0 &&
-           this.managerNames.length >= 2 &&
-           this.managerNames.every(name => name.trim().length > 0);
+           this.managerNames.length >= 2;
   }
 
   startDraft(): void {
     if (this.canStartDraft()) {
+      // Fill empty names with defaults
+      const names = this.managerNames.map((name, i) =>
+        name.trim() || `Manager ${i + 1}`
+      );
       // Load dataset if changed from default
       this.playerService.loadDataset(this.selectedDatasetId).subscribe(() => {
-        this.draftService.initializeDraft(this.managerNames, this.draftName);
+        this.draftService.initializeDraft(names, this.draftName, this.maxRounds);
         this.router.navigate(['/draft']);
       });
     }

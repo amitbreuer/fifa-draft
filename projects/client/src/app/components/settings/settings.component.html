@@ -1,11 +1,15 @@
-<div class="settings-container">
+<div class="settings-page">
   <button class="back-btn" (click)="goBack()">←</button>
-  <h1 class="main-title">⚽ FIFA Draft 🏆</h1>
+
+  <div class="hero">
+    <h1 class="logo">Galactico</h1>
+    <p class="tagline">Local Draft</p>
+  </div>
 
   @if (hasSavedDrafts()) {
-  <p-card header="Continue Draft" class="settings-card saved-drafts-card">
-    <div class="settings-content">
-      <div class="field">
+    <div class="section">
+      <h3>Continue Draft</h3>
+      <div class="form-group">
         <p-select
           id="savedDraft"
           [options]="savedDrafts"
@@ -14,92 +18,63 @@
           [style]="{'width': '100%'}"
         ></p-select>
       </div>
-
-      <div class="actions">
-        <p-button
-          label="Continue"
-          icon="pi pi-arrow-right"
-          [disabled]="!selectedSavedDraft"
-          (onClick)="continueDraft()"
-          severity="primary"
-          [raised]="true"
-        ></p-button>
-        <p-button
-          label="Delete"
-          icon="pi pi-trash"
-          [disabled]="!selectedSavedDraft"
-          (onClick)="deleteSavedDraft()"
-          severity="danger"
-          [outlined]="true"
-        ></p-button>
+      <div class="btn-row">
+        <button class="btn btn-primary btn-sm" [disabled]="!selectedSavedDraft" (click)="continueDraft()">Continue</button>
+        <button class="btn btn-danger btn-sm" [disabled]="!selectedSavedDraft" (click)="deleteSavedDraft()">Delete</button>
       </div>
     </div>
-  </p-card>
   }
 
-  <p-card header="Draft Settings" class="settings-card">
-    <div class="settings-content">
-      <div class="field">
-        <label for="dataset">Player Data</label>
-        <p-select
-          id="dataset"
-          [options]="datasets"
-          [(ngModel)]="selectedDatasetId"
-          optionLabel="label"
-          optionValue="id"
-          [style]="{'width': '100%'}"
-        ></p-select>
-      </div>
+  <div class="section">
+    <h3>New Draft</h3>
 
-      <p-divider></p-divider>
-
-      <div class="field">
-        <input
-          id="draftName"
-          type="text"
-          pInputText
-          [(ngModel)]="draftName"
-          placeholder="Enter draft name"
-        />
-      </div>
-
-      <p-divider></p-divider>
-
-      <div class="managers-section">
-        <h3>Managers</h3>
-        <div class="manager-inputs">
-          @for (manager of managerNames; track $index; let i = $index) {
-          <div class="manager-input-row">
-            <input
-              [id]="'manager' + i"
-              type="text"
-              pInputText
-              [(ngModel)]="managerNames[i]"
-              [placeholder]="'Manager ' + (i + 1)"
-            />
-            @if (managerNames.length > 2) {
-              <button class="btn-remove-manager" (click)="removeManager(i)" title="Remove">✕</button>
-            }
-          </div>
-          }
-        </div>
-        @if (managerNames.length < 10) {
-          <button class="btn-add-manager" (click)="addManager()">+ Add Manager</button>
+    <div class="form-group">
+      <label>Player Data</label>
+      <select [(ngModel)]="selectedDatasetId" class="input">
+        @for (ds of datasets; track ds.id) {
+          <option [value]="ds.id">{{ ds.label }}</option>
         }
-      </div>
+      </select>
+    </div>
 
-      <p-divider></p-divider>
+    <div class="form-group">
+      <label>Draft Name</label>
+      <input type="text" [(ngModel)]="draftName" placeholder="Galactico" class="input" />
+    </div>
 
-      <div class="actions">
-        <p-button
-          label="Start Draft"
-          icon="pi pi-play"
-          [disabled]="!canStartDraft()"
-          (onClick)="startDraft()"
-          severity="success"
-          [raised]="true"
-        ></p-button>
+    <div class="form-group">
+      <label>Rounds</label>
+      <div class="stepper">
+        <button (click)="maxRounds = Math.max(5, maxRounds - 1)">−</button>
+        <span>{{ maxRounds }}</span>
+        <button (click)="maxRounds = Math.min(30, maxRounds + 1)">+</button>
       </div>
     </div>
-  </p-card>
+
+    <div class="managers-section">
+      <label>Managers</label>
+      <div class="manager-inputs">
+        @for (manager of managerNames; track $index; let i = $index) {
+          <div class="manager-input-row">
+            <input
+              type="text"
+              [(ngModel)]="managerNames[i]"
+              [placeholder]="'Manager ' + (i + 1)"
+              class="input"
+            />
+            @if (managerNames.length > 2) {
+              <button class="btn-remove" (click)="removeManager(i)">✕</button>
+            }
+          </div>
+        }
+      </div>
+      @if (managerNames.length < 10) {
+        <button class="btn-add" (click)="addManager()">+ Add Manager</button>
+      }
+    </div>
+
+    <button class="btn btn-primary btn-start" [disabled]="!canStartDraft()" (click)="startDraft()">
+      🚀 Start Draft
+    </button>
+  </div>
 </div>

@@ -112,6 +112,11 @@ export class PlayerService {
 
     let filteredPlayers = allPlayers;
 
+    // Exclude drafted players unless explicitly showing them
+    if (!showSelected) {
+      filteredPlayers = filteredPlayers.filter(player => !selectedIds.has(player.id));
+    }
+
     // Filter by name search
     if (nameSearch && nameSearch.trim()) {
       const search = nameSearch.trim().toLowerCase();
@@ -139,11 +144,6 @@ export class PlayerService {
     // Filter by nationalities
     if (nationalityIds && nationalityIds.length > 0) {
       filteredPlayers = filteredPlayers.filter(player => nationalityIds.includes(player.nationality.id));
-    }
-
-    // Filter by selected/unselected (only when explicitly filtering)
-    if (showSelected) {
-      filteredPlayers = filteredPlayers.filter(player => selectedIds.has(player.id));
     }
 
     return filteredPlayers;
@@ -179,6 +179,10 @@ export class PlayerService {
     const selectedIds = new Set(this.selectedPlayerIdsSubject.value);
     selectedIds.add(playerId);
     this.selectedPlayerIdsSubject.next(selectedIds);
+  }
+
+  clearSelectedPlayers(): void {
+    this.selectedPlayerIdsSubject.next(new Set());
   }
 
   unselectPlayer(playerId: number): void {

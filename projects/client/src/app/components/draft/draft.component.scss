@@ -4,67 +4,234 @@
   max-width: 100%;
   overflow-x: hidden;
   overflow-y: auto;
-  background:
-    radial-gradient(circle at 20% 50%, rgba(59, 130, 246, 0.1), transparent 50%),
-    radial-gradient(circle at 80% 80%, rgba(34, 197, 94, 0.1), transparent 50%),
-    radial-gradient(circle at 40% 20%, rgba(168, 85, 247, 0.08), transparent 50%),
-    linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  background: var(--tg-theme-bg-color, #0f172a);
+  color: var(--tg-theme-text-color, #f1f5f9);
 }
 
 .draft-header {
+  position: relative;
   margin-bottom: 1rem;
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 0.85rem;
+  padding-top: 0.25rem;
+
+  .header-top {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .back-btn,
+  .finish-btn {
+    position: static;
+    top: auto;
+    left: auto;
+    right: auto;
+    z-index: auto;
+    flex: none;
+    width: 2.25rem;
+    height: 2.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    line-height: 1;
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: var(--tg-theme-secondary-bg-color, #1e293b);
+    color: var(--tg-theme-text-color, #f1f5f9);
+    cursor: pointer;
+    transition: background 0.2s ease, border-color 0.2s ease;
+
+    &:hover {
+      background: #334155;
+      border-color: rgba(255, 255, 255, 0.16);
+    }
+  }
+
+  .title-block {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 0.5rem 0.75rem;
+  }
+
+  .draft-name {
+    margin: 0;
+    font-size: 1.15rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: var(--tg-theme-text-color, #f1f5f9);
+  }
 }
 
-.draft-info-card {
-  background: #1e293b;
-  border: 1px solid rgba(59, 130, 246, 0.2);
-  border-radius: 12px;
+.overview-card {
+  padding: 1rem 1.25rem;
+  border-radius: 14px;
+  background: var(--tg-theme-secondary-bg-color, #1e293b);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
 
-  ::ng-deep .p-card-body {
-    padding: 1.5rem;
+.round-tag {
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 0.3rem 0.65rem;
+  border-radius: 8px;
+  background: rgba(59, 130, 246, 0.12);
+  color: #60a5fa;
+  white-space: nowrap;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+// ============ LOADING SKELETON ============
+.skeleton {
+  display: inline-block;
+  border-radius: 6px;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.05) 25%,
+    rgba(255, 255, 255, 0.12) 37%,
+    rgba(255, 255, 255, 0.05) 63%
+  );
+  background-size: 400% 100%;
+  animation: skeleton-shimmer 1.4s ease infinite;
+}
+
+@keyframes skeleton-shimmer {
+  0% { background-position: 100% 50%; }
+  100% { background-position: 0 50%; }
+}
+
+.skeleton-title {
+  height: 1.15rem;
+  width: 9rem;
+  max-width: 55%;
+}
+
+.skeleton-round {
+  height: 1rem;
+  width: 5.5rem;
+  border-radius: 8px;
+}
+
+.manager-card.skeleton-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  cursor: default;
+  pointer-events: none;
+
+  &:hover { border-color: #334155; }
+
+  .skeleton-line {
+    height: 0.7rem;
+
+    &.lg { width: 80%; }
+    &.sm { width: 45%; }
   }
+}
 
-  .draft-info {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 1rem;
+.managers-grid {
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 0.6rem;
 
-    .current-turn {
+  .manager-card {
+    padding: 0.65rem 0.75rem;
+    border: 1.5px solid #334155;
+    border-radius: 10px;
+    background: var(--tg-theme-bg-color, #0f172a);
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover {
+      border-color: #475569;
+    }
+
+    &.current-manager {
+      border-color: #22c55e;
+      background: linear-gradient(135deg, rgba(34, 197, 94, 0.1) 0%, rgba(22, 163, 74, 0.05) 100%);
+      box-shadow: 0 0 12px rgba(34, 197, 94, 0.25);
+      animation: pulse-border 2s ease-in-out infinite;
+    }
+
+    &.my-manager {
+      border-color: #8b5cf6;
+      background: linear-gradient(135deg, rgba(139, 92, 246, 0.08) 0%, rgba(109, 40, 217, 0.04) 100%);
+    }
+
+    &.viewing {
+      border-color: #f59e0b;
+      background: linear-gradient(135deg, rgba(245, 158, 11, 0.08) 0%, rgba(217, 119, 6, 0.04) 100%);
+    }
+
+    // When it's my turn in multiplayer — combine current + my-manager
+    &.current-manager.my-manager {
+      border-color: #4ade80;
+      background: linear-gradient(135deg, rgba(74, 222, 128, 0.12) 0%, rgba(34, 197, 94, 0.06) 100%);
+      box-shadow: 0 0 16px rgba(74, 222, 128, 0.3);
+    }
+
+    .manager-header {
       display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.4rem;
 
-      h2 {
+      h4 {
         margin: 0;
-        color: #3b82f6;
-        font-weight: 700;
-        font-size: 1.5rem;
-      }
-    }
-
-    .draft-progress {
-      flex: 1;
-      min-width: 200px;
-      display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
-
-      label {
+        color: #f1f5f9;
         font-weight: 600;
-        color: #cbd5e1;
+        font-size: 0.8rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
       }
     }
 
-    .turn-actions {
-      display: flex;
-      gap: 0.5rem;
+    .manager-stats {
+      small {
+        color: #94a3b8;
+        font-size: 0.7rem;
+        font-weight: 500;
+      }
     }
   }
+}
+
+@keyframes pulse-border {
+  0%, 100% { box-shadow: 0 0 12px rgba(34, 197, 94, 0.25); }
+  50% { box-shadow: 0 0 4px rgba(34, 197, 94, 0.08); }
+}
+
+.online-dot {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #64748b;
+  margin-right: 4px;
+  vertical-align: middle;
+
+  &.online {
+    background: #22c55e;
+    box-shadow: 0 0 6px rgba(34, 197, 94, 0.6);
+  }
+}
+
+.you-badge {
+  font-size: 0.6rem;
+  opacity: 0.5;
+  font-weight: 400;
+  margin-left: 3px;
 }
 
 .draft-content {
@@ -74,11 +241,11 @@
     display: flex;
     gap: 1rem;
     width: 100%;
-    height: calc(100vh - 154px);
+    height: calc(100vh - 130px);
 
     .players-section {
-      flex: 0 1 auto; // Allow shrinking, don't grow, auto width based on content
-      min-width: 0; // Allows flex item to shrink below its content size
+      flex: 0 1 auto;
+      min-width: 0;
 
       ::ng-deep app-player-table {
         height: 100%;
@@ -101,183 +268,14 @@
     }
 
     .team-section {
-      flex: 1; // Take remaining space
-      min-width: 400px; // Minimum width for field functionality
+      flex: 1;
+      min-width: 400px;
 
       ::ng-deep app-field {
         height: 100%;
       }
     }
   }
-}
-
-.overview-card {
-  background: #1e293b;
-  border: 1px solid rgba(59, 130, 246, 0.2);
-  border-radius: 12px;
-
-  ::ng-deep .p-card-header {
-    background: linear-gradient(135deg, #334155 0%, #1e293b 100%);
-    color: #f1f5f9;
-    padding: 1rem;
-    font-size: 1.25rem;
-    font-weight: 700;
-    border-bottom: 2px solid rgba(59, 130, 246, 0.3);
-  }
-
-  ::ng-deep .p-card-body {
-    padding: 1.5rem;
-  }
-
-  ::ng-deep .p-divider-vertical {
-    margin: 0;
-  }
-}
-
-.overview-content {
-  display: flex;
-  gap: 1.5rem;
-  align-items: center;
-}
-
-.managers-grid {
-  flex: 1;
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 1rem;
-
-  .manager-card {
-    padding: 1rem;
-    border: 2px solid #334155;
-    border-radius: 8px;
-    background: #0f172a;
-    transition: all 0.3s ease;
-
-    &:hover {
-      transform: translateY(-2px);
-      border-color: #475569;
-    }
-
-    &.current-manager {
-      border-color: #22c55e;
-      background: linear-gradient(135deg, rgba(34, 197, 94, 0.15) 0%, rgba(22, 163, 74, 0.1) 100%);
-      box-shadow: 0 0 12px rgba(34, 197, 94, 0.4);
-      animation: pulse-border 1.5s ease-in-out infinite;
-    }
-
-    .manager-header {
-      display: flex;
-      justify-content: space-between;
-      gap: 0.5rem;
-
-      h4 {
-        margin: 0;
-        color: #f1f5f9;
-        font-weight: 600;
-        font-size: 1rem;
-      }
-    }
-
-    .manager-stats {
-      color: #94a3b8;
-      font-size: 0.875rem;
-    }
-  }
-}
-
-.turn-actions {
-  display: flex;
-  flex-direction: row;
-  gap: 0.75rem;
-  align-items: center;
-
-  ::ng-deep .p-button {
-    border-radius: 8px;
-    font-weight: 600;
-    padding: 0.75rem 1.5rem;
-    transition: all 0.2s;
-
-    &:not(:disabled):hover {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-    }
-
-    &:not(:disabled):active {
-      transform: translateY(0);
-    }
-
-    &.p-button-secondary {
-      background: #475569;
-      border-color: #475569;
-
-      &:not(:disabled):hover {
-        background: #64748b;
-        border-color: #64748b;
-      }
-    }
-
-    &.p-button-primary {
-      background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-      border-color: #2563eb;
-      box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
-
-      &:not(:disabled):hover {
-        box-shadow: 0 4px 16px rgba(59, 130, 246, 0.5);
-      }
-    }
-
-    &.p-button-danger {
-      background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-      border-color: #dc2626;
-      box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);
-
-      &:not(:disabled):hover {
-        box-shadow: 0 4px 16px rgba(239, 68, 68, 0.5);
-      }
-    }
-
-    &:disabled {
-      opacity: 0.4;
-      cursor: not-allowed;
-    }
-  }
-}
-
-@keyframes pulse-border {
-  0%, 100% { box-shadow: 0 0 12px rgba(34, 197, 94, 0.4); }
-  50% { box-shadow: 0 0 6px rgba(34, 197, 94, 0.15); }
-}
-
-.online-dot {
-  display: inline-block;
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: #64748b;
-  margin-right: 6px;
-  vertical-align: middle;
-
-  &.online {
-    background: #22c55e;
-    box-shadow: 0 0 6px rgba(34, 197, 94, 0.6);
-  }
-}
-
-.you-badge {
-  font-size: 0.7rem;
-  opacity: 0.7;
-  font-weight: 400;
-  margin-left: 4px;
-}
-
-.my-manager {
-  border-color: #8b5cf6 !important;
-  background: linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(109, 40, 217, 0.05) 100%) !important;
-}
-
-.manager-card.viewing {
-  border-color: #f59e0b !important;
-  background: linear-gradient(135deg, rgba(245, 158, 11, 0.15) 0%, rgba(217, 119, 6, 0.05) 100%) !important;
 }
 
 // Floating action buttons
@@ -363,35 +361,8 @@
     }
   }
 
-  .overview-content {
-    flex-direction: column;
-  }
-
   .managers-grid {
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-  }
-
-  .turn-actions {
-    flex-direction: row;
-    width: 100%;
-    justify-content: center;
-  }
-
-  .draft-info-card {
-    .draft-info {
-      flex-direction: column;
-      align-items: stretch;
-
-      .current-turn,
-      .draft-progress,
-      .turn-actions {
-        width: 100%;
-      }
-
-      .turn-actions {
-        justify-content: center;
-      }
-    }
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
   }
 }
 
@@ -406,22 +377,15 @@
   }
 
   .overview-card {
-    ::ng-deep .p-card-body {
-      padding: 0.5rem !important;
-    }
-
-    ::ng-deep .p-divider {
-      display: none;
-    }
+    padding: 0.6rem 0.75rem;
   }
 
-  .overview-content {
-    flex-wrap: wrap;
-    gap: 0.5rem;
+  .draft-name {
+    font-size: 1.05rem;
   }
 
   .round-tag {
-    font-size: 0.7rem;
+    font-size: 0.6rem;
   }
 
   .managers-grid {
@@ -429,26 +393,15 @@
     gap: 0.4rem;
 
     .manager-card {
-      padding: 0.4rem;
-      border-width: 1px;
+      padding: 0.4rem 0.5rem;
 
       .manager-header h4 {
-        font-size: 0.75rem;
-        margin: 0;
+        font-size: 0.7rem;
       }
 
       .manager-stats small {
-        font-size: 0.65rem;
+        font-size: 0.6rem;
       }
-    }
-  }
-
-  .turn-actions {
-    gap: 0.4rem;
-
-    ::ng-deep .p-button {
-      padding: 0.5rem 0.75rem;
-      font-size: 0.75rem;
     }
   }
 

@@ -38,6 +38,23 @@ body {
   }
 }
 
+.finish-btn {
+  position: fixed;
+  top: calc(env(safe-area-inset-top, 0px) + 12px);
+  right: 12px;
+  z-index: 100;
+  background: none;
+  border: none;
+  font-size: 1.3rem;
+  cursor: pointer;
+  padding: 0.25rem 0.5rem;
+  line-height: 1;
+
+  &:active {
+    opacity: 0.6;
+  }
+}
+
 // Custom utility classes
 .text-center {
   text-align: center;

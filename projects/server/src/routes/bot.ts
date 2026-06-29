@@ -22,7 +22,7 @@ if (bot) {
         },
       });
     } else {
-      await ctx.reply('Welcome to FIFA Draft! ⚽\n\nCreate a new draft or join one with friends.', {
+      await ctx.reply('Welcome to Galactico! ⚽\n\nCreate a new draft or join one with friends.', {
         reply_markup: {
           inline_keyboard: [
             [{ text: '🆕 Create Draft', web_app: { url: `${WEBAPP_URL}/lobby?mode=create` } }],

@@ -44,7 +44,7 @@ export class DraftService {
     this.initializeFieldPositions();
   }
 
-  initializeDraft(managerNames: string[], draftName: string): void {
+  initializeDraft(managerNames: string[], draftName: string, maxRounds = 18): void {
     const managers: DraftManager[] = managerNames.map((name, index) => ({
       id: index,
       name,
@@ -56,11 +56,12 @@ export class DraftService {
       currentManagerIndex: 0,
       currentRound: 1,
       isSnakeDirection: false,
-      maxRounds: 18,
+      maxRounds,
       draftName
     };
 
     this.draftSettingsSubject.next(draftSettings);
+    this.playerService.clearSelectedPlayers();
     this.resetCurrentManagerState();
   }
 
@@ -455,11 +456,12 @@ export class DraftService {
       }
     });
 
-    // Save to localStorage
-    this.saveDraftToLocalStorage();
-
     // Move to next turn
     this.moveToNextTurn();
+
+    // Save to localStorage AFTER advancing so the persisted turn pointer
+    // (currentManagerIndex/currentRound) reflects whose turn is next.
+    this.saveDraftToLocalStorage();
   }
 
   private moveToNextTurn(): void {
@@ -534,6 +536,29 @@ export class DraftService {
       this.initializeEmptyFieldPositions();
       this.benchPlayersSubject.next([]);
     }
+  }
+
+  /** Reset only the per-turn tracking flags, leaving the field/bench untouched. */
+  resetTurnFlags(): void {
+    this.currentPickedPlayerSubject.next(null);
+    this.hasPlacedPlayerThisTurnSubject.next(false);
+    this.placedPlayerIdsThisTurnSubject.next(new Set());
+    this.actionHistorySubject.next([]);
+  }
+
+  /** Load a specific manager's saved squad onto the field (used in multiplayer sync). */
+  loadManagerSquad(manager: DraftManager): void {
+    if (manager.formation) {
+      this.currentFormationSubject.next(manager.formation);
+    }
+
+    if (manager.fieldPositions && manager.fieldPositions.length > 0) {
+      this.fieldPositionsSubject.next([...manager.fieldPositions]);
+    } else {
+      this.initializeEmptyFieldPositions();
+    }
+
+    this.benchPlayersSubject.next(manager.benchPlayers ? [...manager.benchPlayers] : []);
   }
 
   private initializeFieldPositions(): void {
@@ -839,6 +864,9 @@ export class DraftService {
       // Restore draft settings
       this.draftSettingsSubject.next(savedDraft);
 
+      // Clear any selections from a previously open draft
+      this.playerService.clearSelectedPlayers();
+
       // Restore selected players
       const allSelectedPlayerIds: number[] = [];
       savedDraft.managers.forEach(manager => {
@@ -875,7 +903,7 @@ export class DraftService {
     }
   }
 
-  getSavedDraftDetails(): { name: string; currentRound: number; maxRounds: number; managerCount: number; currentManagerName: string }[] {
+  getSavedDraftDetails(): { name: string; currentRound: number; maxRounds: number; managerCount: number; managerNames: string[]; currentManagerName: string }[] {
     try {
       const existingData = localStorage.getItem(this.LOCALSTORAGE_KEY);
       if (!existingData) return [];
@@ -886,6 +914,7 @@ export class DraftService {
         currentRound: d.currentRound,
         maxRounds: d.maxRounds,
         managerCount: d.managers.length,
+        managerNames: d.managers.map(m => m.name),
         currentManagerName: d.managers[d.currentManagerIndex]?.name || '',
       }));
     } catch (error) {

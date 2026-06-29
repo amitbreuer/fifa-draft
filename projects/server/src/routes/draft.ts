@@ -72,6 +72,9 @@ draftRouter.get('/mine', async (req: AuthenticatedRequest, res: Response) => {
       return {
         ...draft,
         managerCount: managers.length,
+        managerNames: managers
+          .sort((a, b) => a.slotIndex - b.slotIndex)
+          .map(m => (m.username ? `@${m.username}` : m.firstName || `Manager ${m.slotIndex + 1}`)),
         currentTurnName: currentManager?.username ? `@${currentManager.username}` : currentManager?.firstName || null,
         isMyTurn,
       };
@@ -138,7 +141,7 @@ draftRouter.post('/', async (req: AuthenticatedRequest, res: Response) => {
     const shortCode = generateShortCode();
     const [draft] = await db.insert(drafts).values({
       shortCode,
-      name: name || 'FIFA Draft',
+      name: name || 'Galactico',
       creatorId: user.id,
       maxManagers: 10,
       maxRounds,

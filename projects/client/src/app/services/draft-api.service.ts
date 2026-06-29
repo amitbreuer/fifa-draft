@@ -60,6 +60,7 @@ export interface MyDraft {
   currentManagerIndex: number;
   currentRound: number;
   managerCount: number;
+  managerNames?: string[];
   currentTurnName: string | null;
   isMyTurn: boolean;
   createdAt: string;

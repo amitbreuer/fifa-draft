@@ -352,6 +352,7 @@
   align-items: center;
   flex-wrap: nowrap;
   overflow-x: auto;
+  max-width: calc(100vw - 4.5rem);
 }
 
 .filter-pill {
@@ -408,9 +409,11 @@
 
 .filter-chips-container {
   display: flex;
+  flex-wrap: nowrap;
   gap: 0.25rem;
   margin-top: 0.3rem;
   overflow-x: auto;
+  max-width: calc(100vw - 4.5rem);
   padding-bottom: 0.15rem;
   scrollbar-width: none;
   -ms-overflow-style: none;

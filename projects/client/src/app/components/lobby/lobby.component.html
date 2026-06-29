@@ -2,18 +2,27 @@
   <!-- Home Screen -->
   @if (mode === 'home') {
     <div class="lobby-home">
-      <h1>⚽ FIFA Draft</h1>
-      <p class="subtitle">Draft players with your friends</p>
+      <!-- Hero -->
+      <div class="hero">
+        <h1 class="logo">Galactico</h1>
+        <p class="tagline">Draft your dream squad</p>
+      </div>
 
-      <div class="actions">
-        <button class="btn btn-primary" (click)="mode = 'create'">
-          🆕 Create Online Draft
+      <!-- Primary CTA -->
+      <button class="hero-cta" (click)="mode = 'create'">
+        <span class="hero-cta-icon">🌐</span>
+        <span class="hero-cta-label">Play Online</span>
+      </button>
+
+      <!-- Secondary actions -->
+      <div class="cta-row">
+        <button class="cta-secondary" (click)="mode = 'join'">
+          <span class="cta-icon">🔗</span>
+          <span>Join</span>
         </button>
-        <button class="btn btn-secondary" (click)="mode = 'join'">
-          🎮 Join Draft
-        </button>
-        <button class="btn btn-outline" (click)="goSinglePlayer()">
-          👤 Single Player (Local)
+        <button class="cta-secondary" (click)="goSinglePlayer()">
+          <span class="cta-icon">👤</span>
+          <span>Local</span>
         </button>
       </div>
 
@@ -24,51 +33,73 @@
         </div>
       } @else if (myDrafts.length > 0 || localDrafts.length > 0) {
         <div class="my-drafts-section">
-          <h3>My Drafts</h3>
-          <div class="draft-list">
+          <h3>Continue</h3>
+          <div class="draft-scroll">
             @for (draft of myDrafts; track draft.id) {
-              <div class="draft-item-wrapper">
-                <button class="draft-item" (click)="openDraft(draft)">
-                  <div class="draft-item-top">
-                    <span class="draft-name">{{ draft.name }}</span>
-                    <span class="draft-badge" [class]="'badge-' + draft.status">
-                      @if (draft.isMyTurn) {
-                        Your Turn
-                      } @else {
-                        {{ draft.status }}
-                      }
-                    </span>
+              <div class="draft-card" [class.myturn]="draft.isMyTurn">
+                <button class="draft-card-btn" (click)="openDraft(draft)">
+                  <div class="o3-head">
+                    <div class="o3-head-text">
+                      <span class="o3-name">{{ draft.name }}</span>
+                      <span class="o3-type">🌐 Online · Round {{ draft.currentRound }} of {{ draft.maxRounds }}</span>
+                    </div>
+                    <div class="o3-ring" [style.--p]="progressPct(draft.currentRound, draft.maxRounds) + '%'">
+                      <span>{{ progressPct(draft.currentRound, draft.maxRounds) }}%</span>
+                    </div>
                   </div>
-                  <div class="draft-item-bottom">
-                    <span class="draft-meta">{{ draft.managerCount }} players</span>
-                    @if (draft.status === 'active' && !draft.isMyTurn) {
-                      <span class="draft-meta">⏳ {{ draft.currentTurnName }}'s turn</span>
+                  <div class="o3-avatars">
+                    @for (mgr of managerSlots(draft.managerNames, draft.managerCount); track $index) {
+                      <span class="o3-av" [style.background]="avatarColor($index)">{{ initials(mgr) }}</span>
                     }
-                    @if (draft.status === 'active') {
-                      <span class="draft-meta">Round {{ draft.currentRound }}/{{ draft.maxRounds }}</span>
+                    <span class="o3-more">{{ draft.managerCount }} players</span>
+                  </div>
+                  <div class="o3-status" [class.is-myturn]="draft.isMyTurn">
+                    @if (draft.isMyTurn) {
+                      ▶ It's your turn
+                    } @else if (draft.status === 'active') {
+                      ⏳ {{ draft.currentTurnName }}'s turn
+                    } @else if (draft.status === 'waiting') {
+                      🕒 Waiting for players
+                    } @else {
+                      ✓ Completed
                     }
                   </div>
                 </button>
-                <button class="draft-delete-btn" (click)="deleteOnlineDraft(draft.shortCode)">🗑</button>
+                <button class="draft-delete-btn" (click)="deleteOnlineDraft(draft.shortCode)" title="Delete">🗑</button>
               </div>
             }
             @for (draft of localDrafts; track draft.name) {
-              <div class="draft-item-wrapper">
-                <button class="draft-item" (click)="openLocalDraft(draft.name)">
-                  <div class="draft-item-top">
-                    <span class="draft-name">{{ draft.name }}</span>
-                    <span class="draft-badge badge-local">Local</span>
+              <div class="draft-card">
+                <button class="draft-card-btn" (click)="openLocalDraft(draft.name)">
+                  <div class="o3-head">
+                    <div class="o3-head-text">
+                      <span class="o3-name">{{ draft.name }}</span>
+                      <span class="o3-type">👤 Local · Round {{ draft.currentRound }} of {{ draft.maxRounds }}</span>
+                    </div>
+                    <div class="o3-ring blue" [style.--p]="progressPct(draft.currentRound, draft.maxRounds) + '%'">
+                      <span>{{ progressPct(draft.currentRound, draft.maxRounds) }}%</span>
+                    </div>
                   </div>
-                  <div class="draft-item-bottom">
-                    <span class="draft-meta">{{ draft.managerCount }} managers</span>
-                    <span class="draft-meta">Round {{ draft.currentRound }}/{{ draft.maxRounds }}</span>
-                    <span class="draft-meta">{{ draft.currentManagerName }}'s turn</span>
+                  <div class="o3-avatars">
+                    @for (mgr of managerSlots(draft.managerNames, draft.managerCount); track $index) {
+                      <span class="o3-av" [style.background]="avatarColor($index)">{{ initials(mgr) }}</span>
+                    }
+                    <span class="o3-more">{{ draft.managerCount }} managers</span>
+                  </div>
+                  <div class="o3-status">
+                    {{ draft.currentManagerName }}'s turn
                   </div>
                 </button>
-                <button class="draft-delete-btn" (click)="deleteLocalDraft(draft.name)">🗑</button>
+                <button class="draft-delete-btn" (click)="deleteLocalDraft(draft.name)" title="Delete">🗑</button>
               </div>
             }
           </div>
+        </div>
+      } @else {
+        <div class="empty-state">
+          <span class="empty-icon">🏟️</span>
+          <p>No active drafts yet</p>
+          <span class="empty-hint">Create or join one to get started!</span>
         </div>
       }
     </div>
@@ -77,7 +108,7 @@
   <!-- Create Screen -->
   @if (mode === 'create') {
     <button class="back-btn" (click)="onBack()">←</button>
-    <div class="lobby-create">
+    <div class="lobby-form">
       <h2>Create Draft</h2>
 
       <div class="form-group">
@@ -91,7 +122,7 @@
 
       <div class="form-group">
         <label>Draft Name</label>
-        <input type="text" [(ngModel)]="draftName" placeholder="FIFA Draft" class="input" />
+        <input type="text" [(ngModel)]="draftName" placeholder="Galactico" class="input" />
       </div>
 
       <div class="form-group">
@@ -107,14 +138,14 @@
         <p class="error">{{ error }}</p>
       }
 
-      <button class="btn btn-primary" (click)="onCreateDraft()">Create</button>
+      <button class="btn btn-primary" (click)="onCreateDraft()">Create Draft</button>
     </div>
   }
 
   <!-- Join Screen -->
   @if (mode === 'join') {
     <button class="back-btn" (click)="onBack()">←</button>
-    <div class="lobby-join">
+    <div class="lobby-form">
       <h2>Join Draft</h2>
 
       <div class="form-group">
@@ -152,13 +183,13 @@
 
       @if (draftState) {
         <div class="managers-list">
-          <h3>Players ({{ draftState.managers.length }})</h3>
-          @for (manager of draftState.managers; track manager.id) {
+          <h3>Players joined</h3>
+          @for (manager of draftState.managers; track manager.id; let i = $index) {
             <div class="manager-item">
-              <span class="manager-avatar">👤</span>
+              <span class="manager-slot">{{ i + 1 }}</span>
               <span class="manager-name">{{ manager.username ? '@' + manager.username : manager.firstName }}</span>
               @if (manager.slotIndex === 0) {
-                <span class="badge">Creator</span>
+                <span class="badge badge-creator">Creator</span>
               }
             </div>
           }
@@ -166,14 +197,14 @@
       }
 
       @if (isCreator && draftState && draftState.managers.length >= 1) {
-        <p class="waiting-text">Waiting for others to join or start now</p>
+        <p class="waiting-text">Waiting for others to join or start now<span class="dots"></span></p>
         <button class="btn btn-primary btn-start" (click)="onStartDraft()">
           🚀 Start Draft
         </button>
       } @else if (isCreator) {
-        <p class="waiting-text">Waiting for others to join...</p>
+        <p class="waiting-text">Waiting for others to join<span class="dots"></span></p>
       } @else {
-        <p class="waiting-text">Waiting for the creator to start...</p>
+        <p class="waiting-text">Waiting for the creator to start<span class="dots"></span></p>
       }
 
       @if (error) {

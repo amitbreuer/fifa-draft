@@ -38,7 +38,7 @@ export class LobbyComponent implements OnInit, OnDestroy {
 
   // My Drafts
   myDrafts: MyDraft[] = [];
-  localDrafts: { name: string; currentRound: number; maxRounds: number; managerCount: number; currentManagerName: string }[] = [];
+  localDrafts: { name: string; currentRound: number; maxRounds: number; managerCount: number; managerNames: string[]; currentManagerName: string }[] = [];
   loadingMyDrafts = false;
 
   constructor(
@@ -105,7 +105,7 @@ export class LobbyComponent implements OnInit, OnDestroy {
 
   onCreateDraft(): void {
     this.error = '';
-    this.api.createDraft(this.draftName || 'FIFA Draft', this.maxRounds, this.selectedDatasetId)
+    this.api.createDraft(this.draftName || 'Galactico', this.maxRounds, this.selectedDatasetId)
       .subscribe({
         next: (res) => {
           this.joinCode = res.shortCode;
@@ -220,6 +220,35 @@ export class LobbyComponent implements OnInit, OnDestroy {
   copyCode(): void {
     navigator.clipboard.writeText(this.joinCode);
     this.telegram.hapticNotification('success');
+  }
+
+  /** Round-completion percentage for the progress ring. */
+  progressPct(currentRound: number, maxRounds: number): number {
+    if (!maxRounds) return 0;
+    return Math.min(Math.round((currentRound / maxRounds) * 100), 100);
+  }
+
+  /** Up to 5 manager display slots, preferring real names when present. */
+  managerSlots(names: string[] | undefined, count: number): string[] {
+    const list = names && names.length ? names : Array.from({ length: count || 0 }, () => '');
+    return list.slice(0, 5);
+  }
+
+  /** Two-letter initials from a manager name (handles @username and "First Last"). */
+  initials(name: string): string {
+    if (!name) return '';
+    const clean = name.replace(/^@/, '').trim();
+    if (!clean) return '';
+    const parts = clean.split(/[\s_]+/).filter(Boolean);
+    if (parts.length >= 2) {
+      return (parts[0][0] + parts[1][0]).toUpperCase();
+    }
+    return clean.slice(0, 2).toUpperCase();
+  }
+
+  avatarColor(i: number): string {
+    const colors = ['#3b82f6', '#ef4444', '#22c55e', '#a855f7', '#f59e0b', '#06b6d4'];
+    return colors[i % colors.length];
   }
 
   get shareLink(): string {

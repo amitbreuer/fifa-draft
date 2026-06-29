@@ -1,40 +1,65 @@
-<div class="summary-container">
-  <div class="summary-header">
-    <h1 class="title">⚽ Draft Summary 🏆</h1>
-    @if (draftSettings && draftSettings.draftName) {
-      <h2 class="draft-name">{{ draftSettings.draftName }}</h2>
-    }
+<div class="summary-page">
+  <button class="back-btn" (click)="backToSettings()">←</button>
+
+  <div class="hero">
+    <h1 class="logo">Galactico</h1>
+    <p class="tagline">Draft Complete 🏆</p>
   </div>
 
-  <div class="managers-grid">
-    @for (manager of managers; track manager.id) {
-      <div class="manager-section">
-        <h3 class="manager-name">{{ manager.name }}</h3>
-        <div class="players-list">
-          @for (player of manager.team; track player.id) {
-            <div class="player-card">
-              <img [src]="player.shieldUrl" class="player-shield" />
-              <div class="player-name">{{ player.commonName || player.lastName }}</div>
-              <div class="player-rating">{{ player.overallRating }}</div>
-              <img [src]="player.team.imageUrl" class="team-logo" />
-              <div class="team-name">{{ player.team.label }}</div>
-            </div>
-          }
-          @if (manager.team.length === 0) {
-            <div class="empty-message">No players selected</div>
-          }
-        </div>
+  @if (draftSettings && draftSettings.draftName) {
+    <div class="draft-name-badge">{{ draftSettings.draftName }}</div>
+  }
+
+  @if (managers.length > 0) {
+    <div class="manager-tabs">
+      @for (manager of managers; track manager.id; let i = $index) {
+        <button class="tab" [class.active]="i === activeIndex" (click)="selectManager(i)">
+          {{ manager.name }}
+        </button>
+      }
+    </div>
+
+    @let active = managers[activeIndex];
+
+    <div class="averages">
+      <div class="avg-card avg-overall">
+        <span class="avg-value">{{ overallAvg(active) }}</span>
+        <span class="avg-label">Overall</span>
       </div>
-    }
-  </div>
+      <div class="avg-card avg-att">
+        <span class="avg-value">{{ attackAvg(active) }}</span>
+        <span class="avg-label">Attack</span>
+      </div>
+      <div class="avg-card avg-mid">
+        <span class="avg-value">{{ midfieldAvg(active) }}</span>
+        <span class="avg-label">Midfield</span>
+      </div>
+      <div class="avg-card avg-def">
+        <span class="avg-value">{{ defenceAvg(active) }}</span>
+        <span class="avg-label">Defence</span>
+      </div>
+    </div>
+
+    <div class="section squad-section">
+      <div class="players-list">
+        @for (player of active.team; track player.id) {
+          <div class="player-card">
+            <img [src]="player.shieldUrl" class="player-shield" alt="" />
+            <div class="player-info">
+              <span class="player-name">{{ player.commonName || player.lastName }}</span>
+              <span class="player-meta">{{ player.position.shortLabel }} · {{ player.team.label }}</span>
+            </div>
+            <span class="player-rating">{{ player.overallRating }}</span>
+          </div>
+        }
+        @if (active.team.length === 0) {
+          <div class="empty-message">No players selected</div>
+        }
+      </div>
+    </div>
+  }
 
   <div class="actions">
-    <p-button
-      label="Back to Settings"
-      icon="pi pi-home"
-      (onClick)="backToSettings()"
-      severity="primary"
-      [raised]="true"
-    ></p-button>
+    <button class="btn btn-primary" (click)="backToSettings()">🏠 Back to Home</button>
   </div>
 </div>

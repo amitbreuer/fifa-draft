@@ -2,11 +2,6 @@ import { Component, OnDestroy, OnInit, ViewChild, ElementRef } from '@angular/co
 import { CommonModule } from '@angular/common';
 import { Router, ActivatedRoute } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
-import { CardModule } from 'primeng/card';
-import { ButtonModule } from 'primeng/button';
-import { TagModule } from 'primeng/tag';
-import { ProgressBarModule } from 'primeng/progressbar';
-import { DividerModule } from 'primeng/divider';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ConfirmationService } from 'primeng/api';
 import { PlayerTableComponent } from '../player-table/player-table.component';
@@ -23,11 +18,6 @@ import { DraftSettings, Player } from '../../types';
   standalone: true,
   imports: [
     CommonModule,
-    CardModule,
-    ButtonModule,
-    TagModule,
-    ProgressBarModule,
-    DividerModule,
     ConfirmDialogModule,
     PlayerTableComponent,
     FieldComponent
@@ -124,6 +114,8 @@ export class DraftComponent implements OnInit, OnDestroy {
 
   /** Initialize multiplayer mode with server polling */
   private initMultiplayer(code: string): void {
+    // Clear any selections carried over from a previous draft
+    this.playerService.clearSelectedPlayers();
     this.polling.startPolling(code);
 
     this.polling.state$.pipe(
@@ -144,12 +136,27 @@ export class DraftComponent implements OnInit, OnDestroy {
 
       this.isMyTurn = state.currentManagerIndex === this.myManagerIndex && state.status === 'active';
 
-      // Update drafted players as selected in player service
+      // Sync drafted players with server (authoritative): clear then apply
+      this.playerService.clearSelectedPlayers();
       const pickedPlayerIds = new Set(state.picks.map(p => p.playerId));
       pickedPlayerIds.forEach(id => this.playerService.selectPlayer(id));
 
       // Build local draft settings from server state
       this.draftSettings = this.buildDraftSettingsFromServer(state);
+
+      // Keep my saved squad on the pitch (server is authoritative).
+      // Skip while I'm mid-placement or viewing another manager's team,
+      // so we don't wipe an in-progress pick or override a peek.
+      if (
+        this.viewingManagerIndex === null &&
+        !this.hasPlacedPlayerThisTurn &&
+        this.myManagerIndex >= 0
+      ) {
+        const myManager = this.draftSettings.managers[this.myManagerIndex];
+        if (myManager) {
+          this.draftService.loadManagerSquad(myManager);
+        }
+      }
 
       // Haptic feedback when it becomes my turn
       if (this.isMyTurn && prevState && prevState.currentManagerIndex !== state.currentManagerIndex) {
@@ -290,6 +297,13 @@ export class DraftComponent implements OnInit, OnDestroy {
   }
 
   private restoreCurrentManagerView(): void {
+    if (this.isMultiplayer && this.draftSettings && this.myManagerIndex >= 0) {
+      const myManager = this.draftSettings.managers[this.myManagerIndex];
+      if (myManager) {
+        this.draftService.loadManagerSquad(myManager);
+        return;
+      }
+    }
     this.draftService.restoreCurrentManagerView();
   }
 
@@ -320,6 +334,10 @@ export class DraftComponent implements OnInit, OnDestroy {
     // Submit pick to server
     this.api.submitPick(this.draftCode, playerId).subscribe({
       next: () => {
+        // Mark the pick locally so the player table updates immediately,
+        // before the next poll/turn — polling will reconcile afterwards.
+        this.playerService.selectPlayer(playerId);
+
         // Save squad layout to server
         const fieldPositions = this.draftService.getFieldPositions();
         const benchPlayerIds = this.draftService.getBenchPlayers().map(p => p.id);
@@ -330,8 +348,9 @@ export class DraftComponent implements OnInit, OnDestroy {
             this.submittingPick = false;
             this.telegram.setMainButtonLoading(false);
             this.telegram.hapticNotification('success');
-            // Reset turn state — polling will update with new server state
-            this.draftService.resetTurnState();
+            // Reset turn flags but keep the placed player on the pitch —
+            // polling will reconcile with authoritative server state.
+            this.draftService.resetTurnFlags();
             window.scrollTo({ top: 0, behavior: 'smooth' });
           },
           error: () => {
