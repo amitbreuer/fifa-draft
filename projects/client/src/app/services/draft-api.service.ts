@@ -42,6 +42,7 @@ export interface DraftState {
   isSnakeDirection: boolean;
   managers: ManagerInfo[];
   picks: PickInfo[];
+  myManagerId?: number | null;
 }
 
 export interface PickResponse {

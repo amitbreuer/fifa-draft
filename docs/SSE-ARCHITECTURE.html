@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SSE Architecture — FIFA Draft</title>
+  <style>
+    :root {
+      --bg: #0d1117;
+      --surface: #161b22;
+      --border: #30363d;
+      --text: #e6edf3;
+      --text-muted: #8b949e;
+      --accent: #58a6ff;
+      --green: #3fb950;
+      --red: #f85149;
+      --orange: #d29922;
+      --code-bg: #1c2128;
+      --tag-bg: #1f2937;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+      padding: 2rem;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      font-size: 2.2rem;
+      margin-bottom: 0.5rem;
+      background: linear-gradient(135deg, var(--accent), var(--green));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    h1 + p.subtitle {
+      color: var(--text-muted);
+      font-size: 1.1rem;
+      margin-bottom: 2.5rem;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 1.5rem;
+    }
+
+    h2 {
+      font-size: 1.5rem;
+      margin-top: 3rem;
+      margin-bottom: 1rem;
+      color: var(--accent);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    h2 .icon { font-size: 1.3rem; }
+
+    h3 {
+      font-size: 1.15rem;
+      margin-top: 1.8rem;
+      margin-bottom: 0.8rem;
+      color: var(--text);
+    }
+
+    p { margin-bottom: 1rem; }
+
+    code {
+      background: var(--code-bg);
+      padding: 0.15em 0.4em;
+      border-radius: 4px;
+      font-size: 0.9em;
+      font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+      color: var(--accent);
+    }
+
+    pre {
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.2rem;
+      overflow-x: auto;
+      margin-bottom: 1.5rem;
+      font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+      font-size: 0.85rem;
+      line-height: 1.6;
+    }
+
+    pre code {
+      background: none;
+      padding: 0;
+      color: var(--text);
+    }
+
+    .keyword { color: #ff7b72; }
+    .string { color: #a5d6ff; }
+    .comment { color: var(--text-muted); }
+    .type { color: #d2a8ff; }
+
+    ul, ol {
+      margin-bottom: 1rem;
+      padding-left: 1.5rem;
+    }
+
+    li { margin-bottom: 0.4rem; }
+
+    strong { color: #f0f6fc; }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .pros-cons {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    @media (max-width: 600px) {
+      .pros-cons { grid-template-columns: 1fr; }
+    }
+
+    .pros-cons .col {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.2rem;
+    }
+
+    .pros-cons .col h4 {
+      margin-bottom: 0.7rem;
+      font-size: 0.95rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .pros-cons .col.pro h4 { color: var(--green); }
+    .pros-cons .col.con h4 { color: var(--red); }
+
+    .pros-cons li { font-size: 0.95rem; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 1.5rem;
+      font-size: 0.95rem;
+    }
+
+    thead th {
+      background: var(--surface);
+      text-align: left;
+      padding: 0.75rem 1rem;
+      border-bottom: 2px solid var(--accent);
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    tbody td {
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    tbody tr:hover { background: rgba(88, 166, 255, 0.04); }
+
+    .phase {
+      border-left: 3px solid var(--accent);
+      padding-left: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .phase-number {
+      display: inline-block;
+      background: var(--accent);
+      color: var(--bg);
+      font-weight: 700;
+      font-size: 0.8rem;
+      padding: 0.15em 0.6em;
+      border-radius: 4px;
+      margin-bottom: 0.5rem;
+    }
+
+    .badge {
+      display: inline-block;
+      font-size: 0.75rem;
+      padding: 0.2em 0.6em;
+      border-radius: 99px;
+      font-weight: 600;
+    }
+
+    .badge.latency-poll { background: rgba(248, 81, 73, 0.15); color: var(--red); }
+    .badge.latency-sse { background: rgba(63, 185, 80, 0.15); color: var(--green); }
+
+    .diagram-box {
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.5rem;
+      overflow-x: auto;
+      margin-bottom: 1.5rem;
+      font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+      font-size: 0.8rem;
+      line-height: 1.5;
+      white-space: pre;
+    }
+
+    .callout {
+      border-radius: 8px;
+      padding: 1rem 1.2rem;
+      margin-bottom: 1.5rem;
+      font-size: 0.95rem;
+    }
+
+    .callout.info {
+      background: rgba(88, 166, 255, 0.08);
+      border-left: 4px solid var(--accent);
+    }
+
+    .callout.success {
+      background: rgba(63, 185, 80, 0.08);
+      border-left: 4px solid var(--green);
+    }
+
+    .toc {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.2rem 1.5rem;
+      margin-bottom: 2.5rem;
+    }
+
+    .toc h3 {
+      margin-top: 0;
+      margin-bottom: 0.6rem;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .toc ol {
+      list-style: none;
+      padding: 0;
+      columns: 2;
+    }
+
+    @media (max-width: 600px) {
+      .toc ol { columns: 1; }
+    }
+
+    .toc li {
+      margin-bottom: 0.3rem;
+    }
+
+    .toc a {
+      color: var(--accent);
+      text-decoration: none;
+      font-size: 0.95rem;
+    }
+
+    .toc a:hover { text-decoration: underline; }
+
+    .vs-label {
+      display: inline-block;
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 0.1em 0.5em;
+      border-radius: 4px;
+      margin-right: 0.3rem;
+    }
+
+    .vs-label.old { background: rgba(248, 81, 73, 0.15); color: var(--red); }
+    .vs-label.new { background: rgba(63, 185, 80, 0.15); color: var(--green); }
+  </style>
+</head>
+<body>
+  <div class="container">
+
+    <h1>⚡ SSE Architecture</h1>
+    <p class="subtitle">Real-time state synchronization for FIFA Draft rooms using Server-Sent Events &middot; <a href="./APP-OVERVIEW.html" style="color:var(--accent);">← App Overview</a></p>
+
+    <nav class="toc">
+      <h3>Contents</h3>
+      <ol>
+        <li><a href="#current">Current Approach (Polling)</a></li>
+        <li><a href="#sse">SSE Approach</a></li>
+        <li><a href="#architecture">Server-Side Architecture</a></li>
+        <li><a href="#flow">Full Draft Flow</a></li>
+        <li><a href="#event-diagram">Event Flow Diagram</a></li>
+        <li><a href="#presence">Presence Handling</a></li>
+        <li><a href="#reconnection">Reconnection</a></li>
+        <li><a href="#changes">What Changes</a></li>
+        <li><a href="#scaling">Scaling Considerations</a></li>
+        <li><a href="#alternatives">Alternatives Considered</a></li>
+      </ol>
+    </nav>
+
+    <!-- ───────────────── CURRENT APPROACH ───────────────── -->
+
+    <h2 id="current"><span class="icon">📡</span> Current Approach: HTTP Polling (every 3s)</h2>
+
+    <p>
+      <code>DraftPollingService</code> calls <code>GET /drafts/:code/state</code> every 3 seconds via
+      <code>timer(0, 3000)</code>. Each response returns the <strong>full state</strong> (draft, managers, all picks).
+      The server also uses the poll to update <code>lastSeenAt</code> for presence.
+    </p>
+
+    <div class="pros-cons">
+      <div class="col pro">
+        <h4>✅ Pros</h4>
+        <ul>
+          <li>Dead simple to implement and debug</li>
+          <li>Works through all proxies/firewalls/CDNs</li>
+          <li>Stateless server — easy to scale horizontally</li>
+          <li>Doubles as a presence heartbeat</li>
+        </ul>
+      </div>
+      <div class="col con">
+        <h4>❌ Cons</h4>
+        <ul>
+          <li><strong>Wasted bandwidth</strong> — most polls return unchanged data</li>
+          <li><strong>Up to 3s latency</strong> — other players don't see a pick immediately</li>
+          <li><strong>DB load scales as O(players × rooms)</strong> — constant queries even when idle</li>
+          <li>Full state on every response — no diffing</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- ───────────────── SSE APPROACH ───────────────── -->
+
+    <h2 id="sse"><span class="icon">⚡</span> SSE Approach</h2>
+
+    <p>
+      SSE uses a <strong>long-lived HTTP connection</strong> where the server can push text events to the client at
+      any time. The client opens the connection once, and the server writes to it whenever state changes. The connection
+      stays open until the client disconnects or the server closes it.
+    </p>
+
+    <p>The HTTP response looks like this on the wire:</p>
+
+    <pre><code><span class="keyword">HTTP/1.1</span> <span class="string">200 OK</span>
+<span class="type">Content-Type:</span> text/event-stream
+<span class="type">Cache-Control:</span> no-cache
+<span class="type">Connection:</span> keep-alive
+
+<span class="keyword">event:</span> state
+<span class="keyword">data:</span> <span class="string">{"id":"abc","status":"active","currentManagerIndex":2,...}</span>
+
+<span class="keyword">event:</span> state
+<span class="keyword">data:</span> <span class="string">{"id":"abc","status":"active","currentManagerIndex":3,...}</span></code></pre>
+
+    <div class="callout info">
+      Each <code>event:</code> + <code>data:</code> block is pushed when something happens.
+      Between pushes, the connection is idle but open — zero traffic, zero DB queries.
+    </div>
+
+    <!-- ───────────────── SERVER ARCHITECTURE ───────────────── -->
+
+    <h2 id="architecture"><span class="icon">🏗️</span> Server-Side Architecture</h2>
+
+    <div class="diagram-box">┌─────────────────────────────────────────────────────────┐
+│                       SERVER                             │
+│                                                         │
+│  ┌─────────────────────────────────────────────────┐    │
+│  │         Room Registry (in-memory Map)            │    │
+│  │                                                  │    │
+│  │  "A3K9XP" → Set&lt;Response&gt; [client1, client2...]  │    │
+│  │  "B7M2QR" → Set&lt;Response&gt; [client3, client4...]  │    │
+│  └─────────────────────────────────────────────────┘    │
+│                                                         │
+│  ┌──────────────┐      ┌───────────────────────┐       │
+│  │  REST Routes │      │  SSE Route            │       │
+│  │              │      │                       │       │
+│  │ POST /pick   │──┐   │ GET /drafts/:code/sse │       │
+│  │ POST /join   │  │   │  - opens connection   │       │
+│  │ POST /start  │  │   │  - registers client   │       │
+│  └──────────────┘  │   │  - sends initial state│       │
+│                    │   └───────────────────────┘       │
+│                    │                                    │
+│                    ▼                                    │
+│  ┌─────────────────────────────────────────────────┐   │
+│  │          broadcastToRoom(code, state)            │   │
+│  │  - queries fresh state from DB                   │   │
+│  │  - iterates over all clients in the room         │   │
+│  │  - writes SSE event to each Response object      │   │
+│  └─────────────────────────────────────────────────┘   │
+└─────────────────────────────────────────────────────────┘</div>
+
+    <div class="callout info">
+      <strong>Key data structure:</strong> A <code>Map&lt;string, Set&lt;Response&gt;&gt;</code> — keyed by draft
+      <code>shortCode</code>, holding all active SSE connections (Express <code>Response</code> objects) for that room.
+    </div>
+
+    <!-- ───────────────── FULL DRAFT FLOW ───────────────── -->
+
+    <h2 id="flow"><span class="icon">🔄</span> Full Draft Flow (Step by Step)</h2>
+
+    <!-- Phase 1 -->
+    <div class="phase">
+      <span class="phase-number">PHASE 1</span>
+      <h3>Room Creation &amp; Joining</h3>
+
+      <pre><code>Player A creates draft → <span class="keyword">POST</span> /api/drafts → returns <span class="string">{ shortCode: "A3K9XP" }</span>
+Player A opens draft page → <span class="keyword">GET</span> /api/drafts/A3K9XP/sse</code></pre>
+
+      <p><strong>Server on SSE connect:</strong></p>
+      <ol>
+        <li>Set response headers: <code>Content-Type: text/event-stream</code>, <code>Cache-Control: no-cache</code>, <code>Connection: keep-alive</code></li>
+        <li>Look up (or create) the room entry: <code>rooms.get("A3K9XP")</code> → <code>Set&lt;Response&gt;</code></li>
+        <li>Add this <code>res</code> object to the Set</li>
+        <li>Query DB for current draft state</li>
+        <li>Write initial state event: <code>res.write("event: state\ndata: ${JSON.stringify(state)}\n\n")</code></li>
+        <li>Update <code>lastSeenAt</code> for this manager</li>
+        <li>Listen for <code>req.on('close', ...)</code> → remove <code>res</code> from the Set when client disconnects</li>
+      </ol>
+
+      <pre><code>Player B joins → <span class="keyword">POST</span> /api/drafts/A3K9XP/join → <span class="string">{ slotIndex: 1 }</span></code></pre>
+
+      <p><strong>Server on join (inside the POST handler):</strong></p>
+      <ol>
+        <li>Insert manager into DB (same as today)</li>
+        <li>After successful insert → call <code>broadcastToRoom("A3K9XP")</code></li>
+        <li><code>broadcastToRoom</code> queries fresh state from DB, then writes to ALL connections in the room:
+          <pre><code><span class="keyword">for</span> (<span class="keyword">const</span> client <span class="keyword">of</span> rooms.get(<span class="string">"A3K9XP"</span>)) {
+  client.write(<span class="string">`event: state\ndata: ${JSON.stringify(freshState)}\n\n`</span>);
+}</code></pre>
+        </li>
+        <li>Player A's client immediately receives the event — sees Player B in the lobby</li>
+      </ol>
+    </div>
+
+    <!-- Phase 2 -->
+    <div class="phase">
+      <span class="phase-number">PHASE 2</span>
+      <h3>Draft Starts</h3>
+
+      <pre><code>Player A (creator) → <span class="keyword">POST</span> /api/drafts/A3K9XP/start</code></pre>
+
+      <p><strong>Server:</strong></p>
+      <ol>
+        <li>Update draft status to <code>'active'</code> in DB</li>
+        <li>Call <code>broadcastToRoom("A3K9XP")</code></li>
+        <li>All connected clients receive the new state with <code>status: 'active'</code>, <code>currentManagerIndex: 0</code></li>
+        <li>Each client's UI reacts: Player A sees "Your turn!", Player B sees "Waiting for Player A"</li>
+      </ol>
+    </div>
+
+    <!-- Phase 3 -->
+    <div class="phase">
+      <span class="phase-number">PHASE 3</span>
+      <h3>Picks (the core loop)</h3>
+
+      <pre><code>Player A picks Messi → <span class="keyword">POST</span> /api/drafts/A3K9XP/pick <span class="string">{ playerId: 231747 }</span></code></pre>
+
+      <p><strong>Server (inside POST /pick handler):</strong></p>
+      <ol>
+        <li>Validate it's Player A's turn (same as today)</li>
+        <li>Insert pick into DB</li>
+        <li>Advance turn (snake logic) → update <code>currentManagerIndex</code>, <code>currentRound</code>, etc.</li>
+        <li>Call <code>broadcastToRoom("A3K9XP")</code></li>
+        <li>Fresh state is pushed to ALL clients in the room</li>
+        <li>Player B's client instantly receives the event:
+          <ul>
+            <li>Sees Messi is taken</li>
+            <li>Sees <code>currentManagerIndex</code> now points to them</li>
+            <li>UI shows "Your turn!"</li>
+          </ul>
+        </li>
+        <li>If Player B is <strong>not connected</strong> (no SSE connection in the Set) → send Telegram notification (same as today, using <code>lastSeenAt</code> threshold)</li>
+      </ol>
+
+      <p><strong>Latency comparison:</strong></p>
+      <p>
+        <span class="badge latency-poll">POLLING: 0 – 3000ms</span>
+        &nbsp;→&nbsp;
+        <span class="badge latency-sse">SSE: ~50ms</span>
+      </p>
+    </div>
+
+    <!-- Phase 4 -->
+    <div class="phase">
+      <span class="phase-number">PHASE 4</span>
+      <h3>Draft Completes</h3>
+
+      <pre><code>Last pick is made → <span class="keyword">POST</span> /pick</code></pre>
+
+      <p><strong>Server:</strong></p>
+      <ol>
+        <li>Snake logic determines <code>nextRound &gt; maxRounds</code> → set <code>status: 'complete'</code></li>
+        <li><code>broadcastToRoom("A3K9XP")</code> → all clients see <code>status: 'complete'</code></li>
+        <li>Optionally: close all SSE connections for that room and delete the room entry (cleanup)</li>
+      </ol>
+    </div>
+
+    <!-- ───────────────── EVENT FLOW DIAGRAM ───────────────── -->
+
+    <h2 id="event-diagram"><span class="icon">📊</span> Event Flow Diagram</h2>
+
+    <div class="diagram-box">Client A (picker)                Server                    Client B (waiting)
+     │                              │                              │
+     │── POST /pick ───────────────►│                              │
+     │                              │── insert pick, advance turn  │
+     │                              │── broadcastToRoom() ────────►│
+     │◄── 200 { nextManager: 1 } ──│                              │
+     │                              │── SSE: event: state ────────►│
+     │◄── SSE: event: state ────────│                              │
+     │                              │                              │
+     │  (both clients now have      │                              │
+     │   identical fresh state)     │                              │</div>
+
+    <!-- ───────────────── PRESENCE ───────────────── -->
+
+    <h2 id="presence"><span class="icon">👥</span> Presence Handling</h2>
+
+    <p>Replace the poll-based <code>lastSeenAt</code> with SSE connection presence:</p>
+
+    <table>
+      <thead>
+        <tr><th>Event</th><th>Action</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Client connects to SSE</td>
+          <td>Update <code>lastSeenAt = now()</code> in DB</td>
+        </tr>
+        <tr>
+          <td>Client disconnects (<code>req.on('close')</code>)</td>
+          <td>Optionally mark manager as offline</td>
+        </tr>
+        <tr>
+          <td>Heartbeat (every 15-30s)</td>
+          <td>Server writes <code>event: ping\ndata: {}\n\n</code> to keep connection alive AND update <code>lastSeenAt</code></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="callout info">
+      The heartbeat serves two purposes:
+      <strong>(1)</strong> prevents proxies/load balancers from killing idle connections (most timeout after 60-120s of silence),
+      <strong>(2)</strong> acts as a presence signal — if the write fails, the client is gone → remove from room.
+    </div>
+
+    <!-- ───────────────── RECONNECTION ───────────────── -->
+
+    <h2 id="reconnection"><span class="icon">🔁</span> Reconnection (Built-In)</h2>
+
+    <p>
+      The browser's <code>EventSource</code> API automatically reconnects if the connection drops.
+      You can control the retry interval:
+    </p>
+
+    <pre><code>res.write(<span class="string">"retry: 3000\n\n"</span>);  <span class="comment">// client will retry in 3s if disconnected</span></code></pre>
+
+    <p>
+      On reconnect, the server sends the full current state again (step 5 of the connect flow).
+      No missed events — the client always gets the latest snapshot.
+    </p>
+
+    <!-- ───────────────── WHAT CHANGES ───────────────── -->
+
+    <h2 id="changes"><span class="icon">🔀</span> What Changes from Current Code</h2>
+
+    <table>
+      <thead>
+        <tr><th>Component</th><th><span class="vs-label old">OLD</span> Polling</th><th><span class="vs-label new">NEW</span> SSE</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>DraftPollingService</code></td>
+          <td><code>timer(0, 3000)</code> + HTTP GET</td>
+          <td>Replaced by <code>EventSource</code> that receives pushed events</td>
+        </tr>
+        <tr>
+          <td><code>GET /state</code> endpoint</td>
+          <td>Hit every 3s by every client</td>
+          <td><strong>Removed</strong> — replaced by <code>GET /sse</code></td>
+        </tr>
+        <tr>
+          <td><code>POST /pick</code>, <code>/join</code>, <code>/start</code></td>
+          <td>Return response to caller only</td>
+          <td>Same, <strong>plus</strong> call <code>broadcastToRoom()</code> after DB mutation</td>
+        </tr>
+        <tr>
+          <td>Server memory</td>
+          <td>Stateless</td>
+          <td>Holds a <code>Map&lt;string, Set&lt;Response&gt;&gt;</code> of active connections</td>
+        </tr>
+        <tr>
+          <td>DB queries</td>
+          <td><code>O(clients × 1/3s)</code> = constant load</td>
+          <td>Only on actual events — <strong>orders of magnitude less</strong></td>
+        </tr>
+        <tr>
+          <td>Latency</td>
+          <td><span class="badge latency-poll">0 – 3000ms</span></td>
+          <td><span class="badge latency-sse">~50ms</span></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- ───────────────── SCALING ───────────────── -->
+
+    <h2 id="scaling"><span class="icon">📈</span> Scaling Considerations</h2>
+
+    <div class="card">
+      <h3>Single server instance (current setup)</h3>
+      <p>
+        The in-memory <code>Map</code> works perfectly. No additional infrastructure needed.
+      </p>
+    </div>
+
+    <div class="card">
+      <h3>Multiple server instances (future)</h3>
+      <p>Clients may connect to different servers. Solutions:</p>
+      <ul>
+        <li><strong>Redis Pub/Sub:</strong> When server A handles a pick, it publishes to a Redis channel. Server B subscribes, receives the event, and pushes to its local clients.</li>
+        <li><strong>Sticky sessions:</strong> Ensure all clients in a room hit the same server (simpler but less resilient).</li>
+      </ul>
+    </div>
+
+    <div class="callout success">
+      For a Telegram Mini App draft game, a single server is almost certainly sufficient for a long time.
+    </div>
+
+    <!-- ───────────────── ALTERNATIVES ───────────────── -->
+
+    <h2 id="alternatives"><span class="icon">🔍</span> Alternatives Considered</h2>
+
+    <h3>WebSockets (e.g., Socket.IO or raw <code>ws</code>)</h3>
+
+    <div class="pros-cons">
+      <div class="col pro">
+        <h4>✅ Pros</h4>
+        <ul>
+          <li>Near-instant updates (~50ms)</li>
+          <li>Zero wasted traffic</li>
+          <li>Bi-directional</li>
+          <li>Can send diffs instead of full state</li>
+        </ul>
+      </div>
+      <div class="col con">
+        <h4>❌ Cons</h4>
+        <ul>
+          <li>Stateful — harder to scale (need sticky sessions or Redis pub/sub)</li>
+          <li>More complex error handling (reconnection, heartbeats)</li>
+          <li>Doesn't work behind some corporate proxies</li>
+          <li>Need separate presence mechanism</li>
+        </ul>
+      </div>
+    </div>
+
+    <h3>Long Polling</h3>
+
+    <div class="pros-cons">
+      <div class="col pro">
+        <h4>✅ Pros</h4>
+        <ul>
+          <li>Works everywhere (plain HTTP)</li>
+          <li>Less traffic than short polling</li>
+          <li>Simpler than WebSockets</li>
+          <li>Still stateless-friendly</li>
+        </ul>
+      </div>
+      <div class="col con">
+        <h4>❌ Cons</h4>
+        <ul>
+          <li>Higher latency (~100-500ms)</li>
+          <li>Server holds open connections (thread/memory)</li>
+          <li>Timeout tuning tricky with proxies</li>
+          <li>Presence needs separate mechanism</li>
+        </ul>
+      </div>
+    </div>
+
+    <h3>Why SSE Was Chosen</h3>
+
+    <div class="card">
+      <ul>
+        <li>Mutations (pick, join, start) are simple REST POSTs — no need for bi-directional communication</li>
+        <li>Built-in browser reconnection via <code>EventSource</code> API</li>
+        <li>Works through most proxies (it's standard HTTP)</li>
+        <li>Simpler than WebSockets for a turn-based game</li>
+        <li>Dramatically reduces DB load compared to polling</li>
+      </ul>
+    </div>
+
+  </div>
+</body>
+</html>

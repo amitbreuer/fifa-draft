@@ -8,7 +8,7 @@ import { PlayerTableComponent } from '../player-table/player-table.component';
 import { FieldComponent } from '../field/field.component';
 import { DraftService } from '../../services/draft.service';
 import { PlayerService } from '../../services/player.service';
-import { DraftApiService, DraftState, ManagerInfo } from '../../services/draft-api.service';
+import { DraftApiService, DraftState } from '../../services/draft-api.service';
 import { DraftPollingService } from '../../services/draft-polling.service';
 import { TelegramService } from '../../services/telegram.service';
 import { DraftSettings, Player } from '../../types';
@@ -126,14 +126,17 @@ export class DraftComponent implements OnInit, OnDestroy {
       const prevState = this.serverState;
       this.serverState = state;
 
-      // Find my manager index
-      this.myManagerIndex = state.managers.findIndex(m => {
-        // Match by telegram ID through the user lookup
-        // In dev mode, match by the first manager (slot 0)
-        if (!this.telegram.isInTelegram) return m.slotIndex === 0;
-        return true; // Will be refined once we have user matching
-      });
+      // Find my manager index (server tells us which manager is ours)
+      if (state.myManagerId != null) {
+        this.myManagerIndex = state.managers.findIndex(m => m.id === state.myManagerId);
+      } else if (!this.telegram.isInTelegram) {
+        // Dev fallback: assume the first slot
+        this.myManagerIndex = state.managers.findIndex(m => m.slotIndex === 0);
+      } else {
+        this.myManagerIndex = -1;
+      }
 
+      const wasMyTurn = this.isMyTurn;
       this.isMyTurn = state.currentManagerIndex === this.myManagerIndex && state.status === 'active';
 
       // Sync drafted players with server (authoritative): clear then apply
@@ -143,6 +146,12 @@ export class DraftComponent implements OnInit, OnDestroy {
 
       // Build local draft settings from server state
       this.draftSettings = this.buildDraftSettingsFromServer(state);
+
+      // When it becomes my turn, stop peeking at another manager so I don't
+      // pick onto (and later save over) a stale/other squad.
+      if (this.isMyTurn && !wasMyTurn) {
+        this.viewingManagerIndex = null;
+      }
 
       // Keep my saved squad on the pitch (server is authoritative).
       // Skip while I'm mid-placement or viewing another manager's team,

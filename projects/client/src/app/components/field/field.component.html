@@ -134,7 +134,18 @@
       </div>
       }
 
-      @if (benchPlayers.length === 0) {
+      @if ((canPlacePlayer() || selectedPositionId) && !isBenchFull()) {
+      <div
+        class="bench-add-slot"
+        (click)="onBenchClick(); $event.stopPropagation()"
+        title="Add to bench"
+      >
+        <i class="pi pi-plus"></i>
+        <span>Add</span>
+      </div>
+      }
+
+      @if (benchPlayers.length === 0 && !canPlacePlayer() && !selectedPositionId) {
       <div class="bench-empty-state">
         <i class="pi pi-users"></i>
         <span>Click/Drag to add players</span>

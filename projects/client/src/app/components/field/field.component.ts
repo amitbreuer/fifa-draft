@@ -8,7 +8,6 @@ import { TagModule } from 'primeng/tag';
 import { SelectModule } from 'primeng/select';
 import { Player, FieldPosition, FormationName, FORMATIONS } from '../../types';
 import { DraftService } from '../../services/draft.service';
-import { PlayerService } from '../../services/player.service';
 
 @Component({
   selector: 'app-field',
@@ -45,8 +44,7 @@ export class FieldComponent implements OnInit, OnDestroy {
   formations: { label: string; value: FormationName }[] = [];
 
   constructor(
-    private draftService: DraftService,
-    private playerService: PlayerService
+    private draftService: DraftService
   ) {
     this.formations = Object.keys(FORMATIONS).map(key => ({
       label: key,
@@ -204,7 +202,7 @@ export class FieldComponent implements OnInit, OnDestroy {
     return basePosition;
   }
 
-  trackByPlayerId(index: number, player: Player): number {
+  trackByPlayerId(_index: number, player: Player): number {
     return player.id;
   }
 
@@ -223,7 +221,7 @@ export class FieldComponent implements OnInit, OnDestroy {
     }
   }
 
-  onDragEnd(event: DragEvent): void {
+  onDragEnd(_event: DragEvent): void {
     this.draggedPlayer = null;
     this.draggedFromPosition = null;
     this.draggedFromBench = false;
@@ -283,26 +281,6 @@ export class FieldComponent implements OnInit, OnDestroy {
       this.draftService.movePlayerFromFieldToBench(this.draggedPlayer, this.draggedFromPosition);
     }
     // Dragging from bench to bench does nothing (player stays on bench)
-  }
-
-  private removePlayerFromOriginalPosition(): void {
-    if (!this.draggedPlayer) return;
-
-    // Remove from fixed positions
-    if (this.draggedFromPosition) {
-      const originalPosition = this.fieldPositions.find(pos => pos.id === this.draggedFromPosition);
-      if (originalPosition) {
-        originalPosition.player = undefined;
-      }
-    }
-
-    // Remove from bench
-    if (this.draggedFromBench) {
-      const benchIndex = this.benchPlayers.findIndex(p => p.id === this.draggedPlayer!.id);
-      if (benchIndex !== -1) {
-        this.benchPlayers.splice(benchIndex, 1);
-      }
-    }
   }
 
   onImageError(event: any): void {

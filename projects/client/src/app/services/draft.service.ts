@@ -5,6 +5,15 @@ import { PlayerService } from './player.service';
 
 type ActionType = 'placeOnField' | 'placeOnBench' | 'moveFromBench' | 'swapField';
 
+export interface SavedDraftDetails {
+  name: string;
+  currentRound: number;
+  maxRounds: number;
+  managerCount: number;
+  managerNames: string[];
+  currentManagerName: string;
+}
+
 interface DraftAction {
   type: ActionType;
   player: Player;
@@ -552,13 +561,34 @@ export class DraftService {
       this.currentFormationSubject.next(manager.formation);
     }
 
+    let fieldPositions: FieldPosition[];
     if (manager.fieldPositions && manager.fieldPositions.length > 0) {
-      this.fieldPositionsSubject.next([...manager.fieldPositions]);
+      fieldPositions = [...manager.fieldPositions];
+      this.fieldPositionsSubject.next(fieldPositions);
     } else {
       this.initializeEmptyFieldPositions();
+      fieldPositions = this.fieldPositionsSubject.value;
     }
 
-    this.benchPlayersSubject.next(manager.benchPlayers ? [...manager.benchPlayers] : []);
+    const bench: Player[] = manager.benchPlayers ? [...manager.benchPlayers] : [];
+
+    // Reconcile: every drafted player must appear somewhere. If a picked player
+    // is neither on the field nor the bench (e.g. a squad-save race dropped it),
+    // add it back to the bench so it never silently disappears.
+    if (manager.team && manager.team.length > 0) {
+      const onField = new Set(
+        fieldPositions.filter(p => p.player).map(p => p.player!.id)
+      );
+      const onBench = new Set(bench.map(p => p.id));
+      for (const player of manager.team) {
+        if (!onField.has(player.id) && !onBench.has(player.id)) {
+          bench.push(player);
+          onBench.add(player.id);
+        }
+      }
+    }
+
+    this.benchPlayersSubject.next(bench);
   }
 
   private initializeFieldPositions(): void {
@@ -903,7 +933,7 @@ export class DraftService {
     }
   }
 
-  getSavedDraftDetails(): { name: string; currentRound: number; maxRounds: number; managerCount: number; managerNames: string[]; currentManagerName: string }[] {
+  getSavedDraftDetails(): SavedDraftDetails[] {
     try {
       const existingData = localStorage.getItem(this.LOCALSTORAGE_KEY);
       if (!existingData) return [];
@@ -917,7 +947,7 @@ export class DraftService {
         managerNames: d.managers.map(m => m.name),
         currentManagerName: d.managers[d.currentManagerIndex]?.name || '',
       }));
-    } catch (error) {
+    } catch {
       return [];
     }
   }

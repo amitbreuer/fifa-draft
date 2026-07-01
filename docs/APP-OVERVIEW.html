@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FIFA Draft — Application Overview</title>
+  <style>
+    :root {
+      --bg: #0d1117;
+      --surface: #161b22;
+      --border: #30363d;
+      --text: #e6edf3;
+      --text-muted: #8b949e;
+      --accent: #58a6ff;
+      --green: #3fb950;
+      --red: #f85149;
+      --orange: #d29922;
+      --purple: #d2a8ff;
+      --code-bg: #1c2128;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+      padding: 2rem;
+    }
+
+    .container { max-width: 960px; margin: 0 auto; }
+
+    h1 {
+      font-size: 2.3rem;
+      margin-bottom: 0.5rem;
+      background: linear-gradient(135deg, var(--accent), var(--green));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    h1 + p.subtitle {
+      color: var(--text-muted);
+      font-size: 1.1rem;
+      margin-bottom: 2.5rem;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 1.5rem;
+    }
+
+    h2 {
+      font-size: 1.55rem;
+      margin-top: 3rem;
+      margin-bottom: 1rem;
+      color: var(--accent);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      scroll-margin-top: 1rem;
+    }
+
+    h2 .icon { font-size: 1.3rem; }
+
+    h3 {
+      font-size: 1.18rem;
+      margin-top: 1.8rem;
+      margin-bottom: 0.8rem;
+      color: var(--text);
+    }
+
+    h4 { margin-bottom: 0.6rem; font-size: 1.02rem; color: var(--purple); }
+
+    p { margin-bottom: 1rem; }
+
+    code {
+      background: var(--code-bg);
+      padding: 0.15em 0.4em;
+      border-radius: 4px;
+      font-size: 0.9em;
+      font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+      color: var(--accent);
+    }
+
+    pre {
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.2rem;
+      overflow-x: auto;
+      margin-bottom: 1.5rem;
+      font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+      font-size: 0.85rem;
+      line-height: 1.6;
+    }
+
+    pre code { background: none; padding: 0; color: var(--text); }
+
+    .keyword { color: #ff7b72; }
+    .string { color: #a5d6ff; }
+    .comment { color: var(--text-muted); }
+    .type { color: #d2a8ff; }
+
+    ul, ol { margin-bottom: 1rem; padding-left: 1.5rem; }
+    li { margin-bottom: 0.4rem; }
+    strong { color: #f0f6fc; }
+
+    .diagram-box {
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.5rem;
+      overflow-x: auto;
+      margin-bottom: 1.5rem;
+      font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+      font-size: 0.78rem;
+      line-height: 1.5;
+      white-space: pre;
+      color: var(--text);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 1.5rem;
+      font-size: 0.93rem;
+    }
+
+    thead th {
+      background: var(--surface);
+      text-align: left;
+      padding: 0.75rem 1rem;
+      border-bottom: 2px solid var(--accent);
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    tbody td {
+      padding: 0.7rem 1rem;
+      border-bottom: 1px solid var(--border);
+      vertical-align: top;
+    }
+
+    tbody tr:hover { background: rgba(88, 166, 255, 0.04); }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .callout {
+      border-radius: 8px;
+      padding: 1rem 1.2rem;
+      margin-bottom: 1.5rem;
+      font-size: 0.95rem;
+    }
+
+    .callout.info { background: rgba(88, 166, 255, 0.08); border-left: 4px solid var(--accent); }
+    .callout.success { background: rgba(63, 185, 80, 0.08); border-left: 4px solid var(--green); }
+    .callout.warn { background: rgba(210, 153, 34, 0.08); border-left: 4px solid var(--orange); }
+
+    .toc {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.2rem 1.5rem;
+      margin-bottom: 2.5rem;
+    }
+
+    .toc h3 {
+      margin-top: 0;
+      margin-bottom: 0.6rem;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .toc ol { list-style: decimal; padding-left: 1.4rem; columns: 2; }
+    @media (max-width: 640px) { .toc ol { columns: 1; } }
+    .toc li { margin-bottom: 0.3rem; }
+    .toc a { color: var(--accent); text-decoration: none; font-size: 0.95rem; }
+    .toc a:hover { text-decoration: underline; }
+
+    .phase {
+      border-left: 3px solid var(--accent);
+      padding-left: 1.5rem;
+      margin-bottom: 1.8rem;
+    }
+
+    .phase h3 { margin-top: 0.4rem; }
+
+    .flow-letter {
+      display: inline-block;
+      background: var(--accent);
+      color: var(--bg);
+      font-weight: 700;
+      font-size: 0.8rem;
+      padding: 0.15em 0.65em;
+      border-radius: 4px;
+      margin-bottom: 0.3rem;
+    }
+
+    .badge {
+      display: inline-block;
+      font-size: 0.75rem;
+      padding: 0.2em 0.6em;
+      border-radius: 99px;
+      font-weight: 600;
+    }
+    .badge.now { background: rgba(210, 153, 34, 0.15); color: var(--orange); }
+    .badge.scale { background: rgba(63, 185, 80, 0.15); color: var(--green); }
+
+    .pill-row { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1.5rem; }
+    .pill {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 99px;
+      padding: 0.35em 0.9em;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+    .pill strong { color: var(--accent); }
+  </style>
+</head>
+<body>
+  <div class="container">
+
+    <h1>⚽ FIFA Draft — Application Overview</h1>
+    <p class="subtitle">A Telegram Mini App for running a multiplayer FIFA/EA FC snake draft. Friends join a room, take turns picking real players, and build their squads on an interactive pitch.</p>
+
+    <nav class="toc">
+      <h3>Contents</h3>
+      <ol>
+        <li><a href="#what">What the App Is</a></li>
+        <li><a href="#arch">High-Level Architecture</a></li>
+        <li><a href="#stack">Tech Stack</a></li>
+        <li><a href="#features">Features</a></li>
+        <li><a href="#backend">How the Backend Works</a></li>
+        <li><a href="#data">Data Model</a></li>
+        <li><a href="#auth">Authentication Flow</a></li>
+        <li><a href="#flows">End-to-End Flows</a></li>
+        <li><a href="#realtime">Real-Time Updates</a></li>
+        <li><a href="#scale">What Changes at Scale</a></li>
+      </ol>
+    </nav>
+
+    <!-- WHAT -->
+    <h2 id="what"><span class="icon">🎯</span> What the App Is</h2>
+    <p>
+      FIFA Draft is a <strong>Telegram Mini App</strong> (a web app running inside Telegram). A user opens it from a
+      Telegram bot, creates a draft room, and shares a 6-character code (or deep link) with friends. Everyone joins,
+      the creator starts the draft, and players take turns picking footballers in a <strong>snake draft</strong> order.
+      Each manager arranges their picks into a formation on a football pitch.
+    </p>
+    <p>
+      There is also a <strong>local single-player mode</strong> that stores everything in the browser
+      (<code>localStorage</code>) with no server involved.
+    </p>
+
+    <!-- ARCHITECTURE -->
+    <h2 id="arch"><span class="icon">🏗️</span> High-Level Architecture</h2>
+    <div class="diagram-box">┌────────────────────────────────────────────────────────────────┐
+│                      TELEGRAM CLIENT                           │
+│  ┌──────────────────────────────────────────────────────────┐  │
+│  │   Angular Mini App (projects/client)                     │  │
+│  │   - Lobby / Settings / Draft / Summary components        │  │
+│  │   - Services: DraftApi, DraftPolling, Telegram, Player   │  │
+│  └──────────────────────────────────────────────────────────┘  │
+└──────────────────────────────┬─────────────────────────────────┘
+                               │ HTTPS (REST + X-Telegram-Init-Data header)
+                               ▼
+┌────────────────────────────────────────────────────────────────┐
+│                 EXPRESS API SERVER (projects/server)          │
+│                                                                │
+│  /api/drafts   → draftRouter  (auth-protected)                 │
+│  /api/players  → playerRouter (static JSON, in-memory cache)   │
+│  /bot/webhook  → botRouter    (grammy Telegram bot)            │
+│                                                                │
+│  authMiddleware → validates Telegram initData (HMAC)           │
+│  notifications  → sends Telegram push when it's your turn      │
+└──────────────┬──────────────────────────────┬─────────────────┘
+               │ Drizzle ORM                   │ grammy Bot API
+               ▼                               ▼
+       ┌───────────────┐              ┌──────────────────┐
+       │  PostgreSQL   │              │  Telegram Bot    │
+       │  users        │              │  (notifications, │
+       │  drafts       │              │   deep links)    │
+       │  draftManagers│              └──────────────────┘
+       │  picks        │
+       └───────────────┘
+
+  Player datasets (JSON files on disk) served from projects/server/data/</div>
+
+    <p>The repo is a <strong>monorepo</strong> with three packages:</p>
+    <table>
+      <thead><tr><th>Package</th><th>Path</th><th>Role</th></tr></thead>
+      <tbody>
+        <tr><td><code>client</code></td><td><code>projects/client</code></td><td>Angular + PrimeNG front-end (the Mini App)</td></tr>
+        <tr><td><code>server</code></td><td><code>projects/server</code></td><td>Express REST API + Telegram bot</td></tr>
+        <tr><td><code>shared</code></td><td><code>projects/shared</code></td><td>Types/logic shared between client and server</td></tr>
+      </tbody>
+    </table>
+
+    <!-- STACK -->
+    <h2 id="stack"><span class="icon">🧰</span> Tech Stack</h2>
+    <h4>Frontend</h4>
+    <div class="pill-row">
+      <span class="pill"><strong>Angular</strong> standalone + RxJS</span>
+      <span class="pill"><strong>PrimeNG</strong> UI</span>
+      <span class="pill"><strong>Telegram</strong> Web App SDK</span>
+      <span class="pill"><strong>localStorage</strong> single-player</span>
+    </div>
+    <h4>Backend</h4>
+    <div class="pill-row">
+      <span class="pill"><strong>Node.js</strong> + Express 5</span>
+      <span class="pill"><strong>Drizzle ORM</strong> + PostgreSQL (pg)</span>
+      <span class="pill"><strong>grammy</strong> Telegram bot (webhook)</span>
+      <span class="pill"><strong>JSON</strong> datasets, in-memory cache</span>
+    </div>
+
+    <!-- FEATURES -->
+    <h2 id="features"><span class="icon">✨</span> Features</h2>
+
+    <h3>Draft Mechanics</h3>
+    <ul>
+      <li><strong>Snake draft</strong> — pick order reverses each round (R1: 1→2→3, R2: 3→2→1) for fairness.</li>
+      <li><strong>Multi-manager rooms</strong> — up to 10 managers per draft.</li>
+      <li><strong>Configurable rounds</strong> — default 18 rounds (11 starters + 7 bench).</li>
+      <li><strong>Turn enforcement</strong> — only the current manager can submit a pick; the server validates it.</li>
+      <li><strong>Presence tracking</strong> — <code>lastSeenAt</code> is updated so the app knows who is online.</li>
+    </ul>
+
+    <h3>Player Database</h3>
+    <ul>
+      <li>Full EA FC player pool with ratings, stats, positions, clubs, nationalities.</li>
+      <li>Multiple datasets (e.g. <code>fc-2026</code>), listed via <code>/api/players/datasets</code>.</li>
+      <li>Player details dialog and side-by-side comparison.</li>
+      <li>Filtering by position, club, nationality, and drafted status.</li>
+    </ul>
+
+    <h3>Squad Building</h3>
+    <ul>
+      <li>30+ formations with an interactive pitch.</li>
+      <li>Smart repositioning when switching formations.</li>
+      <li>Drag &amp; drop between field positions and bench.</li>
+      <li>Undo within a turn.</li>
+    </ul>
+
+    <h3>Multiplayer / Telegram Integration</h3>
+    <ul>
+      <li>Create/join rooms via 6-character short code or Telegram deep link (<code>/start CODE</code>).</li>
+      <li>Telegram-native auth (no passwords).</li>
+      <li>Push notification when it's your turn <strong>if you're offline</strong>.</li>
+      <li>Haptic feedback and native Main/Back buttons.</li>
+    </ul>
+
+    <h3>Persistence</h3>
+    <ul>
+      <li>Online drafts persisted in PostgreSQL, resumable via "My Drafts".</li>
+      <li>Local single-player drafts persisted in <code>localStorage</code>.</li>
+    </ul>
+
+    <!-- BACKEND -->
+    <h2 id="backend"><span class="icon">⚙️</span> How the Backend Works</h2>
+    <p>
+      The server (<code>projects/server/src/index.ts</code>) is a small Express app with three route groups.
+    </p>
+
+    <h3>1. <code>/api/drafts</code> — draftRouter <span class="badge scale">auth required</span></h3>
+    <p>The core of the app. Every route runs <code>authMiddleware</code> first.</p>
+    <table>
+      <thead><tr><th>Method</th><th>Route</th><th>Purpose</th></tr></thead>
+      <tbody>
+        <tr><td>GET</td><td><code>/mine</code></td><td>List drafts the user belongs to (sorted: my-turn → active → waiting → complete)</td></tr>
+        <tr><td>POST</td><td><code>/</code></td><td>Create a draft; creator auto-joins as manager slot 0</td></tr>
+        <tr><td>GET</td><td><code>/:code</code></td><td>Draft info + managers</td></tr>
+        <tr><td>POST</td><td><code>/:code/join</code></td><td>Join a waiting draft (max 10 managers)</td></tr>
+        <tr><td>POST</td><td><code>/:code/start</code></td><td>Creator starts the draft (status → <code>active</code>)</td></tr>
+        <tr><td>GET</td><td><code>/:code/state</code></td><td><strong>Poll</strong> endpoint — full state; also updates <code>lastSeenAt</code></td></tr>
+        <tr><td>POST</td><td><code>/:code/pick</code></td><td>Submit a pick; validates turn, inserts pick, advances snake turn</td></tr>
+        <tr><td>PUT</td><td><code>/:code/squad</code></td><td>Save formation / field positions / bench</td></tr>
+        <tr><td>DELETE</td><td><code>/:code</code></td><td>Delete a draft (creator only)</td></tr>
+      </tbody>
+    </table>
+
+    <div class="callout info">
+      <strong>The pick handler is the heart of the logic.</strong> On <code>POST /:code/pick</code> it:
+      <ol>
+        <li>Verifies the draft is <code>active</code> and it's the caller's turn (<code>manager.slotIndex === draft.currentManagerIndex</code>).</li>
+        <li>Rejects already-drafted players.</li>
+        <li>Inserts the pick with a computed <code>pickOrder</code>.</li>
+        <li>Advances the turn using snake logic (increment/decrement index, flip direction at the ends, bump round).</li>
+        <li>Marks the draft <code>complete</code> when <code>nextRound &gt; maxRounds</code>.</li>
+        <li>If the next manager is offline, fires a Telegram notification.</li>
+      </ol>
+    </div>
+
+    <h3>2. <code>/api/players</code> — playerRouter <span class="badge now">public</span></h3>
+    <p>
+      Serves player datasets from JSON files in <code>projects/server/data/</code>. Files are read once and cached in an
+      in-memory <code>Map</code>, so subsequent requests are served from memory. This data is static and read-heavy.
+    </p>
+
+    <h3>3. <code>/bot/webhook</code> — botRouter (grammy)</h3>
+    <p>
+      Handles Telegram bot updates. The <code>/start</code> command shows Create/Join buttons that open the Mini App,
+      supports deep links (<code>/start CODE</code> → join prompt), and stores the user's <code>chatId</code> so the
+      server can send "it's your turn" notifications later.
+    </p>
+
+    <!-- DATA MODEL -->
+    <h2 id="data"><span class="icon">🗄️</span> Data Model</h2>
+    <p>Four PostgreSQL tables (Drizzle schema in <code>projects/server/src/db/schema.ts</code>):</p>
+    <div class="diagram-box">users                     drafts                        draft_managers            picks
+─────                     ──────                        ──────────────            ─────
+id (PK)                   id (uuid PK)                  id (PK)                   id (PK)
+telegram_id (unique)      short_code (unique)           draft_id → drafts         draft_id → drafts
+telegram_chat_id          name                          user_id → users           manager_id → draft_managers
+username                  creator_id → users            slot_index                player_id
+first_name                status (waiting/active/       formation                 round
+created_at                        complete)             field_positions (jsonb)   pick_order
+                          max_managers                  bench_player_ids (jsonb)  created_at
+                          max_rounds                    last_seen_at
+                          dataset_id
+                          current_manager_index
+                          current_round
+                          is_snake_direction
+                          last_pick_at</div>
+    <ul>
+      <li><strong>users</strong> — one row per Telegram user; <code>telegram_chat_id</code> enables push notifications.</li>
+      <li><strong>drafts</strong> — one room; holds turn state (<code>current_manager_index</code>, <code>current_round</code>, <code>is_snake_direction</code>) and status.</li>
+      <li><strong>draft_managers</strong> — a user's seat in a draft; stores their squad (<code>formation</code>, <code>field_positions</code>, <code>bench_player_ids</code>) and presence (<code>last_seen_at</code>).</li>
+      <li><strong>picks</strong> — one row per drafted player, ordered by <code>pick_order</code>.</li>
+    </ul>
+    <div class="callout warn">
+      Player data itself is <strong>not</strong> in the DB — only the <code>player_id</code> is stored in <code>picks</code>.
+      Player details come from the static JSON datasets.
+    </div>
+
+    <!-- AUTH -->
+    <h2 id="auth"><span class="icon">🔐</span> Authentication Flow</h2>
+    <p>There are no passwords. Auth is based on Telegram's signed <code>initData</code>.</p>
+    <div class="diagram-box">1. Telegram loads the Mini App and injects window.Telegram.WebApp.initData
+   (a signed string containing the user object + a hash).
+
+2. Angular's DraftApiService attaches it to every request:
+      X-Telegram-Init-Data: &lt;initData&gt;
+   (In dev, it instead sends X-Dev-Telegram-Id: 12345.)
+
+3. Server authMiddleware validates it:
+      - Rebuilds the data-check-string from the params (sorted, minus hash)
+      - secretKey = HMAC_SHA256("WebAppData", BOT_TOKEN)
+      - expectedHash = HMAC_SHA256(secretKey, dataCheckString)
+      - If expectedHash === hash → trust the embedded user object
+      - Extracts { telegramId, username, firstName } onto req.user
+
+4. If validation fails and NODE_ENV !== development → 401 Unauthorized.</div>
+    <div class="callout info">
+      This proves the request genuinely came from Telegram for that user, without any login step. The bot token is the
+      shared secret that makes the signature verifiable.
+    </div>
+
+    <!-- FLOWS -->
+    <h2 id="flows"><span class="icon">🔄</span> End-to-End Flows (UI → Backend)</h2>
+
+    <div class="phase">
+      <span class="flow-letter">FLOW A</span>
+      <h3>Create a draft</h3>
+      <pre><code>Lobby (create mode)
+  → onCreateDraft()
+  → DraftApiService.createDraft(name, maxRounds, datasetId)
+  → <span class="keyword">POST</span> /api/drafts           [authMiddleware]
+      - find/create user
+      - insert draft (status='waiting', shortCode=random)
+      - insert creator as draft_manager slot 0
+      ← { id, shortCode, name }
+  → UI switches to "waiting" mode, starts polling GET /state every 2s</code></pre>
+    </div>
+
+    <div class="phase">
+      <span class="flow-letter">FLOW B</span>
+      <h3>Join a draft</h3>
+      <pre><code>Lobby (join mode) — code typed, or deep link /start CODE, or ?code= query
+  → onJoin()
+  → DraftApiService.joinDraft(code)
+  → <span class="keyword">POST</span> /api/drafts/:code/join   [authMiddleware]
+      - validate draft is 'waiting'
+      - reject if full (>=10) or already joined
+      - insert draft_manager with next slotIndex
+      ← { message, slotIndex }
+  → UI switches to "waiting" mode, polls /state until status='active'</code></pre>
+    </div>
+
+    <div class="phase">
+      <span class="flow-letter">FLOW C</span>
+      <h3>Start the draft</h3>
+      <pre><code>Waiting room (creator only)
+  → onStartDraft()
+  → <span class="keyword">POST</span> /api/drafts/:code/start  [authMiddleware]
+      - verify caller is creator
+      - set status='active'
+  → Creator navigates to /draft?code=CODE
+  → Other clients see status='active' via their next poll and navigate too</code></pre>
+    </div>
+
+    <div class="phase">
+      <span class="flow-letter">FLOW D</span>
+      <h3>Make a pick (the core loop)</h3>
+      <pre><code>Draft component — it's my turn
+  1. Browse/filter players (data from GET /api/players/:datasetId, cached client-side)
+  2. Select a player, place on field/bench (local UI state, undoable)
+  3. onFinishTurn()
+       → DraftApiService.submitPick(code, playerId)
+       → <span class="keyword">POST</span> /api/drafts/:code/pick   [authMiddleware]
+             - validate turn + player availability
+             - insert pick, advance snake turn, maybe complete
+             - notify next manager if offline
+             ← { nextManagerIndex, round, status }
+       → DraftApiService.updateSquad(code, {formation, fieldPositions, benchPlayerIds})
+       → <span class="keyword">PUT</span> /api/drafts/:code/squad   (persists the arranged squad)
+  4. DraftPollingService keeps polling GET /state every 3s
+       - other managers' clients see the new pick + new currentManagerIndex
+       - the next manager's UI flips to "Your turn!"</code></pre>
+    </div>
+
+    <div class="phase">
+      <span class="flow-letter">FLOW E</span>
+      <h3>Completion &amp; summary</h3>
+      <pre><code>Last pick pushes nextRound > maxRounds
+  → server sets status='complete'
+  → clients polling /state see 'complete'
+  → navigate to /summary?code=CODE to view all final squads</code></pre>
+    </div>
+
+    <!-- REALTIME -->
+    <h2 id="realtime"><span class="icon">📡</span> Real-Time Updates</h2>
+    <p><strong>Current implementation: HTTP polling.</strong></p>
+    <ul>
+      <li><code>DraftPollingService</code> calls <code>GET /drafts/:code/state</code> every <strong>3 seconds</strong> during a draft.</li>
+      <li>The lobby waiting room polls every <strong>2 seconds</strong> until the draft goes active.</li>
+      <li>Each <code>/state</code> response returns the <strong>full</strong> state and updates the caller's <code>lastSeenAt</code> (presence).</li>
+      <li>Offline players are covered by <strong>Telegram push notifications</strong> — when a pick advances the turn to someone whose <code>lastSeenAt</code> is stale (&gt;10s), the server messages them via the bot.</li>
+    </ul>
+    <div class="callout success">
+      <strong>Why polling is the right fit here:</strong> the app targets a <strong>Google Cloud Run free tier</strong>
+      deployment with rare, casual usage. Polling lets the instance scale to zero between requests, each poll is a cheap
+      ~50ms request, and a turn-based draft doesn't care about sub-second latency. A dedicated real-time transport
+      (SSE/WebSockets) would keep an instance alive continuously and break the free-tier cost model.
+    </div>
+    <div class="callout info">
+      See <a href="./SSE-ARCHITECTURE.html"><code>SSE-ARCHITECTURE.html</code></a> for a deep dive on the
+      Server-Sent Events alternative and why it was <strong>not</strong> adopted for the free-tier deployment.
+    </div>
+
+    <!-- SCALE -->
+    <h2 id="scale"><span class="icon">📈</span> What Changes at Scale / Off the Free Tier</h2>
+    <p>
+      If this app grew into a high-traffic product — or if you simply chose to pay for always-on infrastructure and
+      wanted the "textbook right" design — here's how each layer would evolve.
+    </p>
+
+    <h3>1. Real-time transport</h3>
+    <table>
+      <thead><tr><th><span class="badge now">NOW</span></th><th><span class="badge scale">AT SCALE</span></th></tr></thead>
+      <tbody><tr>
+        <td>3s polling, full-state responses</td>
+        <td><strong>WebSockets</strong> (Socket.IO) or <strong>SSE</strong> pushing only diffs. Near-instant (~50ms) updates, no wasted requests.</td>
+      </tr></tbody>
+    </table>
+    <ul>
+      <li>For a turn-based game, <strong>SSE</strong> is usually enough (server→client push; mutations stay REST).</li>
+      <li>For richer real-time (chat, typing indicators, live cursors), <strong>WebSockets</strong>.</li>
+      <li>Either way you drop the constant <code>/state</code> polling load entirely.</li>
+    </ul>
+
+    <h3>2. Horizontal scaling &amp; connection fan-out</h3>
+    <p>
+      An in-memory room registry (<code>Map&lt;code, connections&gt;</code>) only works on a single instance. With many
+      instances behind a load balancer, a pick handled by instance A must reach clients connected to instance B.
+    </p>
+    <ul>
+      <li><strong>Redis Pub/Sub</strong> (or NATS/Kafka) as a message backplane: each instance subscribes to a room channel; publishing a pick fans out to every instance, which pushes to its local connections.</li>
+      <li>Managed options: <strong>Ably</strong>, <strong>Pusher</strong>, or <strong>Cloud Run + Redis (Memorystore)</strong>.</li>
+    </ul>
+
+    <h3>3. Compute / hosting</h3>
+    <table>
+      <thead><tr><th><span class="badge now">NOW</span></th><th><span class="badge scale">AT SCALE</span></th></tr></thead>
+      <tbody><tr>
+        <td>Cloud Run scale-to-zero, 1 instance</td>
+        <td>Min instances ≥ 1 (no cold starts), autoscaling on CPU/connections, or a persistent platform (GKE, ECS, Fly.io) that keeps long-lived connections.</td>
+      </tr></tbody>
+    </table>
+    <p>Real-time connections need <code>min-instances ≥ 1</code> and generous timeouts, which is exactly what breaks the free tier — hence the current polling choice.</p>
+
+    <h3>4. Database</h3>
+    <table>
+      <thead><tr><th><span class="badge now">NOW</span></th><th><span class="badge scale">AT SCALE</span></th></tr></thead>
+      <tbody><tr>
+        <td>Single PostgreSQL, per-request queries</td>
+        <td>Connection <strong>pooling</strong> (PgBouncer), <strong>read replicas</strong> for state reads, indexes on <code>drafts.short_code</code>, <code>draft_managers.draft_id</code>, <code>picks.draft_id</code>.</td>
+      </tr></tbody>
+    </table>
+    <ul>
+      <li>Add a <strong>cache layer</strong> (Redis) for hot draft state so reads don't always hit Postgres.</li>
+      <li>Consider moving turn-state into Redis and periodically snapshotting to Postgres if pick throughput becomes high.</li>
+    </ul>
+
+    <h3>5. Player data delivery</h3>
+    <table>
+      <thead><tr><th><span class="badge now">NOW</span></th><th><span class="badge scale">AT SCALE</span></th></tr></thead>
+      <tbody><tr>
+        <td>JSON files read from disk, in-memory cache per instance, served by the API</td>
+        <td>Push datasets to a <strong>CDN</strong> (Cloudflare/Cloud CDN) or object storage (GCS/S3). Static &amp; immutable — perfect for edge caching with long TTLs and versioned URLs.</td>
+      </tr></tbody>
+    </table>
+    <p>This offloads a large chunk of bandwidth from the API entirely.</p>
+
+    <h3>6. Concurrency &amp; correctness</h3>
+    <p>At low volume, a race on two picks is unlikely. At scale, make the pick handler <strong>atomic</strong>:</p>
+    <ul>
+      <li>Wrap validate-turn + insert-pick + advance-turn in a <strong>DB transaction</strong> with row-level locking (<code>SELECT ... FOR UPDATE</code> on the draft row), or</li>
+      <li>Use an <strong>optimistic version/<code>updated_at</code> check</strong> so two simultaneous picks can't both succeed.</li>
+    </ul>
+
+    <h3>7. Notifications</h3>
+    <table>
+      <thead><tr><th><span class="badge now">NOW</span></th><th><span class="badge scale">AT SCALE</span></th></tr></thead>
+      <tbody><tr>
+        <td>Synchronous Telegram send inside the pick handler</td>
+        <td>Offload to a <strong>queue</strong> (Cloud Tasks / SQS / BullMQ) so a slow/failed Telegram call never blocks or fails a pick. Add retries and dead-lettering.</td>
+      </tr></tbody>
+    </table>
+
+    <h3>8. Observability &amp; resilience</h3>
+    <ul>
+      <li>Structured logging, metrics, and tracing (OpenTelemetry) once there are many concurrent rooms.</li>
+      <li>Rate limiting on mutations, health/readiness probes, graceful shutdown that flushes open connections.</li>
+    </ul>
+
+    <h3>The "right" real-world design for this kind of app</h3>
+    <p>For a genuinely multiplayer, real-time, scalable version:</p>
+    <div class="diagram-box">Clients ──WebSocket/SSE──► Stateless app instances (autoscaled)
+                                │        │
+                                │        └── Redis (Pub/Sub backplane + hot-state cache)
+                                │
+                                └── PostgreSQL (source of truth, pooled, read replicas)
+
+Static player data ──► CDN / object storage
+Notifications ──► async queue ──► Telegram / push providers</div>
+
+    <div class="callout success">
+      But for the current goal — a free, always-available app for occasional use — <strong>the existing polling +
+      Cloud Run scale-to-zero design is the correct, cost-optimal choice.</strong> The sophistication above is only
+      justified once real concurrent load exists.
+    </div>
+
+  </div>
+</body>
+</html>

@@ -8,9 +8,47 @@
 
   @if (draftSettings && draftSettings.draftName) {
     <div class="draft-name-badge">{{ draftSettings.draftName }}</div>
+  } @else if (loading) {
+    <span class="skeleton skeleton-name"></span>
   }
 
-  @if (managers.length > 0) {
+  @if (loading) {
+    <!-- ============ SKELETON ============ -->
+    <div class="manager-tabs">
+      <span class="skeleton skeleton-tab"></span>
+      <span class="skeleton skeleton-tab"></span>
+      <span class="skeleton skeleton-tab"></span>
+    </div>
+
+    <div class="rating-panel">
+      <div class="ovr-block">
+        <span class="skeleton skeleton-ovr"></span>
+      </div>
+      <div class="ovr-divider"></div>
+      <div class="line-stats">
+        <div class="line-stat"><span class="skeleton skeleton-ls"></span></div>
+        <div class="line-stat"><span class="skeleton skeleton-ls"></span></div>
+        <div class="line-stat"><span class="skeleton skeleton-ls"></span></div>
+      </div>
+    </div>
+
+    <div class="view-toggle">
+      <span class="skeleton skeleton-toggle"></span>
+      <span class="skeleton skeleton-toggle"></span>
+    </div>
+
+    <div class="pitch-panel">
+      <span class="skeleton skeleton-pitch"></span>
+    </div>
+
+    <div class="bench-panel">
+      <div class="bench-row">
+        <span class="skeleton skeleton-chip"></span>
+        <span class="skeleton skeleton-chip"></span>
+        <span class="skeleton skeleton-chip"></span>
+      </div>
+    </div>
+  } @else if (managers.length > 0) {
     <div class="manager-tabs">
       @for (manager of managers; track manager.id; let i = $index) {
         <button class="tab" [class.active]="i === activeIndex" (click)="selectManager(i)">
@@ -21,45 +59,118 @@
 
     @let active = managers[activeIndex];
 
-    <div class="averages">
-      <div class="avg-card avg-overall">
-        <span class="avg-value">{{ overallAvg(active) }}</span>
-        <span class="avg-label">Overall</span>
+    @if (active) {
+
+    <!-- FC-style team rating -->
+    <div class="rating-panel">
+      <div class="ovr-block">
+        <span class="ovr-value">{{ overallAvg(active) }}</span>
+        <span class="ovr-label">OVR</span>
       </div>
-      <div class="avg-card avg-att">
-        <span class="avg-value">{{ attackAvg(active) }}</span>
-        <span class="avg-label">Attack</span>
-      </div>
-      <div class="avg-card avg-mid">
-        <span class="avg-value">{{ midfieldAvg(active) }}</span>
-        <span class="avg-label">Midfield</span>
-      </div>
-      <div class="avg-card avg-def">
-        <span class="avg-value">{{ defenceAvg(active) }}</span>
-        <span class="avg-label">Defence</span>
+      <div class="ovr-divider"></div>
+      <div class="line-stats">
+        <div class="line-stat att">
+          <span class="ls-value">{{ attackAvg(active) }}</span>
+          <span class="ls-label">ATT</span>
+        </div>
+        <div class="line-stat mid">
+          <span class="ls-value">{{ midfieldAvg(active) }}</span>
+          <span class="ls-label">MID</span>
+        </div>
+        <div class="line-stat def">
+          <span class="ls-value">{{ defenceAvg(active) }}</span>
+          <span class="ls-label">DEF</span>
+        </div>
       </div>
     </div>
 
-    <div class="section squad-section">
-      <div class="players-list">
-        @for (player of active.team; track player.id) {
-          <div class="player-card">
-            <img [src]="player.shieldUrl" class="player-shield" alt="" />
-            <div class="player-info">
-              <span class="player-name">{{ player.commonName || player.lastName }}</span>
-              <span class="player-meta">{{ player.position.shortLabel }} · {{ player.team.label }}</span>
+    <!-- View toggle -->
+    <div class="view-toggle">
+      <button class="vt-btn" [class.active]="viewMode === 'pitch'" (click)="viewMode = 'pitch'">
+        <i class="pi pi-th-large"></i> Pitch
+      </button>
+      <button class="vt-btn" [class.active]="viewMode === 'list'" (click)="viewMode = 'list'">
+        <i class="pi pi-list"></i> Picks
+      </button>
+    </div>
+
+    @if (viewMode === 'pitch') {
+      <!-- ============ PITCH VIEW ============ -->
+      <div class="pitch-panel">
+        @if (active.formation) {
+          <div class="formation-badge">{{ active.formation }}</div>
+        }
+        <div class="pitch">
+          <div class="half-line"></div>
+          <div class="center-circle"></div>
+          <div class="center-spot"></div>
+          <div class="penalty-area top"></div>
+          <div class="goal-area top"></div>
+          <div class="penalty-mark top"></div>
+          <div class="penalty-area bottom"></div>
+          <div class="goal-area bottom"></div>
+          <div class="penalty-mark bottom"></div>
+
+          @for (position of (active.fieldPositions ?? []); track position.id) {
+            <div class="pitch-slot" [style.left.%]="position.x" [style.top.%]="position.y">
+              @if (position.player) {
+                <div class="slot-shield">
+                  <img [src]="position.player.shieldUrl" [alt]="playerName(position.player)" (error)="onImageError($event)" />
+                </div>
+                <div class="slot-name">{{ playerName(position.player) }}</div>
+                <div class="slot-rating">{{ position.player.overallRating }}</div>
+              } @else {
+                <div class="slot-empty">
+                  <span class="slot-pos">{{ positionLabel(position.id) }}</span>
+                </div>
+              }
             </div>
-            <span class="player-rating">{{ player.overallRating }}</span>
-          </div>
-        }
-        @if (active.team.length === 0) {
-          <div class="empty-message">No players selected</div>
-        }
+          }
+        </div>
       </div>
-    </div>
-  }
 
-  <div class="actions">
-    <button class="btn btn-primary" (click)="backToSettings()">🏠 Back to Home</button>
-  </div>
+      <!-- Bench -->
+      <div class="bench-panel">
+        <div class="bench-title">
+          <span>Bench</span>
+          <span class="bench-count">{{ active.benchPlayers?.length || 0 }}</span>
+        </div>
+        <div class="bench-row">
+          @for (player of (active.benchPlayers ?? []); track player.id) {
+            <div class="bench-chip">
+              <div class="slot-shield sm">
+                <img [src]="player.shieldUrl" [alt]="playerName(player)" (error)="onImageError($event)" />
+              </div>
+              <div class="slot-name">{{ playerName(player) }}</div>
+              <div class="slot-rating">{{ player.overallRating }}</div>
+            </div>
+          }
+          @if (!active.benchPlayers || active.benchPlayers.length === 0) {
+            <div class="bench-empty">No bench players</div>
+          }
+        </div>
+      </div>
+    } @else {
+      <!-- ============ LIST VIEW ============ -->
+      <div class="section squad-section">
+        <div class="players-list">
+          @for (player of active.team; track player.id; let idx = $index) {
+            <div class="player-card">
+              <span class="pick-num">{{ idx + 1 }}</span>
+              <img [src]="player.shieldUrl" class="player-shield" alt="" (error)="onImageError($event)" />
+              <div class="player-info">
+                <span class="player-name">{{ playerName(player) }}</span>
+                <span class="player-meta">{{ player.position.shortLabel }} · {{ player.team.label }}</span>
+              </div>
+              <span class="player-rating" [class]="ratingClass(player.overallRating)">{{ player.overallRating }}</span>
+            </div>
+          }
+          @if (active.team.length === 0) {
+            <div class="empty-message">No players selected</div>
+          }
+        </div>
+      </div>
+    }
+    }
+  }
 </div>

@@ -291,6 +291,9 @@ draftRouter.get('/:code/state', async (req: AuthenticatedRequest, res: Response)
       .where(eq(picks.draftId, draft.id))
       .orderBy(picks.pickOrder);
 
+    // Identify which manager belongs to the requesting user
+    const myManager = user ? managers.find(m => m.userId === user.id) : undefined;
+
     res.json({
       id: draft.id,
       shortCode: draft.shortCode,
@@ -302,6 +305,7 @@ draftRouter.get('/:code/state', async (req: AuthenticatedRequest, res: Response)
       isSnakeDirection: draft.isSnakeDirection,
       managers,
       picks: allPicks,
+      myManagerId: myManager?.id ?? null,
     });
   } catch (err) {
     console.error('Get state error:', err);

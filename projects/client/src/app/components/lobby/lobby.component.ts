@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { Subject, takeUntil, interval, switchMap } from 'rxjs';
 import { DraftApiService, DraftState, MyDraft } from '../../services/draft-api.service';
-import { DraftService } from '../../services/draft.service';
+import { DraftService, SavedDraftDetails } from '../../services/draft.service';
 import { TelegramService } from '../../services/telegram.service';
 import { PlayerService } from '../../services/player.service';
 import { Dataset } from '../../types';
@@ -22,7 +22,7 @@ export class LobbyComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
 
   mode: LobbyMode = 'home';
-  draftName = '';
+  draftName = 'Galactico';
   maxRounds = 18;
   joinCode = '';
   error = '';
@@ -38,7 +38,7 @@ export class LobbyComponent implements OnInit, OnDestroy {
 
   // My Drafts
   myDrafts: MyDraft[] = [];
-  localDrafts: { name: string; currentRound: number; maxRounds: number; managerCount: number; managerNames: string[]; currentManagerName: string }[] = [];
+  localDrafts: SavedDraftDetails[] = [];
   loadingMyDrafts = false;
 
   constructor(
@@ -187,6 +187,8 @@ export class LobbyComponent implements OnInit, OnDestroy {
       this.mode = 'waiting';
       this.isCreator = false; // Will be determined by polling
       this.startWaitingPolling(draft.shortCode);
+    } else if (draft.status === 'complete') {
+      this.router.navigate(['/summary'], { queryParams: { code: draft.shortCode } });
     } else {
       this.router.navigate(['/draft'], { queryParams: { code: draft.shortCode } });
     }
@@ -199,7 +201,11 @@ export class LobbyComponent implements OnInit, OnDestroy {
   openLocalDraft(name: string): void {
     const success = this.draftService.loadDraftFromLocalStorage(name);
     if (success) {
-      this.router.navigate(['/draft']);
+      if (this.draftService.isDraftComplete()) {
+        this.router.navigate(['/summary']);
+      } else {
+        this.router.navigate(['/draft']);
+      }
     }
   }
 

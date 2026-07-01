@@ -67,8 +67,7 @@ export class SettingsComponent implements OnInit {
   }
 
   canStartDraft(): boolean {
-    return this.draftName.trim().length > 0 &&
-           this.managerNames.length >= 2;
+    return this.managerNames.length >= 2;
   }
 
   startDraft(): void {
@@ -77,9 +76,10 @@ export class SettingsComponent implements OnInit {
       const names = this.managerNames.map((name, i) =>
         name.trim() || `Manager ${i + 1}`
       );
+      const draftName = this.draftName.trim() || 'Galactico';
       // Load dataset if changed from default
       this.playerService.loadDataset(this.selectedDatasetId).subscribe(() => {
-        this.draftService.initializeDraft(names, this.draftName, this.maxRounds);
+        this.draftService.initializeDraft(names, draftName, this.maxRounds);
         this.router.navigate(['/draft']);
       });
     }
