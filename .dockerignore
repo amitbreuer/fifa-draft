@@ -1,0 +1,35 @@
+# Build context is the repo root: docker build -f projects/server/Dockerfile .
+# Keep the context small; only server sources + workspace manifests + data are needed.
+
+# Dependencies (reinstalled inside the image)
+**/node_modules
+
+# Build output / caches
+**/dist
+**/.angular
+/tmp
+/out-tsc
+coverage
+
+# The Angular client is deployed separately (Firebase Hosting)
+projects/client/src
+projects/client/public
+
+# Secrets & local env (injected via Cloud Run, never baked into the image)
+.env
+.env.*
+**/.env
+**/.env.*
+
+# VCS / CI / editor / docs
+.git
+.github
+.claude
+.idea
+.vscode
+docs
+*.md
+
+# OS files
+.DS_Store
+Thumbs.db

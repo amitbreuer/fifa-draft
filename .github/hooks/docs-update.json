@@ -1,0 +1,14 @@
+{
+  "version": 1,
+  "hooks": {
+    "agentStop": [
+      {
+        "type": "command",
+        "bash": "./.github/hooks/scripts/check-docs-update.sh",
+        "powershell": "powershell -ExecutionPolicy Bypass -File ./.github/hooks/scripts/check-docs-update.ps1",
+        "cwd": ".",
+        "timeoutSec": 15
+      }
+    ]
+  }
+}

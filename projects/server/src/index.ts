@@ -9,7 +9,17 @@ import { db } from './db/index.js';
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-app.use(cors({ origin: process.env.FRONTEND_URL || '*' }));
+// CORS: in production, restrict to the deployed client origin (FRONTEND_URL).
+// In development, allow any origin for convenience.
+if (process.env.NODE_ENV === 'production' && !process.env.FRONTEND_URL) {
+  console.warn('⚠️  FRONTEND_URL not set — cross-origin requests will be blocked in production');
+}
+const corsOrigin =
+  process.env.NODE_ENV === 'production'
+    ? (process.env.FRONTEND_URL ?? false)
+    : (process.env.FRONTEND_URL || '*');
+
+app.use(cors({ origin: corsOrigin }));
 app.use(express.json());
 
 // Health check

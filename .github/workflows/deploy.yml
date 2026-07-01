@@ -1,0 +1,140 @@
+name: Deploy
+
+# Single monorepo pipeline. A change-detection job decides which parts deploy,
+# so the server (Cloud Run) and client (Firebase Hosting) deploy independently.
+# Works for push AND manual runs (workflow_dispatch supports forcing either part).
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      deploy_server:
+        description: 'Force-deploy the server'
+        type: boolean
+        default: false
+      deploy_client:
+        description: 'Force-deploy the client'
+        type: boolean
+        default: false
+
+env:
+  GCP_REGION: ${{ vars.GCP_REGION }}
+  SERVICE: fifa-draft-api
+  IMAGE: ${{ vars.GCP_REGION }}-docker.pkg.dev/${{ vars.GCP_PROJECT_ID }}/fifa-draft/api
+
+jobs:
+  # ---------------------------------------------------------------------------
+  # Detect which project(s) changed.
+  # ---------------------------------------------------------------------------
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      server: ${{ steps.decide.outputs.server }}
+      client: ${{ steps.decide.outputs.client }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Path filter
+        uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            server:
+              - 'projects/server/**'
+              - 'projects/shared/**'
+              - 'package-lock.json'
+              - '.github/workflows/deploy.yml'
+            client:
+              - 'projects/client/**'
+              - 'projects/shared/**'
+              - 'package-lock.json'
+              - 'firebase.json'
+              - '.firebaserc'
+              - '.github/workflows/deploy.yml'
+
+      - name: Decide what to deploy (paths OR manual dispatch inputs)
+        id: decide
+        run: |
+          server=${{ steps.filter.outputs.server }}
+          client=${{ steps.filter.outputs.client }}
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            [ "${{ inputs.deploy_server }}" = "true" ] && server=true
+            [ "${{ inputs.deploy_client }}" = "true" ] && client=true
+          fi
+          echo "server=$server" >> "$GITHUB_OUTPUT"
+          echo "client=$client" >> "$GITHUB_OUTPUT"
+
+  # ---------------------------------------------------------------------------
+  # Server → Cloud Run
+  # ---------------------------------------------------------------------------
+  deploy-server:
+    needs: changes
+    if: ${{ needs.changes.outputs.server == 'true' }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write # Workload Identity Federation
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WIF_PROVIDER }}
+          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Configure Docker for Artifact Registry
+        run: gcloud auth configure-docker ${{ vars.GCP_REGION }}-docker.pkg.dev --quiet
+
+      - name: Build image (context = repo root)
+        run: docker build -f projects/server/Dockerfile -t "$IMAGE:${{ github.sha }}" -t "$IMAGE:latest" .
+
+      - name: Push image
+        run: |
+          docker push "$IMAGE:${{ github.sha }}"
+          docker push "$IMAGE:latest"
+
+      - name: Deploy to Cloud Run
+        run: |
+          gcloud run deploy "$SERVICE" \
+            --image "$IMAGE:${{ github.sha }}" \
+            --region "$GCP_REGION" \
+            --platform managed \
+            --allow-unauthenticated \
+            --min-instances 0 \
+            --max-instances 1 \
+            --set-env-vars "NODE_ENV=production,WEBAPP_URL=${{ vars.WEBAPP_URL }},FRONTEND_URL=${{ vars.FRONTEND_URL }}" \
+            --set-secrets "DATABASE_URL=DATABASE_URL:latest,TELEGRAM_BOT_TOKEN=TELEGRAM_BOT_TOKEN:latest"
+
+  # ---------------------------------------------------------------------------
+  # Client → Firebase Hosting
+  # ---------------------------------------------------------------------------
+  deploy-client:
+    needs: changes
+    if: ${{ needs.changes.outputs.client == 'true' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build Angular client (production)
+        run: npm run build:client
+
+      - name: Deploy to Firebase Hosting
+        uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: ${{ secrets.GITHUB_TOKEN }}
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          projectId: ${{ vars.FIREBASE_PROJECT_ID }}
+          channelId: live
