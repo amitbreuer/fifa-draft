@@ -89,7 +89,10 @@ Verify the 4 tables exist (`users`, `drafts`, `draft_managers`, `picks`) in the 
 gcloud auth configure-docker "$REGION-docker.pkg.dev" --quiet
 
 # Build (context = repo root) and push
-docker build -f projects/server/Dockerfile -t "$IMAGE:manual" .
+# Build (context = repo root) and push.
+# --platform linux/amd64 is REQUIRED when building on Apple Silicon / arm64:
+# Cloud Run only runs linux/amd64, and an arm64 image fails to start with NO logs.
+docker build --platform linux/amd64 -f projects/server/Dockerfile -t "$IMAGE:manual" .
 docker push "$IMAGE:manual"
 
 # Deploy (free-tier friendly: scale to zero, single instance)
