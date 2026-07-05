@@ -177,6 +177,12 @@ gcloud iam workload-identity-pools providers create-oidc github-oidc \
   --attribute-mapping="google.subject=assertion.sub,attribute.repository=assertion.repository" \
   --attribute-condition="assertion.repository=='$GITHUB_REPO'" \
   --issuer-uri="https://token.actions.githubusercontent.com"
+# ⚠️ Paste the command above as a real multi-line block (no trailing spaces after '\').
+#    If pasted as one long line the nested quotes can break, producing:
+#    "argument --attribute-mapping --issuer-uri: Must be specified".
+#    If it fails midway, delete the half-created provider before retrying:
+#    gcloud iam workload-identity-pools providers delete github-oidc \
+#      --location=global --workload-identity-pool=github --quiet
 export PROVIDER=$(gcloud iam workload-identity-pools providers describe github-oidc \
   --location=global --workload-identity-pool=github --format='value(name)')
 
@@ -197,6 +203,9 @@ gcloud iam service-accounts create fb-deployer --display-name="Firebase Hosting 
 export FB_SA="fb-deployer@$PROJECT_ID.iam.gserviceaccount.com"
 gcloud projects add-iam-policy-binding "$PROJECT_ID" \
   --member="serviceAccount:$FB_SA" --role="roles/firebasehosting.admin"
+# The deploy action also LISTS Firebase resources, so it needs viewer too:
+gcloud projects add-iam-policy-binding "$PROJECT_ID" \
+  --member="serviceAccount:$FB_SA" --role="roles/firebase.viewer"
 gcloud iam service-accounts keys create fb-key.json --iam-account="$FB_SA"
 # fb-key.json is uploaded as the FIREBASE_SERVICE_ACCOUNT secret below — then delete it.
 ```
@@ -204,6 +213,11 @@ gcloud iam service-accounts keys create fb-key.json --iam-account="$FB_SA"
 ---
 
 ## 8. GitHub repo secrets & variables (via `gh` CLI)
+
+> If `gh` returns **HTTP 403 "must have repository write permissions"**, your token
+> lacks the scope to manage Actions secrets/variables. Fix it once:
+> `gh auth refresh -h github.com -s repo` (or add them in the GitHub UI:
+> Settings → Secrets and variables → Actions).
 
 ```bash
 # Variables (non-secret)
@@ -226,10 +240,21 @@ rm -f fb-key.json   # don't leave the key on disk
 ## 9. Trigger CI
 
 ```bash
-# Manual first run (forces both parts)
+# Deploys run on push to main. Merge your working branch and push:
+git checkout main && git merge --ff-only <your-branch> && git push origin main
+
+# If the push fails with "RPC failed; HTTP 400" (large first pack), bump the buffer:
+#   git config http.postBuffer 524288000    # then push again
+
+# Or trigger manually without a push (forces both parts):
 gh workflow run deploy.yml -R "$GITHUB_REPO" -f deploy_server=true -f deploy_client=true
 
+# Watch it:
+gh run list --workflow=deploy.yml -R "$GITHUB_REPO" -L 3
+gh run watch -R "$GITHUB_REPO"
+
 # Thereafter: push to main → change detection deploys only what changed.
+# Docs-only changes don't match the server/client path filters, so they never deploy.
 ```
 
 ---
