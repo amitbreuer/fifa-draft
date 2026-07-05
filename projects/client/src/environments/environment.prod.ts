@@ -3,5 +3,5 @@
 //   https://fifa-draft-api-xxxxxxxx-uc.a.run.app
 export const environment = {
   production: true,
-  apiUrl: 'https://REPLACE_WITH_CLOUD_RUN_URL',
+  apiUrl: 'https://fifa-draft-api-h6qnm5aqqq-zf.a.run.app',
 };

@@ -7,6 +7,27 @@ Track progress by ticking the boxes. See [`APP-OVERVIEW.md`](./APP-OVERVIEW.md) 
 
 ---
 
+## ✅ Live deployment (first deploy completed 2026-07-05)
+
+| Resource | Value |
+|---|---|
+| GCP project | `fifa-draft-app` (project number `553968852510`) |
+| Region | `me-west1` |
+| Artifact Registry | `me-west1-docker.pkg.dev/fifa-draft-app/fifa-draft/api` |
+| Cloud Run service | `fifa-draft-api` → **https://fifa-draft-api-h6qnm5aqqq-zf.a.run.app** |
+| Firebase project | `fifa-draft-app` (Firebase added to the same GCP project) |
+| Firebase Hosting site | `galactico-draft-app` → **https://galactico-draft-app.web.app** |
+| Database | Neon PostgreSQL (schema in sync via `db:push`) |
+| Secrets | Secret Manager: `DATABASE_URL`, `TELEGRAM_BOT_TOKEN` |
+
+**Gotchas hit during the first deploy (and their fixes):**
+1. **API-enable failed right after project creation** (`SERVICE_CONFIG_NOT_FOUND_OR_PERMISSION_DENIED`) — propagation lag. Fix: wait ~60s and enable APIs one at a time.
+2. **`db:push` needs `DATABASE_URL` exported** — `drizzle.config.ts` reads `process.env` but does **not** load `.env.local`. Export it into the shell first.
+3. **Container failed to start with NO logs** — the image was built on Apple Silicon (arm64); Cloud Run only runs **linux/amd64**. Fix: `docker build --platform linux/amd64 …` (now documented in the runbook). CI runners are amd64, so this only affects local manual builds.
+4. **Firebase Hosting "no site name or target name"** — a fresh Firebase project has no Hosting site. Fix: enable `firebasehosting.googleapis.com`, then `firebase hosting:sites:create`. The chosen site id (`galactico-draft-app`) is pinned in `firebase.json` (`hosting.site`).
+
+---
+
 ## Why this architecture
 
 | Factor | Single Cloud Run container | **Separate (Firebase + Cloud Run)** ✅ |
@@ -27,24 +48,24 @@ Decisive reason: a Telegram Mini App must **open instantly**, so serving the she
 
 ---
 
-## Phase 0 — Prerequisites
+## Phase 0 — Prerequisites ✅ DONE
 
-- [ ] 👤 Google Cloud project created, billing account linked (required even for free tier)
-- [ ] 👤 `gcloud` CLI installed and authenticated (`gcloud auth login`, `gcloud config set project <ID>`)
-- [ ] 👤 Firebase CLI installed and authenticated (`npm i -g firebase-tools`, `firebase login`)
-- [ ] 👤 Enable APIs: `gcloud services enable run.googleapis.com artifactregistry.googleapis.com cloudbuild.googleapis.com`
-- [ ] 👤 Neon PostgreSQL database reachable (already provisioned)
-- [ ] 👤 Telegram bot created via @BotFather; have the bot token
+- [x] 👤 Google Cloud project created (`fifa-draft-app`), billing account linked
+- [x] 👤 `gcloud` CLI installed and authenticated
+- [x] 👤 Firebase CLI installed and authenticated
+- [x] 👤 Enable APIs: `run`, `artifactregistry`, `cloudbuild`, `secretmanager`, `iamcredentials`, `firebase`, `firebasehosting`
+- [x] 👤 Neon PostgreSQL database reachable (already provisioned)
+- [x] 👤 Telegram bot created via @BotFather; have the bot token
 
 ---
 
-## Phase 1 — Secret hygiene (do first)
+## Phase 1 — Secret hygiene
 
-`projects/server/.env.local` holds **live credentials in plaintext** (Neon DB password, Telegram bot token). It is **gitignored and was never committed** (not in git history), so it did not leak to the remote. Rotation is prudent-but-optional since the values were surfaced in plaintext locally; regardless, production must load them from Secret Manager, not a file.
+`projects/server/.env.local` holds **live credentials in plaintext** (Neon DB password, Telegram bot token). It is **gitignored and was never committed** (not in git history), so it did not leak to the remote. Production loads them from Secret Manager, not a file.
 
-- [ ] 👤 (Recommended) **Rotate the Neon DB password** and **Telegram bot token** (@BotFather `/revoke`)
-- [ ] 🤖 Confirm `.env.local` stays gitignored (it is) and is never committed ✅
-- [ ] 👤 Inject secrets via **Secret Manager** / Cloud Run, never baked into the image
+- [x] 👤 Rotation: skipped for the Neon DB (reused); a **fresh Telegram bot** was created for this deployment
+- [x] 🤖 Confirm `.env.local` stays gitignored (it is) and is never committed ✅
+- [x] 👤 Secrets injected via **Secret Manager** (`DATABASE_URL`, `TELEGRAM_BOT_TOKEN`), not baked into the image
 
 ---
 
@@ -64,57 +85,56 @@ Decisive reason: a Telegram Mini App must **open instantly**, so serving the she
 
 ---
 
-## Phase 3 — Database migration
+## Phase 3 — Database migration ✅ DONE
 
-- [ ] 👤 Point `DATABASE_URL` at the (rotated) Neon connection string
-- [ ] 👤 Run `npm run db:push` to sync the Drizzle schema to Neon
-- [ ] 👤 Verify the 4 tables exist: `users`, `drafts`, `draft_managers`, `picks`
+- [x] 👤 Point `DATABASE_URL` at the Neon connection string (exported into shell; `drizzle.config.ts` does not auto-load `.env.local`)
+- [x] 👤 Run `npm run db:push` to sync the Drizzle schema to Neon → **"No changes"** (already in sync)
+- [x] 👤 Verify the 4 tables exist: `users`, `drafts`, `draft_managers`, `picks`
 
 ---
 
-## Phase 4 — Deploy the API to Cloud Run
+## Phase 4 — Deploy the API to Cloud Run ✅ DONE
 
-- [ ] 🤖 Add a deploy script / runbook (`deploy/deploy-server.sh`) wrapping the commands below
-- [ ] 👤 Store secrets in Secret Manager (recommended) or pass as env vars:
-  - `DATABASE_URL`, `TELEGRAM_BOT_TOKEN`, `WEBAPP_URL`, `FRONTEND_URL`, `NODE_ENV=production`
-- [ ] 👤 Deploy:
+- [x] 🤖 Runbook with exact commands added ([`DEPLOYMENT-COMMANDS.md`](./DEPLOYMENT-COMMANDS.md) §4)
+- [x] 👤 Store secrets in Secret Manager (`DATABASE_URL`, `TELEGRAM_BOT_TOKEN`) + grant the runtime SA `secretmanager.secretAccessor`
+- [x] 👤 Create Artifact Registry repo `fifa-draft` in `me-west1`
+- [x] 👤 Build **for linux/amd64** and push, then deploy:
   ```bash
+  IMAGE="me-west1-docker.pkg.dev/fifa-draft-app/fifa-draft/api"
+  docker build --platform linux/amd64 -f projects/server/Dockerfile -t "$IMAGE:manual" .
+  docker push "$IMAGE:manual"
   gcloud run deploy fifa-draft-api \
-    --source projects/server \
-    --region <REGION> \
-    --allow-unauthenticated \
-    --min-instances 0 \
-    --max-instances 1 \
+    --image "$IMAGE:manual" --region me-west1 --allow-unauthenticated \
+    --min-instances 0 --max-instances 1 \
     --set-env-vars NODE_ENV=production \
-    --set-secrets DATABASE_URL=…,TELEGRAM_BOT_TOKEN=…
+    --set-secrets DATABASE_URL=DATABASE_URL:latest,TELEGRAM_BOT_TOKEN=TELEGRAM_BOT_TOKEN:latest
   ```
-- [ ] 👤 Note the assigned Cloud Run URL (e.g. `https://fifa-draft-api-xxxx.run.app`)
-- [ ] 👤 Verify `GET <cloud-run-url>/health` returns `{ status: "ok" }`
-- [ ] 👤 Verify `GET <cloud-run-url>/api/players/datasets` returns the dataset list (confirms `data/` shipped)
+- [x] 👤 Cloud Run URL: **https://fifa-draft-api-h6qnm5aqqq-zf.a.run.app**
+- [x] 👤 `GET /health` → `{"status":"ok"}` ✅
+- [x] 👤 `GET /api/players/datasets` → dataset list ✅ (confirms `data/` shipped)
 
 ---
 
-## Phase 5 — Deploy the client to Firebase Hosting
+## Phase 5 — Deploy the client to Firebase Hosting ✅ DONE
 
-- [x] 🤖 Add `firebase.json` + `.firebaserc` (public dir = `projects/client/dist/fifa-draft-app/browser`, SPA rewrite → `index.html`)
-- [x] 🤖 Set `projects/client/src/environments/environment.prod.ts` `apiUrl` to a Cloud Run URL placeholder
-- [ ] 👤 Replace `REPLACE_WITH_FIREBASE_PROJECT_ID` in `.firebaserc` with your Firebase project ID
-- [ ] 👤 Replace `REPLACE_WITH_CLOUD_RUN_URL` in `environment.prod.ts` with the real Cloud Run URL (from Phase 4)
-- [ ] 👤 Build the client: `npm run build:client`
-- [ ] 👤 Deploy: `firebase deploy --only hosting`
-- [ ] 👤 Note the Firebase Hosting URL (e.g. `https://<project>.web.app`)
-- [ ] 👤 Set Cloud Run `FRONTEND_URL` **and** `WEBAPP_URL` to this URL, then redeploy the API (CORS + Telegram links)
+- [x] 🤖 Add `firebase.json` + `.firebaserc` (public dir = `projects/client/dist/fifa-draft-app/browser`, SPA rewrite → `index.html`, `hosting.site` = `galactico-draft-app`)
+- [x] 🤖 Relax Angular production budgets so `build:client` passes (initial bundle is ~2.8 MB)
+- [x] 👤 `.firebaserc` default project → `fifa-draft-app`
+- [x] 👤 `environment.prod.ts` `apiUrl` → `https://fifa-draft-api-h6qnm5aqqq-zf.a.run.app`
+- [x] 👤 Add Firebase to the GCP project (`firebase projects:addfirebase`) + create Hosting site (`galactico-draft-app`)
+- [x] 👤 Build the client: `npm run build:client`
+- [x] 👤 Deploy: `firebase deploy --only hosting` → **https://galactico-draft-app.web.app**
+- [x] 👤 Set Cloud Run `FRONTEND_URL` **and** `WEBAPP_URL` to the Hosting URL (CORS + Telegram links)
 
 ---
 
-## Phase 6 — Telegram wiring
+## Phase 6 — Telegram wiring ✅ DONE
 
-- [ ] 👤 Register the bot webhook:
-  ```bash
-  curl "https://api.telegram.org/bot<TOKEN>/setWebhook?url=<cloud-run-url>/bot/webhook"
-  ```
-- [ ] 👤 In @BotFather, set the Mini App / menu button URL to the Firebase Hosting URL
-- [ ] 👤 Confirm `WEBAPP_URL` (used in bot deep links & notifications) points to the Firebase URL
+- [x] 👤 Register the bot webhook → `.../bot/webhook` (verified `getWebhookInfo`)
+- [x] 👤 Set the persistent **Menu Button** (`setChatMenuButton`, type `web_app`) to the Firebase URL
+- [x] 👤 `WEBAPP_URL` on Cloud Run points to `https://galactico-draft-app.web.app`
+
+> Note: the `/start` **inline** buttons only appear after pressing Start; the always-visible app button is the **Menu Button**, set separately via BotFather or `setChatMenuButton`.
 
 ---
 
@@ -178,4 +198,11 @@ A single workflow (`.github/workflows/deploy.yml`) with a **change-detection job
 1. ~~**Dockerfile is currently broken**~~ ✅ **Fixed** — rewritten monorepo-aware with esbuild bundling; validated with a local `docker build` + container run.
 2. ~~**`data/` not copied** into the image~~ ✅ **Fixed** — `data/` is copied; verified `/api/players/datasets` returns data from the running container.
 3. ~~**Client hosting undecided**~~ ✅ **Resolved** — Firebase Hosting; `firebase.json`/`.firebaserc` + CI added.
-4. **Secrets were in plaintext** in `.env.local` → still **TODO**: rotate in Phase 1 and move to Secret Manager.
+4. ~~**Secrets were in plaintext** in `.env.local`~~ ✅ **Resolved** — production reads `DATABASE_URL` + `TELEGRAM_BOT_TOKEN` from Secret Manager; a fresh Telegram bot was created for this deploy. `.env.local` remains local-only and gitignored.
+
+---
+
+## Still open (post–first-deploy)
+
+- [ ] 👤 **CI/CD activation** (Phase 6.5): set up Workload Identity Federation + deployer SAs and add the GitHub secrets/vars so pushes auto-deploy. Until then, deploys are manual (runbook §4–5).
+- [ ] 👤 **End-to-end verification** (Phase 7): run a full two-player draft through Telegram.

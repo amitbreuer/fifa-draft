@@ -1,5 +1,6 @@
 {
   "hosting": {
+    "site": "galactico-draft-app",
     "public": "projects/client/dist/fifa-draft-app/browser",
     "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
     "rewrites": [
