@@ -223,6 +223,7 @@
     }
     .pill strong { color: var(--accent); }
   </style>
+
   <style>
     ul:has(> li > input[type="checkbox"]) { list-style: none; padding-left: 0.5rem; }
     li:has(> input[type="checkbox"]) { list-style: none; }
@@ -233,7 +234,7 @@
   <div class="container">
 
     <h1>🚀 FIFA Draft — Deployment Plan</h1>
-    <p class="subtitle">Deploying the app on the Google Cloud free tier — Angular on Firebase Hosting + Express API on Cloud Run + Neon PostgreSQL. First deploy completed 2026-07-05.</p>
+    <p class="subtitle">Deploying the app on the Google Cloud free tier — Angular on Firebase Hosting + Express API on Cloud Run + Neon PostgreSQL. First deploy + CI/CD completed 2026-07-05.</p>
 
 <blockquote>
 <p>Deploying the FIFA Draft app on the <strong>Google Cloud free tier</strong>.
@@ -412,21 +413,20 @@ gcloud run deploy fifa-draft-api \
 <p>Note: the <code>/start</code> <strong>inline</strong> buttons only appear after pressing Start; the always-visible app button is the <strong>Menu Button</strong>, set separately via BotFather or <code>setChatMenuButton</code>.</p>
 </blockquote>
 <hr>
-<h2>Phase 6.5 — CI/CD (GitHub Actions) — one monorepo pipeline, independent deploys</h2>
+<h2>Phase 6.5 — CI/CD (GitHub Actions) — one monorepo pipeline, independent deploys ✅ DONE</h2>
 <p>A single workflow (<code>.github/workflows/deploy.yml</code>) with a <strong>change-detection job</strong> (<code>dorny/paths-filter</code>) that decides which parts deploy — so the <strong>client and server deploy independently</strong> and a change to one never redeploys the other.</p>
 <ul>
 <li><input checked="" disabled="" type="checkbox"> 🤖 <code>.github/workflows/deploy.yml</code> — jobs: <code>changes</code> → <code>deploy-server</code> (Cloud Run) + <code>deploy-client</code> (Firebase), each gated on the filter. Validated as well-formed YAML.</li>
 <li><input checked="" disabled="" type="checkbox"> 🤖 Change detection also honors <strong>manual <code>workflow_dispatch</code></strong> inputs (<code>deploy_server</code> / <code>deploy_client</code>) — something native <code>on.paths</code> can&#39;t do.</li>
-<li><input disabled="" type="checkbox"> 👤 Create an Artifact Registry Docker repo named <code>fifa-draft</code> in your region:
-<code>gcloud artifacts repositories create fifa-draft --repository-format=docker --location=&lt;REGION&gt;</code></li>
-<li><input disabled="" type="checkbox"> 👤 Set up <strong>Workload Identity Federation</strong> (recommended) for GitHub → GCP, and a deployer service account with roles: <code>run.admin</code>, <code>artifactregistry.writer</code>, <code>iam.serviceAccountUser</code>, <code>secretmanager.secretAccessor</code>.</li>
-<li><input disabled="" type="checkbox"> 👤 Add GitHub <strong>repository secrets</strong>: <code>GCP_WIF_PROVIDER</code>, <code>GCP_SERVICE_ACCOUNT</code>, <code>FIREBASE_SERVICE_ACCOUNT</code>.</li>
-<li><input disabled="" type="checkbox"> 👤 Add GitHub <strong>repository variables</strong>: <code>GCP_PROJECT_ID</code>, <code>GCP_REGION</code>, <code>FIREBASE_PROJECT_ID</code>, <code>WEBAPP_URL</code>, <code>FRONTEND_URL</code>.</li>
-<li><input disabled="" type="checkbox"> 👤 Create Secret Manager secrets <code>DATABASE_URL</code> and <code>TELEGRAM_BOT_TOKEN</code> (referenced by the Cloud Run deploy step).</li>
-<li><input disabled="" type="checkbox"> 👤 First run: trigger via <code>workflow_dispatch</code> (tick both inputs) to confirm, then rely on push-based change detection.</li>
+<li><input checked="" disabled="" type="checkbox"> 👤 Artifact Registry Docker repo <code>fifa-draft</code> created in <code>me-west1</code></li>
+<li><input checked="" disabled="" type="checkbox"> 👤 <strong>Workload Identity Federation</strong> set up (pool <code>github</code>, provider <code>github-oidc</code>, condition scoped to <code>amitbreuer/fifa-draft</code>) + deployer SA <code>gh-deployer</code> with roles <code>run.admin</code>, <code>artifactregistry.writer</code>, <code>iam.serviceAccountUser</code>, <code>secretmanager.secretAccessor</code></li>
+<li><input checked="" disabled="" type="checkbox"> 👤 Firebase deploy SA <code>fb-deployer</code> (<code>firebasehosting.admin</code> + <code>firebase.viewer</code>) → key uploaded as <code>FIREBASE_SERVICE_ACCOUNT</code></li>
+<li><input checked="" disabled="" type="checkbox"> 👤 GitHub <strong>secrets</strong>: <code>GCP_WIF_PROVIDER</code>, <code>GCP_SERVICE_ACCOUNT</code>, <code>FIREBASE_SERVICE_ACCOUNT</code></li>
+<li><input checked="" disabled="" type="checkbox"> 👤 GitHub <strong>variables</strong>: <code>GCP_PROJECT_ID</code>, <code>GCP_REGION</code>, <code>FIREBASE_PROJECT_ID</code>, <code>WEBAPP_URL</code>, <code>FRONTEND_URL</code></li>
+<li><input checked="" disabled="" type="checkbox"> 👤 <strong>First run green</strong> (push to <code>main</code>, run <code>28747509585</code>): <code>changes</code> ✓ → <code>deploy-server</code> ✓ (1m22s) + <code>deploy-client</code> ✓ (1m2s); both live services verified afterward</li>
 </ul>
 <blockquote>
-<p>Note: the workflow does the first deploy too, but the very first Cloud Run deploy can also be done manually (Phase 4) so you can capture the URL before the client build.</p>
+<p>Deploys trigger on <strong>push to <code>main</code></strong>. Docs-only changes don&#39;t match the server/client path filters, so they never trigger a deploy.</p>
 </blockquote>
 <hr>
 <h2>Phase 7 — End-to-end verification</h2>
@@ -506,8 +506,8 @@ gcloud run deploy fifa-draft-api \
 <hr>
 <h2>Still open (post–first-deploy)</h2>
 <ul>
-<li><input disabled="" type="checkbox"> 👤 <strong>CI/CD activation</strong> (Phase 6.5): set up Workload Identity Federation + deployer SAs and add the GitHub secrets/vars so pushes auto-deploy. Until then, deploys are manual (runbook §4–5).</li>
 <li><input disabled="" type="checkbox"> 👤 <strong>End-to-end verification</strong> (Phase 7): run a full two-player draft through Telegram.</li>
+<li><input disabled="" type="checkbox"> 🤖 (Minor) Bump CI actions off deprecated Node 20 runners (<code>actions/checkout</code>, <code>dorny/paths-filter</code>) when newer majors land — non-blocking warning only.</li>
 </ul>
 
   </div>

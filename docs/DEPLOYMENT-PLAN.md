@@ -138,21 +138,20 @@ Decisive reason: a Telegram Mini App must **open instantly**, so serving the she
 
 ---
 
-## Phase 6.5 — CI/CD (GitHub Actions) — one monorepo pipeline, independent deploys
+## Phase 6.5 — CI/CD (GitHub Actions) — one monorepo pipeline, independent deploys ✅ DONE
 
 A single workflow (`.github/workflows/deploy.yml`) with a **change-detection job** (`dorny/paths-filter`) that decides which parts deploy — so the **client and server deploy independently** and a change to one never redeploys the other.
 
 - [x] 🤖 `.github/workflows/deploy.yml` — jobs: `changes` → `deploy-server` (Cloud Run) + `deploy-client` (Firebase), each gated on the filter. Validated as well-formed YAML.
 - [x] 🤖 Change detection also honors **manual `workflow_dispatch`** inputs (`deploy_server` / `deploy_client`) — something native `on.paths` can't do.
-- [ ] 👤 Create an Artifact Registry Docker repo named `fifa-draft` in your region:
-  `gcloud artifacts repositories create fifa-draft --repository-format=docker --location=<REGION>`
-- [ ] 👤 Set up **Workload Identity Federation** (recommended) for GitHub → GCP, and a deployer service account with roles: `run.admin`, `artifactregistry.writer`, `iam.serviceAccountUser`, `secretmanager.secretAccessor`.
-- [ ] 👤 Add GitHub **repository secrets**: `GCP_WIF_PROVIDER`, `GCP_SERVICE_ACCOUNT`, `FIREBASE_SERVICE_ACCOUNT`.
-- [ ] 👤 Add GitHub **repository variables**: `GCP_PROJECT_ID`, `GCP_REGION`, `FIREBASE_PROJECT_ID`, `WEBAPP_URL`, `FRONTEND_URL`.
-- [ ] 👤 Create Secret Manager secrets `DATABASE_URL` and `TELEGRAM_BOT_TOKEN` (referenced by the Cloud Run deploy step).
-- [ ] 👤 First run: trigger via `workflow_dispatch` (tick both inputs) to confirm, then rely on push-based change detection.
+- [x] 👤 Artifact Registry Docker repo `fifa-draft` created in `me-west1`
+- [x] 👤 **Workload Identity Federation** set up (pool `github`, provider `github-oidc`, condition scoped to `amitbreuer/fifa-draft`) + deployer SA `gh-deployer` with roles `run.admin`, `artifactregistry.writer`, `iam.serviceAccountUser`, `secretmanager.secretAccessor`
+- [x] 👤 Firebase deploy SA `fb-deployer` (`firebasehosting.admin` + `firebase.viewer`) → key uploaded as `FIREBASE_SERVICE_ACCOUNT`
+- [x] 👤 GitHub **secrets**: `GCP_WIF_PROVIDER`, `GCP_SERVICE_ACCOUNT`, `FIREBASE_SERVICE_ACCOUNT`
+- [x] 👤 GitHub **variables**: `GCP_PROJECT_ID`, `GCP_REGION`, `FIREBASE_PROJECT_ID`, `WEBAPP_URL`, `FRONTEND_URL`
+- [x] 👤 **First run green** (push to `main`, run `28747509585`): `changes` ✓ → `deploy-server` ✓ (1m22s) + `deploy-client` ✓ (1m2s); both live services verified afterward
 
-> Note: the workflow does the first deploy too, but the very first Cloud Run deploy can also be done manually (Phase 4) so you can capture the URL before the client build.
+> Deploys trigger on **push to `main`**. Docs-only changes don't match the server/client path filters, so they never trigger a deploy.
 
 ---
 
@@ -204,5 +203,5 @@ A single workflow (`.github/workflows/deploy.yml`) with a **change-detection job
 
 ## Still open (post–first-deploy)
 
-- [ ] 👤 **CI/CD activation** (Phase 6.5): set up Workload Identity Federation + deployer SAs and add the GitHub secrets/vars so pushes auto-deploy. Until then, deploys are manual (runbook §4–5).
 - [ ] 👤 **End-to-end verification** (Phase 7): run a full two-player draft through Telegram.
+- [ ] 🤖 (Minor) Bump CI actions off deprecated Node 20 runners (`actions/checkout`, `dorny/paths-filter`) when newer majors land — non-blocking warning only.
