@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FIFA Draft — Deployment Plan</title>
+  <style>
+    :root {
+      --bg: #0d1117;
+      --surface: #161b22;
+      --border: #30363d;
+      --text: #e6edf3;
+      --text-muted: #8b949e;
+      --accent: #58a6ff;
+      --green: #3fb950;
+      --red: #f85149;
+      --orange: #d29922;
+      --purple: #d2a8ff;
+      --code-bg: #1c2128;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+      padding: 2rem;
+    }
+
+    .container { max-width: 960px; margin: 0 auto; }
+
+    h1 {
+      font-size: 2.3rem;
+      margin-bottom: 0.5rem;
+      background: linear-gradient(135deg, var(--accent), var(--green));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    h1 + p.subtitle {
+      color: var(--text-muted);
+      font-size: 1.1rem;
+      margin-bottom: 2.5rem;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 1.5rem;
+    }
+
+    h2 {
+      font-size: 1.55rem;
+      margin-top: 3rem;
+      margin-bottom: 1rem;
+      color: var(--accent);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      scroll-margin-top: 1rem;
+    }
+
+    h2 .icon { font-size: 1.3rem; }
+
+    h3 {
+      font-size: 1.18rem;
+      margin-top: 1.8rem;
+      margin-bottom: 0.8rem;
+      color: var(--text);
+    }
+
+    h4 { margin-bottom: 0.6rem; font-size: 1.02rem; color: var(--purple); }
+
+    p { margin-bottom: 1rem; }
+
+    code {
+      background: var(--code-bg);
+      padding: 0.15em 0.4em;
+      border-radius: 4px;
+      font-size: 0.9em;
+      font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+      color: var(--accent);
+    }
+
+    pre {
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.2rem;
+      overflow-x: auto;
+      margin-bottom: 1.5rem;
+      font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+      font-size: 0.85rem;
+      line-height: 1.6;
+    }
+
+    pre code { background: none; padding: 0; color: var(--text); }
+
+    .keyword { color: #ff7b72; }
+    .string { color: #a5d6ff; }
+    .comment { color: var(--text-muted); }
+    .type { color: #d2a8ff; }
+
+    ul, ol { margin-bottom: 1rem; padding-left: 1.5rem; }
+    li { margin-bottom: 0.4rem; }
+    strong { color: #f0f6fc; }
+
+    .diagram-box {
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.5rem;
+      overflow-x: auto;
+      margin-bottom: 1.5rem;
+      font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+      font-size: 0.78rem;
+      line-height: 1.5;
+      white-space: pre;
+      color: var(--text);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 1.5rem;
+      font-size: 0.93rem;
+    }
+
+    thead th {
+      background: var(--surface);
+      text-align: left;
+      padding: 0.75rem 1rem;
+      border-bottom: 2px solid var(--accent);
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    tbody td {
+      padding: 0.7rem 1rem;
+      border-bottom: 1px solid var(--border);
+      vertical-align: top;
+    }
+
+    tbody tr:hover { background: rgba(88, 166, 255, 0.04); }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .callout {
+      border-radius: 8px;
+      padding: 1rem 1.2rem;
+      margin-bottom: 1.5rem;
+      font-size: 0.95rem;
+    }
+
+    .callout.info { background: rgba(88, 166, 255, 0.08); border-left: 4px solid var(--accent); }
+    .callout.success { background: rgba(63, 185, 80, 0.08); border-left: 4px solid var(--green); }
+    .callout.warn { background: rgba(210, 153, 34, 0.08); border-left: 4px solid var(--orange); }
+
+    .toc {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.2rem 1.5rem;
+      margin-bottom: 2.5rem;
+    }
+
+    .toc h3 {
+      margin-top: 0;
+      margin-bottom: 0.6rem;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .toc ol { list-style: decimal; padding-left: 1.4rem; columns: 2; }
+    @media (max-width: 640px) { .toc ol { columns: 1; } }
+    .toc li { margin-bottom: 0.3rem; }
+    .toc a { color: var(--accent); text-decoration: none; font-size: 0.95rem; }
+    .toc a:hover { text-decoration: underline; }
+
+    .phase {
+      border-left: 3px solid var(--accent);
+      padding-left: 1.5rem;
+      margin-bottom: 1.8rem;
+    }
+
+    .phase h3 { margin-top: 0.4rem; }
+
+    .flow-letter {
+      display: inline-block;
+      background: var(--accent);
+      color: var(--bg);
+      font-weight: 700;
+      font-size: 0.8rem;
+      padding: 0.15em 0.65em;
+      border-radius: 4px;
+      margin-bottom: 0.3rem;
+    }
+
+    .badge {
+      display: inline-block;
+      font-size: 0.75rem;
+      padding: 0.2em 0.6em;
+      border-radius: 99px;
+      font-weight: 600;
+    }
+    .badge.now { background: rgba(210, 153, 34, 0.15); color: var(--orange); }
+    .badge.scale { background: rgba(63, 185, 80, 0.15); color: var(--green); }
+
+    .pill-row { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1.5rem; }
+    .pill {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 99px;
+      padding: 0.35em 0.9em;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+    .pill strong { color: var(--accent); }
+  </style>
+  <style>
+    ul:has(> li > input[type="checkbox"]) { list-style: none; padding-left: 0.5rem; }
+    li:has(> input[type="checkbox"]) { list-style: none; }
+    li input[type="checkbox"] { margin-right: 0.5rem; transform: translateY(1px); }
+  </style>
+</head>
+<body>
+  <div class="container">
+
+    <h1>🚀 FIFA Draft — Deployment Plan</h1>
+    <p class="subtitle">Deploying the app on the Google Cloud free tier — Angular on Firebase Hosting + Express API on Cloud Run + Neon PostgreSQL. First deploy completed 2026-07-05.</p>
+
+<blockquote>
+<p>Deploying the FIFA Draft app on the <strong>Google Cloud free tier</strong>.
+<strong>Architecture:</strong> Angular static SPA on <strong>Firebase Hosting</strong> (CDN) + Express API on <strong>Cloud Run</strong> (scale-to-zero) + <strong>Neon</strong> PostgreSQL (already provisioned).</p>
+</blockquote>
+<p>Track progress by ticking the boxes. See <a href="./APP-OVERVIEW.md"><code>APP-OVERVIEW.md</code></a> for architecture and <a href="./SSE-ARCHITECTURE.md"><code>SSE-ARCHITECTURE.md</code></a> for the real-time discussion. Exact copy-paste commands for the 👤 steps live in <a href="./DEPLOYMENT-COMMANDS.md"><code>DEPLOYMENT-COMMANDS.md</code></a>.</p>
+<hr>
+<h2>✅ Live deployment (first deploy completed 2026-07-05)</h2>
+<table>
+<thead>
+<tr>
+<th>Resource</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>GCP project</td>
+<td><code>fifa-draft-app</code> (project number <code>553968852510</code>)</td>
+</tr>
+<tr>
+<td>Region</td>
+<td><code>me-west1</code></td>
+</tr>
+<tr>
+<td>Artifact Registry</td>
+<td><code>me-west1-docker.pkg.dev/fifa-draft-app/fifa-draft/api</code></td>
+</tr>
+<tr>
+<td>Cloud Run service</td>
+<td><code>fifa-draft-api</code> → <strong><a href="https://fifa-draft-api-h6qnm5aqqq-zf.a.run.app">https://fifa-draft-api-h6qnm5aqqq-zf.a.run.app</a></strong></td>
+</tr>
+<tr>
+<td>Firebase project</td>
+<td><code>fifa-draft-app</code> (Firebase added to the same GCP project)</td>
+</tr>
+<tr>
+<td>Firebase Hosting site</td>
+<td><code>galactico-draft-app</code> → <strong><a href="https://galactico-draft-app.web.app">https://galactico-draft-app.web.app</a></strong></td>
+</tr>
+<tr>
+<td>Database</td>
+<td>Neon PostgreSQL (schema in sync via <code>db:push</code>)</td>
+</tr>
+<tr>
+<td>Secrets</td>
+<td>Secret Manager: <code>DATABASE_URL</code>, <code>TELEGRAM_BOT_TOKEN</code></td>
+</tr>
+</tbody></table>
+<p><strong>Gotchas hit during the first deploy (and their fixes):</strong></p>
+<ol>
+<li><strong>API-enable failed right after project creation</strong> (<code>SERVICE_CONFIG_NOT_FOUND_OR_PERMISSION_DENIED</code>) — propagation lag. Fix: wait ~60s and enable APIs one at a time.</li>
+<li><strong><code>db:push</code> needs <code>DATABASE_URL</code> exported</strong> — <code>drizzle.config.ts</code> reads <code>process.env</code> but does <strong>not</strong> load <code>.env.local</code>. Export it into the shell first.</li>
+<li><strong>Container failed to start with NO logs</strong> — the image was built on Apple Silicon (arm64); Cloud Run only runs <strong>linux/amd64</strong>. Fix: <code>docker build --platform linux/amd64 …</code> (now documented in the runbook). CI runners are amd64, so this only affects local manual builds.</li>
+<li><strong>Firebase Hosting &quot;no site name or target name&quot;</strong> — a fresh Firebase project has no Hosting site. Fix: enable <code>firebasehosting.googleapis.com</code>, then <code>firebase hosting:sites:create</code>. The chosen site id (<code>galactico-draft-app</code>) is pinned in <code>firebase.json</code> (<code>hosting.site</code>).</li>
+</ol>
+<hr>
+<h2>Why this architecture</h2>
+<table>
+<thead>
+<tr>
+<th>Factor</th>
+<th>Single Cloud Run container</th>
+<th><strong>Separate (Firebase + Cloud Run)</strong> ✅</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>UI load when scaled to zero</td>
+<td>Cold start blocks the whole page (1–3s blank)</td>
+<td>UI serves instantly from CDN; only first API call pays cold start</td>
+</tr>
+<tr>
+<td>Free-tier budget</td>
+<td>Static requests burn Cloud Run CPU-seconds</td>
+<td>Static bandwidth offloaded to Firebase; Cloud Run only handles API</td>
+</tr>
+<tr>
+<td>CORS</td>
+<td>None (same origin)</td>
+<td>One env var (<code>FRONTEND_URL</code>) — already handled in code</td>
+</tr>
+<tr>
+<td>Deploys</td>
+<td>One step</td>
+<td>Two steps (both scripted)</td>
+</tr>
+</tbody></table>
+<p>Decisive reason: a Telegram Mini App must <strong>open instantly</strong>, so serving the shell from a CDN (never blocked by a cold Cloud Run instance) is the better UX for rare, casual usage.</p>
+<hr>
+<h2>Legend</h2>
+<ul>
+<li>🤖 = agent can produce this (code/config artifact)</li>
+<li>👤 = you run this (needs GCP/Firebase auth, secrets, or your accounts)</li>
+</ul>
+<hr>
+<h2>Phase 0 — Prerequisites ✅ DONE</h2>
+<ul>
+<li><input checked="" disabled="" type="checkbox"> 👤 Google Cloud project created (<code>fifa-draft-app</code>), billing account linked</li>
+<li><input checked="" disabled="" type="checkbox"> 👤 <code>gcloud</code> CLI installed and authenticated</li>
+<li><input checked="" disabled="" type="checkbox"> 👤 Firebase CLI installed and authenticated</li>
+<li><input checked="" disabled="" type="checkbox"> 👤 Enable APIs: <code>run</code>, <code>artifactregistry</code>, <code>cloudbuild</code>, <code>secretmanager</code>, <code>iamcredentials</code>, <code>firebase</code>, <code>firebasehosting</code></li>
+<li><input checked="" disabled="" type="checkbox"> 👤 Neon PostgreSQL database reachable (already provisioned)</li>
+<li><input checked="" disabled="" type="checkbox"> 👤 Telegram bot created via @BotFather; have the bot token</li>
+</ul>
+<hr>
+<h2>Phase 1 — Secret hygiene</h2>
+<p><code>projects/server/.env.local</code> holds <strong>live credentials in plaintext</strong> (Neon DB password, Telegram bot token). It is <strong>gitignored and was never committed</strong> (not in git history), so it did not leak to the remote. Production loads them from Secret Manager, not a file.</p>
+<ul>
+<li><input checked="" disabled="" type="checkbox"> 👤 Rotation: skipped for the Neon DB (reused); a <strong>fresh Telegram bot</strong> was created for this deployment</li>
+<li><input checked="" disabled="" type="checkbox"> 🤖 Confirm <code>.env.local</code> stays gitignored (it is) and is never committed ✅</li>
+<li><input checked="" disabled="" type="checkbox"> 👤 Secrets injected via <strong>Secret Manager</strong> (<code>DATABASE_URL</code>, <code>TELEGRAM_BOT_TOKEN</code>), not baked into the image</li>
+</ul>
+<hr>
+<h2>Phase 2 — Server: containerization (code artifacts) ✅ DONE</h2>
+<ul>
+<li><input checked="" disabled="" type="checkbox"> 🤖 Rewrite <code>projects/server/Dockerfile</code> to be <strong>monorepo-aware</strong>:<ul>
+<li>build context = repo root (so the <code>@fifa-draft/shared</code> workspace resolves)</li>
+<li>workspace-aware <code>npm ci</code>, then <strong>bundle the server with esbuild</strong> into a single self-contained CJS file</li>
+<li>copy <code>projects/server/data/</code> into the image (player datasets)</li>
+<li>removed the broken <code>COPY ../src/assets/players.json</code> line</li>
+<li><em>Result: 166 MB runtime image, no runtime <code>node_modules</code> needed → fast cold starts.</em></li>
+</ul>
+</li>
+<li><input checked="" disabled="" type="checkbox"> 🤖 Add <code>.dockerignore</code> (excludes <code>node_modules</code>, <code>.env*</code>, <code>dist</code>, <code>.angular</code>, <code>.git</code>, docs, client source)</li>
+<li><input checked="" disabled="" type="checkbox"> 🤖 Add esbuild <code>build:bundle</code> script + devDep to <code>projects/server/package.json</code> (lockfile updated)</li>
+<li><input checked="" disabled="" type="checkbox"> 🤖 Verify <code>PORT</code> handling (code reads <code>process.env.PORT</code>; Cloud Run injects 8080) ✅ already OK</li>
+<li><input checked="" disabled="" type="checkbox"> 🤖 Tighten CORS: production requires <code>FRONTEND_URL</code> (warns if unset); dev still allows <code>*</code></li>
+<li><input checked="" disabled="" type="checkbox"> 🤖 <strong>Validated locally</strong>: <code>docker build</code> succeeds; container serves <code>/health</code>, <code>/api/players/datasets</code> (data shipped), and returns 401 on protected routes</li>
+</ul>
+<hr>
+<h2>Phase 3 — Database migration ✅ DONE</h2>
+<ul>
+<li><input checked="" disabled="" type="checkbox"> 👤 Point <code>DATABASE_URL</code> at the Neon connection string (exported into shell; <code>drizzle.config.ts</code> does not auto-load <code>.env.local</code>)</li>
+<li><input checked="" disabled="" type="checkbox"> 👤 Run <code>npm run db:push</code> to sync the Drizzle schema to Neon → <strong>&quot;No changes&quot;</strong> (already in sync)</li>
+<li><input checked="" disabled="" type="checkbox"> 👤 Verify the 4 tables exist: <code>users</code>, <code>drafts</code>, <code>draft_managers</code>, <code>picks</code></li>
+</ul>
+<hr>
+<h2>Phase 4 — Deploy the API to Cloud Run ✅ DONE</h2>
+<ul>
+<li><input checked="" disabled="" type="checkbox"> 🤖 Runbook with exact commands added (<a href="./DEPLOYMENT-COMMANDS.md"><code>DEPLOYMENT-COMMANDS.md</code></a> §4)</li>
+<li><input checked="" disabled="" type="checkbox"> 👤 Store secrets in Secret Manager (<code>DATABASE_URL</code>, <code>TELEGRAM_BOT_TOKEN</code>) + grant the runtime SA <code>secretmanager.secretAccessor</code></li>
+<li><input checked="" disabled="" type="checkbox"> 👤 Create Artifact Registry repo <code>fifa-draft</code> in <code>me-west1</code></li>
+<li><input checked="" disabled="" type="checkbox"> 👤 Build <strong>for linux/amd64</strong> and push, then deploy:<pre><code class="language-bash">IMAGE=&quot;me-west1-docker.pkg.dev/fifa-draft-app/fifa-draft/api&quot;
+docker build --platform linux/amd64 -f projects/server/Dockerfile -t &quot;$IMAGE:manual&quot; .
+docker push &quot;$IMAGE:manual&quot;
+gcloud run deploy fifa-draft-api \
+  --image &quot;$IMAGE:manual&quot; --region me-west1 --allow-unauthenticated \
+  --min-instances 0 --max-instances 1 \
+  --set-env-vars NODE_ENV=production \
+  --set-secrets DATABASE_URL=DATABASE_URL:latest,TELEGRAM_BOT_TOKEN=TELEGRAM_BOT_TOKEN:latest
+</code></pre>
+</li>
+<li><input checked="" disabled="" type="checkbox"> 👤 Cloud Run URL: <strong><a href="https://fifa-draft-api-h6qnm5aqqq-zf.a.run.app">https://fifa-draft-api-h6qnm5aqqq-zf.a.run.app</a></strong></li>
+<li><input checked="" disabled="" type="checkbox"> 👤 <code>GET /health</code> → <code>{&quot;status&quot;:&quot;ok&quot;}</code> ✅</li>
+<li><input checked="" disabled="" type="checkbox"> 👤 <code>GET /api/players/datasets</code> → dataset list ✅ (confirms <code>data/</code> shipped)</li>
+</ul>
+<hr>
+<h2>Phase 5 — Deploy the client to Firebase Hosting ✅ DONE</h2>
+<ul>
+<li><input checked="" disabled="" type="checkbox"> 🤖 Add <code>firebase.json</code> + <code>.firebaserc</code> (public dir = <code>projects/client/dist/fifa-draft-app/browser</code>, SPA rewrite → <code>index.html</code>, <code>hosting.site</code> = <code>galactico-draft-app</code>)</li>
+<li><input checked="" disabled="" type="checkbox"> 🤖 Relax Angular production budgets so <code>build:client</code> passes (initial bundle is ~2.8 MB)</li>
+<li><input checked="" disabled="" type="checkbox"> 👤 <code>.firebaserc</code> default project → <code>fifa-draft-app</code></li>
+<li><input checked="" disabled="" type="checkbox"> 👤 <code>environment.prod.ts</code> <code>apiUrl</code> → <code>https://fifa-draft-api-h6qnm5aqqq-zf.a.run.app</code></li>
+<li><input checked="" disabled="" type="checkbox"> 👤 Add Firebase to the GCP project (<code>firebase projects:addfirebase</code>) + create Hosting site (<code>galactico-draft-app</code>)</li>
+<li><input checked="" disabled="" type="checkbox"> 👤 Build the client: <code>npm run build:client</code></li>
+<li><input checked="" disabled="" type="checkbox"> 👤 Deploy: <code>firebase deploy --only hosting</code> → <strong><a href="https://galactico-draft-app.web.app">https://galactico-draft-app.web.app</a></strong></li>
+<li><input checked="" disabled="" type="checkbox"> 👤 Set Cloud Run <code>FRONTEND_URL</code> <strong>and</strong> <code>WEBAPP_URL</code> to the Hosting URL (CORS + Telegram links)</li>
+</ul>
+<hr>
+<h2>Phase 6 — Telegram wiring ✅ DONE</h2>
+<ul>
+<li><input checked="" disabled="" type="checkbox"> 👤 Register the bot webhook → <code>.../bot/webhook</code> (verified <code>getWebhookInfo</code>)</li>
+<li><input checked="" disabled="" type="checkbox"> 👤 Set the persistent <strong>Menu Button</strong> (<code>setChatMenuButton</code>, type <code>web_app</code>) to the Firebase URL</li>
+<li><input checked="" disabled="" type="checkbox"> 👤 <code>WEBAPP_URL</code> on Cloud Run points to <code>https://galactico-draft-app.web.app</code></li>
+</ul>
+<blockquote>
+<p>Note: the <code>/start</code> <strong>inline</strong> buttons only appear after pressing Start; the always-visible app button is the <strong>Menu Button</strong>, set separately via BotFather or <code>setChatMenuButton</code>.</p>
+</blockquote>
+<hr>
+<h2>Phase 6.5 — CI/CD (GitHub Actions) — one monorepo pipeline, independent deploys</h2>
+<p>A single workflow (<code>.github/workflows/deploy.yml</code>) with a <strong>change-detection job</strong> (<code>dorny/paths-filter</code>) that decides which parts deploy — so the <strong>client and server deploy independently</strong> and a change to one never redeploys the other.</p>
+<ul>
+<li><input checked="" disabled="" type="checkbox"> 🤖 <code>.github/workflows/deploy.yml</code> — jobs: <code>changes</code> → <code>deploy-server</code> (Cloud Run) + <code>deploy-client</code> (Firebase), each gated on the filter. Validated as well-formed YAML.</li>
+<li><input checked="" disabled="" type="checkbox"> 🤖 Change detection also honors <strong>manual <code>workflow_dispatch</code></strong> inputs (<code>deploy_server</code> / <code>deploy_client</code>) — something native <code>on.paths</code> can&#39;t do.</li>
+<li><input disabled="" type="checkbox"> 👤 Create an Artifact Registry Docker repo named <code>fifa-draft</code> in your region:
+<code>gcloud artifacts repositories create fifa-draft --repository-format=docker --location=&lt;REGION&gt;</code></li>
+<li><input disabled="" type="checkbox"> 👤 Set up <strong>Workload Identity Federation</strong> (recommended) for GitHub → GCP, and a deployer service account with roles: <code>run.admin</code>, <code>artifactregistry.writer</code>, <code>iam.serviceAccountUser</code>, <code>secretmanager.secretAccessor</code>.</li>
+<li><input disabled="" type="checkbox"> 👤 Add GitHub <strong>repository secrets</strong>: <code>GCP_WIF_PROVIDER</code>, <code>GCP_SERVICE_ACCOUNT</code>, <code>FIREBASE_SERVICE_ACCOUNT</code>.</li>
+<li><input disabled="" type="checkbox"> 👤 Add GitHub <strong>repository variables</strong>: <code>GCP_PROJECT_ID</code>, <code>GCP_REGION</code>, <code>FIREBASE_PROJECT_ID</code>, <code>WEBAPP_URL</code>, <code>FRONTEND_URL</code>.</li>
+<li><input disabled="" type="checkbox"> 👤 Create Secret Manager secrets <code>DATABASE_URL</code> and <code>TELEGRAM_BOT_TOKEN</code> (referenced by the Cloud Run deploy step).</li>
+<li><input disabled="" type="checkbox"> 👤 First run: trigger via <code>workflow_dispatch</code> (tick both inputs) to confirm, then rely on push-based change detection.</li>
+</ul>
+<blockquote>
+<p>Note: the workflow does the first deploy too, but the very first Cloud Run deploy can also be done manually (Phase 4) so you can capture the URL before the client build.</p>
+</blockquote>
+<hr>
+<h2>Phase 7 — End-to-end verification</h2>
+<ul>
+<li><input disabled="" type="checkbox"> 👤 Open the bot in Telegram → tap Create Draft → Mini App opens (instant load from CDN)</li>
+<li><input disabled="" type="checkbox"> 👤 Create a draft, confirm a <code>drafts</code> row + creator <code>draft_managers</code> row appear in Neon</li>
+<li><input disabled="" type="checkbox"> 👤 Join from a second Telegram account via the share code / deep link</li>
+<li><input disabled="" type="checkbox"> 👤 Start the draft; verify polling reflects state across both clients</li>
+<li><input disabled="" type="checkbox"> 👤 Make a pick; confirm turn advances (snake logic) and the other client updates within ~3s</li>
+<li><input disabled="" type="checkbox"> 👤 Go offline on the next manager&#39;s turn → confirm the Telegram &quot;your turn&quot; notification fires</li>
+<li><input disabled="" type="checkbox"> 👤 Complete a short draft (low <code>maxRounds</code>) → confirm status <code>complete</code> + summary view</li>
+</ul>
+<hr>
+<h2>Phase 8 — Hardening (optional / later)</h2>
+<ul>
+<li><input checked="" disabled="" type="checkbox"> 🤖 CI/CD pipelines created (see Phase 6.5) — GitHub Actions, client &amp; server deploy independently</li>
+<li><input disabled="" type="checkbox"> Move player datasets to CDN/static hosting to offload API egress</li>
+<li><input disabled="" type="checkbox"> Add structured logging + Cloud Run request metrics/alerts</li>
+<li><input disabled="" type="checkbox"> Rate-limit mutation endpoints (<code>/pick</code>, <code>/join</code>, <code>/create</code>)</li>
+<li><input disabled="" type="checkbox"> Make the pick handler atomic (DB transaction + row lock) if concurrency grows</li>
+<li><input disabled="" type="checkbox"> Revisit SSE/WebSockets only if you move off scale-to-zero (see <code>SSE-ARCHITECTURE.md</code>)</li>
+</ul>
+<hr>
+<h2>Environment variables reference</h2>
+<table>
+<thead>
+<tr>
+<th>Variable</th>
+<th>Where</th>
+<th>Example / Notes</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>DATABASE_URL</code></td>
+<td>Cloud Run (secret)</td>
+<td>Neon connection string (rotated)</td>
+</tr>
+<tr>
+<td><code>TELEGRAM_BOT_TOKEN</code></td>
+<td>Cloud Run (secret)</td>
+<td>From @BotFather (rotated)</td>
+</tr>
+<tr>
+<td><code>WEBAPP_URL</code></td>
+<td>Cloud Run</td>
+<td>Firebase Hosting URL — used in bot deep links &amp; notifications</td>
+</tr>
+<tr>
+<td><code>FRONTEND_URL</code></td>
+<td>Cloud Run</td>
+<td>Firebase Hosting URL — used for CORS</td>
+</tr>
+<tr>
+<td><code>NODE_ENV</code></td>
+<td>Cloud Run</td>
+<td><code>production</code> (disables dev-auth bypass)</td>
+</tr>
+<tr>
+<td><code>PORT</code></td>
+<td>Cloud Run</td>
+<td>Injected automatically (8080); code already respects it</td>
+</tr>
+<tr>
+<td><code>apiUrl</code></td>
+<td>client <code>environment.prod.ts</code></td>
+<td>Cloud Run API URL (baked into the static build)</td>
+</tr>
+</tbody></table>
+<hr>
+<h2>Known blockers being fixed</h2>
+<ol>
+<li><del><strong>Dockerfile is currently broken</strong></del> ✅ <strong>Fixed</strong> — rewritten monorepo-aware with esbuild bundling; validated with a local <code>docker build</code> + container run.</li>
+<li><del><strong><code>data/</code> not copied</strong> into the image</del> ✅ <strong>Fixed</strong> — <code>data/</code> is copied; verified <code>/api/players/datasets</code> returns data from the running container.</li>
+<li><del><strong>Client hosting undecided</strong></del> ✅ <strong>Resolved</strong> — Firebase Hosting; <code>firebase.json</code>/<code>.firebaserc</code> + CI added.</li>
+<li><del><strong>Secrets were in plaintext</strong> in <code>.env.local</code></del> ✅ <strong>Resolved</strong> — production reads <code>DATABASE_URL</code> + <code>TELEGRAM_BOT_TOKEN</code> from Secret Manager; a fresh Telegram bot was created for this deploy. <code>.env.local</code> remains local-only and gitignored.</li>
+</ol>
+<hr>
+<h2>Still open (post–first-deploy)</h2>
+<ul>
+<li><input disabled="" type="checkbox"> 👤 <strong>CI/CD activation</strong> (Phase 6.5): set up Workload Identity Federation + deployer SAs and add the GitHub secrets/vars so pushes auto-deploy. Until then, deploys are manual (runbook §4–5).</li>
+<li><input disabled="" type="checkbox"> 👤 <strong>End-to-end verification</strong> (Phase 7): run a full two-player draft through Telegram.</li>
+</ul>
+
+  </div>
+</body>
+</html>
