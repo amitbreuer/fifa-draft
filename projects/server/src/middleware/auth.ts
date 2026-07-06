@@ -20,6 +20,10 @@ export function validateInitData(initData: string): { telegramId: number; userna
     if (!hash) return null;
 
     params.delete('hash');
+    // Telegram Mini App initData includes a `signature` field (Ed25519, used for
+    // third-party validation). It must be excluded from the HMAC data-check-string,
+    // otherwise validation fails for all real clients.
+    params.delete('signature');
     const dataCheckString = Array.from(params.entries())
       .sort(([a], [b]) => a.localeCompare(b))
       .map(([key, val]) => `${key}=${val}`)
