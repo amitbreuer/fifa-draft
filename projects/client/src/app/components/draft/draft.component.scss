@@ -261,7 +261,7 @@
 
           .p-datatable-wrapper {
             flex: 1;
-            overflow: auto;
+            overflow: visible;
           }
         }
       }
@@ -409,11 +409,6 @@
     .content-row {
       gap: 0.5rem;
       height: auto;
-
-      .players-section {
-        max-height: calc(var(--tg-viewport-stable-height, 100vh) * 0.8);
-        overflow: hidden;
-      }
 
       .team-section {
         margin-top: 0.5rem;

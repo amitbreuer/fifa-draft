@@ -25,6 +25,7 @@ Track progress by ticking the boxes. See [`APP-OVERVIEW.md`](./APP-OVERVIEW.md) 
 2. **`db:push` needs `DATABASE_URL` exported** — `drizzle.config.ts` reads `process.env` but does **not** load `.env.local`. Export it into the shell first.
 3. **Container failed to start with NO logs** — the image was built on Apple Silicon (arm64); Cloud Run only runs **linux/amd64**. Fix: `docker build --platform linux/amd64 …` (now documented in the runbook). CI runners are amd64, so this only affects local manual builds.
 4. **Firebase Hosting "no site name or target name"** — a fresh Firebase project has no Hosting site. Fix: enable `firebasehosting.googleapis.com`, then `firebase hosting:sites:create`. The chosen site id (`galactico-draft-app`) is pinned in `firebase.json` (`hosting.site`).
+5. **Prod client called `http://localhost:3000` instead of the Cloud Run API** — the `production` build config in `projects/client/angular.json` was missing `fileReplacements`, so prod builds shipped the dev `environment.ts` and never swapped in `environment.prod.ts`. Symptom: API requests never reached Cloud Run (no server logs), and the UI showed a generic "Failed to create draft" toast. Fix: add a `fileReplacements` entry to the `production` configuration mapping `src/environments/environment.ts` → `src/environments/environment.prod.ts`.
 
 ---
 
@@ -188,7 +189,7 @@ A single workflow (`.github/workflows/deploy.yml`) with a **change-detection job
 | `FRONTEND_URL` | Cloud Run | Firebase Hosting URL — used for CORS |
 | `NODE_ENV` | Cloud Run | `production` (disables dev-auth bypass) |
 | `PORT` | Cloud Run | Injected automatically (8080); code already respects it |
-| `apiUrl` | client `environment.prod.ts` | Cloud Run API URL (baked into the static build) |
+| `apiUrl` | client `environment.prod.ts` | Cloud Run API URL (baked into the static build via `angular.json` `fileReplacements` on the `production` config) |
 
 ---
 

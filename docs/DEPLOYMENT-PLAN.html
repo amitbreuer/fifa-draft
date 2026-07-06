@@ -289,6 +289,7 @@
 <li><strong><code>db:push</code> needs <code>DATABASE_URL</code> exported</strong> — <code>drizzle.config.ts</code> reads <code>process.env</code> but does <strong>not</strong> load <code>.env.local</code>. Export it into the shell first.</li>
 <li><strong>Container failed to start with NO logs</strong> — the image was built on Apple Silicon (arm64); Cloud Run only runs <strong>linux/amd64</strong>. Fix: <code>docker build --platform linux/amd64 …</code> (now documented in the runbook). CI runners are amd64, so this only affects local manual builds.</li>
 <li><strong>Firebase Hosting &quot;no site name or target name&quot;</strong> — a fresh Firebase project has no Hosting site. Fix: enable <code>firebasehosting.googleapis.com</code>, then <code>firebase hosting:sites:create</code>. The chosen site id (<code>galactico-draft-app</code>) is pinned in <code>firebase.json</code> (<code>hosting.site</code>).</li>
+<li><strong>Prod client called <code>http://localhost:3000</code> instead of the Cloud Run API</strong> — the <code>production</code> build config in <code>projects/client/angular.json</code> was missing <code>fileReplacements</code>, so prod builds shipped the dev <code>environment.ts</code> and never swapped in <code>environment.prod.ts</code>. Symptom: API requests never reached Cloud Run (no server logs), and the UI showed a generic &quot;Failed to create draft&quot; toast. Fix: add a <code>fileReplacements</code> entry to the <code>production</code> configuration mapping <code>src/environments/environment.ts</code> → <code>src/environments/environment.prod.ts</code>.</li>
 </ol>
 <hr>
 <h2>Why this architecture</h2>
@@ -492,7 +493,7 @@ gcloud run deploy fifa-draft-api \
 <tr>
 <td><code>apiUrl</code></td>
 <td>client <code>environment.prod.ts</code></td>
-<td>Cloud Run API URL (baked into the static build)</td>
+<td>Cloud Run API URL (baked into the static build via <code>angular.json</code> <code>fileReplacements</code> on the <code>production</code> config)</td>
 </tr>
 </tbody></table>
 <hr>
