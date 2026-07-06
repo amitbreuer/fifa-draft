@@ -47,7 +47,7 @@
       }
 
       > td {
-        padding: 0.35rem 0.4rem;
+        padding: 0.6rem 0.4rem;
         white-space: nowrap;
         width: auto;
         border-color: #334155;
@@ -71,7 +71,7 @@
     .p-datatable-tbody > tr > td:first-child {
       width: 2.2rem;
       text-align: center;
-      padding: 0.25rem 0.2rem;
+      padding: 0.6rem 0.2rem;
     }
 
     // All columns except checkbox should be compact
@@ -692,8 +692,8 @@
 }
 
 .player-shield-large {
-  width: 160px;
-  height: 160px;
+  width: 220px;
+  height: 220px;
   border-radius: 50%;
   object-fit: cover;
   border: 3px solid #404040;
@@ -800,8 +800,8 @@
   }
 
   .player-shield-large {
-    width: 110px;
-    height: 110px;
+    width: 150px;
+    height: 150px;
   }
 
   .info-item {
@@ -1017,9 +1017,9 @@
     }
   }
 
-  .player-shield-large {
-    width: 60px;
-    height: 60px;
+  .comparison-player-header .player-shield-large {
+    width: 100px;
+    height: 100px;
   }
 
   .player-details-info {

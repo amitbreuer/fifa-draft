@@ -71,6 +71,9 @@
       @if (managerNames.length < 10) {
         <button class="btn-add" (click)="addManager()">+ Add Manager</button>
       }
+      <button class="btn-lottery" [disabled]="managerNames.length < 2" (click)="randomizeOrder()">
+        🎲 Randomize Pick Order
+      </button>
     </div>
 
     <button class="btn btn-primary btn-start" [disabled]="!canStartDraft()" (click)="startDraft()">
@@ -78,3 +81,30 @@
     </button>
   </div>
 </div>
+
+@if (lotteryPhase !== 'idle') {
+  <div class="lottery-overlay">
+    <div class="lottery-card">
+      @if (lotteryPhase === 'countdown') {
+        <p class="lottery-title">🎰 Draft Lottery</p>
+        <p class="lottery-sub">Drawing the pick order…</p>
+        <div class="lottery-count">{{ countdown }}</div>
+      } @else if (lotteryPhase === 'shuffling') {
+        <p class="lottery-title">🎲 Shuffling…</p>
+        <ul class="lottery-list shuffling">
+          @for (name of lotteryNames; track $index) {
+            <li>{{ name }}</li>
+          }
+        </ul>
+      } @else {
+        <p class="lottery-title">🏆 Pick Order</p>
+        <ul class="lottery-list">
+          @for (name of lotteryNames; track $index; let i = $index) {
+            <li><span class="pick-num">{{ i + 1 }}</span>{{ name }}</li>
+          }
+        </ul>
+        <button class="btn btn-primary btn-sm" (click)="closeLottery()">Looks good</button>
+      }
+    </div>
+  </div>
+}

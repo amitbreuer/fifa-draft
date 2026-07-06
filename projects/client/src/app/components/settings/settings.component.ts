@@ -24,6 +24,12 @@ export class SettingsComponent implements OnInit {
   maxRounds = 18;
   Math = Math;
 
+  // Pick-order lottery state
+  lotteryPhase: 'idle' | 'countdown' | 'shuffling' | 'reveal' = 'idle';
+  countdown = 3;
+  lotteryNames: string[] = [];
+  private lotteryTimers: any[] = [];
+
   // Dataset selection
   datasets: Dataset[] = [];
   selectedDatasetId = 'fc-2026';
@@ -64,6 +70,84 @@ export class SettingsComponent implements OnInit {
     if (this.managerNames.length > 2) {
       this.managerNames.splice(index, 1);
     }
+  }
+
+  /** Human-friendly name for a manager slot, falling back to a placeholder. */
+  displayName(name: string, index: number): string {
+    return (name || '').trim() || `Manager ${index + 1}`;
+  }
+
+  /**
+   * Run a "draft lottery": show a countdown, a shuffle animation, then reveal
+   * the randomized pick order and apply it to the manager list.
+   */
+  randomizeOrder(): void {
+    if (this.lotteryPhase !== 'idle' || this.managerNames.length < 2) return;
+
+    // Snapshot display names so the reveal always shows something readable.
+    const names = this.managerNames.map((n, i) => this.displayName(n, i));
+
+    this.lotteryPhase = 'countdown';
+    this.countdown = 3;
+    this.lotteryNames = [...names];
+
+    const tick = (n: number) => {
+      this.countdown = n;
+      if (n > 0) {
+        this.lotteryTimers.push(setTimeout(() => tick(n - 1), 1000));
+      } else {
+        this.startShuffleAnimation(names);
+      }
+    };
+    this.lotteryTimers.push(setTimeout(() => tick(2), 1000));
+  }
+
+  private startShuffleAnimation(names: string[]): void {
+    this.lotteryPhase = 'shuffling';
+
+    let ticks = 0;
+    const spin = () => {
+      this.lotteryNames = this.shuffle(names);
+      ticks++;
+      if (ticks < 12) {
+        this.lotteryTimers.push(setTimeout(spin, 90 + ticks * 12));
+      } else {
+        // Final order — shuffle the actual manager inputs to match.
+        const finalOrder = this.shuffleWithNames(this.managerNames);
+        this.managerNames = finalOrder.names;
+        this.lotteryNames = finalOrder.display;
+        this.lotteryPhase = 'reveal';
+      }
+    };
+    spin();
+  }
+
+  closeLottery(): void {
+    this.lotteryTimers.forEach(t => clearTimeout(t));
+    this.lotteryTimers = [];
+    this.lotteryPhase = 'idle';
+  }
+
+  private shuffle(arr: string[]): string[] {
+    const a = [...arr];
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+
+  /** Shuffle raw names while producing matching display labels for the reveal. */
+  private shuffleWithNames(names: string[]): { names: string[]; display: string[] } {
+    const indexed = names.map((n, i) => ({ n, i }));
+    for (let i = indexed.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [indexed[i], indexed[j]] = [indexed[j], indexed[i]];
+    }
+    return {
+      names: indexed.map(x => x.n),
+      display: indexed.map((x, pos) => this.displayName(x.n, x.i)),
+    };
   }
 
   canStartDraft(): boolean {

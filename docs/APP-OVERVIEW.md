@@ -93,6 +93,7 @@ The repo is a **monorepo** with three packages:
 
 ### Draft Mechanics
 - **Snake draft** — pick order reverses each round (R1: 1→2→3, R2: 3→2→1) for fairness.
+- **Pick order lottery** — local drafts can randomize the initial pick order via a client-side lottery (countdown + shuffle animation) that reorders the manager list before starting.
 - **Multi-manager rooms** — up to 10 managers per draft.
 - **Configurable rounds** — default 18 rounds (11 starters + 7 bench).
 - **Turn enforcement** — only the current manager can submit a pick; the server validates it.

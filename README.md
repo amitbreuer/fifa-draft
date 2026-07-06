@@ -5,6 +5,7 @@ A web-based FIFA Ultimate Team draft simulator that allows multiple managers to 
 ## Features
 
 - 🎮 **Snake Draft System** - Fair drafting with alternating pick order
+- 🎲 **Pick Order Lottery** - Randomize the draft order with a countdown & shuffle animation
 - 👥 **Multi-Manager Support** - Draft with 2-8 managers
 - ⚽ **Formation Builder** - Choose from 30+ real FIFA formations
 - 🔄 **Drag & Drop** - Easy player positioning with intuitive drag-and-drop
@@ -40,7 +41,12 @@ A web-based FIFA Ultimate Team draft simulator that allows multiple managers to 
    - Give your draft a unique name (e.g., "Friends League 2024")
    - This allows you to save and resume drafts later
 
-3. **Start the Draft**
+3. **Randomize Pick Order** (optional)
+   - Click "🎲 Randomize Pick Order" to run a draft lottery
+   - A countdown and shuffle animation reveal a randomized pick order
+   - The manager list is reordered to match the result
+
+4. **Start the Draft**
    - Click "Start Draft" to begin
    - The draft uses a snake system: round 1 goes 1→2→3, round 2 goes 3→2→1, etc.
 

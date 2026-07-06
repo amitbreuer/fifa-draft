@@ -228,6 +228,134 @@
   margin-top: 0.5rem;
 }
 
+// ============ LOTTERY ============
+.btn-lottery {
+  margin-top: 0.75rem;
+  width: 100%;
+  padding: 0.6rem 1rem;
+  border-radius: 10px;
+  border: 1px solid rgba(139, 92, 246, 0.4);
+  background: rgba(139, 92, 246, 0.08);
+  color: #c4b5fd;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+
+  &:hover:not(:disabled) {
+    background: rgba(139, 92, 246, 0.18);
+    border-color: #8b5cf6;
+  }
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+}
+
+.lottery-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  background: rgba(2, 6, 23, 0.75);
+  backdrop-filter: blur(4px);
+  animation: fade-in 0.2s ease;
+}
+
+.lottery-card {
+  width: 100%;
+  max-width: 320px;
+  padding: 1.75rem 1.5rem;
+  border-radius: 18px;
+  text-align: center;
+  background: var(--tg-theme-secondary-bg-color, #1e293b);
+  border: 1px solid rgba(139, 92, 246, 0.3);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+}
+
+.lottery-title {
+  font-size: 1.25rem;
+  font-weight: 800;
+  margin: 0 0 0.25rem;
+  background: linear-gradient(135deg, #3b82f6, #8b5cf6, #ec4899);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.lottery-sub {
+  font-size: 0.85rem;
+  opacity: 0.6;
+  margin: 0 0 1rem;
+}
+
+.lottery-count {
+  font-size: 5rem;
+  font-weight: 800;
+  line-height: 1;
+  color: #8b5cf6;
+  animation: pop 1s ease infinite;
+}
+
+.lottery-list {
+  list-style: none;
+  padding: 0;
+  margin: 0.5rem 0 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+
+  li {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.6rem 0.9rem;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.05);
+    font-weight: 600;
+    font-size: 0.95rem;
+    animation: slide-in 0.3s ease both;
+  }
+
+  &.shuffling li {
+    opacity: 0.7;
+    animation: none;
+  }
+
+  .pick-num {
+    width: 1.5rem;
+    height: 1.5rem;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+    color: #fff;
+    font-size: 0.75rem;
+    font-weight: 700;
+  }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes pop {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.15); }
+}
+
+@keyframes slide-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
 // PrimeNG overrides
 ::ng-deep .p-select {
   width: 100%;

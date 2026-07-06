@@ -86,7 +86,20 @@ export class TelegramService {
       this.webApp.ready();
       this.webApp.expand();
       this.webApp.disableVerticalSwipes();
+      this.syncViewportHeight();
+      this.webApp.onEvent('viewportChanged', () => this.syncViewportHeight());
       this.readySubject.next(true);
+    }
+  }
+
+  private syncViewportHeight(): void {
+    if (!this.webApp) return;
+    const stable = this.webApp.viewportStableHeight;
+    if (stable && stable > 0) {
+      document.documentElement.style.setProperty(
+        '--tg-viewport-stable-height',
+        `${stable}px`
+      );
     }
   }
 
