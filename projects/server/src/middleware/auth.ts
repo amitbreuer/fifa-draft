@@ -11,12 +11,14 @@ export interface AuthenticatedRequest extends Request {
 
 /** Validate Telegram Mini App initData and extract user info */
 export function validateInitData(initData: string): { telegramId: number; username?: string; firstName?: string } | null {
+  const debug = process.env.AUTH_DEBUG === '1';
   try {
     const botToken = process.env.TELEGRAM_BOT_TOKEN || '';
-    if (!botToken) return null;
+    if (!botToken) { if (debug) console.warn('[AUTH_DEBUG] no bot token set'); return null; }
 
     const params = new URLSearchParams(initData);
     const hash = params.get('hash');
+    if (debug) console.warn('[AUTH_DEBUG] keys=', Array.from(params.keys()).sort().join(','), 'hashPresent=', !!hash, 'initDataLen=', initData.length);
     if (!hash) return null;
 
     params.delete('hash');
@@ -32,7 +34,10 @@ export function validateInitData(initData: string): { telegramId: number; userna
     const secretKey = crypto.createHmac('sha256', 'WebAppData').update(botToken).digest();
     const expectedHash = crypto.createHmac('sha256', secretKey).update(dataCheckString).digest('hex');
 
-    if (hash !== expectedHash) return null;
+    if (hash !== expectedHash) {
+      if (debug) console.warn('[AUTH_DEBUG] hash mismatch. received=', hash, 'expected=', expectedHash, 'rawInitData=', initData);
+      return null;
+    }
 
     const userStr = params.get('user');
     if (!userStr) return null;
@@ -43,15 +48,23 @@ export function validateInitData(initData: string): { telegramId: number; userna
       username: user.username,
       firstName: user.first_name,
     };
-  } catch {
+  } catch (e) {
+    if (debug) console.warn('[AUTH_DEBUG] exception', e);
     return null;
   }
 }
 
 /** Auth middleware — validates Telegram initData */
 export function authMiddleware(req: AuthenticatedRequest, res: Response, next: NextFunction): void {
+  const debug = process.env.AUTH_DEBUG === '1';
   // Validate initData from header
   const initData = req.headers['x-telegram-init-data'] as string;
+  if (debug) {
+    console.warn('[AUTH_DEBUG] path=', req.method, req.originalUrl,
+      'hasInitDataHeader=', !!initData,
+      'initDataHeaderLen=', initData ? initData.length : 0,
+      'hasDevHeader=', !!req.headers['x-dev-telegram-id']);
+  }
   if (initData) {
     const user = validateInitData(initData);
     if (user) {
