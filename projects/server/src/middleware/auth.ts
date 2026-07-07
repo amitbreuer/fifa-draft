@@ -63,7 +63,8 @@ export function authMiddleware(req: AuthenticatedRequest, res: Response, next: N
     console.warn('[AUTH_DEBUG] path=', req.method, req.originalUrl,
       'hasInitDataHeader=', !!initData,
       'initDataHeaderLen=', initData ? initData.length : 0,
-      'hasDevHeader=', !!req.headers['x-dev-telegram-id']);
+      'hasDevHeader=', !!req.headers['x-dev-telegram-id'],
+      'rawInitData=', JSON.stringify(initData));
   }
   if (initData) {
     const user = validateInitData(initData);
