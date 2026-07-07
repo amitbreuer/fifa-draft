@@ -202,7 +202,7 @@ There are no passwords. Auth is based on Telegram's signed `initData`.
    (In dev, it instead sends X-Dev-Telegram-Id: 12345.)
 
 3. Server authMiddleware validates it:
-      - Rebuilds the data-check-string from the params (sorted, minus hash and signature)
+      - Rebuilds the data-check-string from the params (sorted, minus hash only — the signature field IS included in the HMAC)
       - secretKey = HMAC_SHA256("WebAppData", BOT_TOKEN)
       - expectedHash = HMAC_SHA256(secretKey, dataCheckString)
       - If expectedHash === hash → trust the embedded user object
