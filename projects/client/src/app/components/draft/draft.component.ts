@@ -223,15 +223,10 @@ export class DraftComponent implements OnInit, OnDestroy {
     };
   }
 
-  /** Update Telegram MainButton based on turn state */
+  /** Ensure the Telegram MainButton is never shown — the floating FAB handles finishing a turn */
   private updateMainButton(): void {
     if (!this.telegram.isInTelegram) return;
-
-    if (this.isMyTurn && this.hasPlacedPlayerThisTurn) {
-      this.telegram.showMainButton('✅ Finish Turn', () => this.finishTurn());
-    } else {
-      this.telegram.hideMainButton();
-    }
+    this.telegram.hideMainButton();
   }
 
   getCurrentManagerName(): string {

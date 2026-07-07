@@ -34,12 +34,17 @@ export async function notifyNextManager(
 
     if (!bot) return; // Bot not configured
 
-    // Get user's chat_id
+    // Get user's chat_id. For Telegram private chats the chat_id equals the
+    // user's telegramId, so fall back to that when we haven't captured a chat_id
+    // via /start (users who launch the app straight from the menu button never
+    // trigger the /start handler that stores telegramChatId).
     const [user] = await db.select().from(users).where(eq(users.id, manager.userId));
-    if (!user?.telegramChatId) return;
+    if (!user) return;
+    const chatId = user.telegramChatId ?? user.telegramId;
+    if (!chatId) return;
 
     await bot.api.sendMessage(
-      user.telegramChatId,
+      chatId,
       `🎮 It's your turn in **${draft.name}**! Round ${round}.`,
       {
         parse_mode: 'Markdown',
