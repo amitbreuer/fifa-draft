@@ -5,7 +5,7 @@ import { Router } from '@angular/router';
 import { DraftService } from '../../services/draft.service';
 import { PlayerService } from '../../services/player.service';
 import { Select } from 'primeng/select';
-import { Dataset } from '../../types';
+import { Dataset, DATASETS, DEFAULT_DATASET_ID } from '../../types';
 
 @Component({
   selector: 'app-settings',
@@ -31,8 +31,8 @@ export class SettingsComponent implements OnInit {
   private lotteryTimers: any[] = [];
 
   // Dataset selection
-  datasets: Dataset[] = [];
-  selectedDatasetId = 'fc-2026';
+  datasets: Dataset[] = DATASETS;
+  selectedDatasetId = DEFAULT_DATASET_ID;
 
   // Saved drafts
   savedDrafts: string[] = [];
@@ -51,11 +51,11 @@ export class SettingsComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    // Load datasets from server, fall back to default
+    // Load datasets from server, fall back to the bundled defaults
     this.playerService.loadDatasets().subscribe({
       next: (datasets) => this.datasets = datasets,
       error: () => {
-        this.datasets = [{ id: 'fc-2026', label: 'EA FC 25/26', file: 'fc-2026.json', default: true }];
+        this.datasets = DATASETS;
       }
     });
   }

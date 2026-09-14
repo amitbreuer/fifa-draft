@@ -4,6 +4,7 @@ import { db } from '../db/index.js';
 import { drafts, draftManagers, picks, users } from '../db/schema.js';
 import { authMiddleware, AuthenticatedRequest } from '../middleware/auth.js';
 import { notifyNextManager } from '../services/notifications.js';
+import { getDefaultDatasetId } from '../services/datasets.js';
 
 export const draftRouter = Router();
 
@@ -125,7 +126,7 @@ draftRouter.delete('/:code', async (req: AuthenticatedRequest, res: Response) =>
 // Create a new draft
 draftRouter.post('/', async (req: AuthenticatedRequest, res: Response) => {
   try {
-    const { name, maxRounds = 18, datasetId = 'fc-2026' } = req.body;
+    const { name, maxRounds = 18, datasetId } = req.body;
     const telegramId = req.user!.telegramId;
 
     // Find or create user
@@ -145,7 +146,7 @@ draftRouter.post('/', async (req: AuthenticatedRequest, res: Response) => {
       creatorId: user.id,
       maxManagers: 10,
       maxRounds,
-      datasetId,
+      datasetId: datasetId || (await getDefaultDatasetId()),
     }).returning();
 
     // Creator auto-joins as first manager

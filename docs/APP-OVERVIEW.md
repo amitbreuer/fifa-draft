@@ -101,7 +101,7 @@ The repo is a **monorepo** with three packages:
 
 ### Player Database
 - Full EA FC player pool with ratings, stats, positions, clubs, nationalities.
-- Multiple datasets supported (e.g. `fc-2026`), listed via `/api/players/datasets`.
+- Multiple datasets supported (`fc-2027` by default, plus `fc-2026`), listed via `/api/players/datasets`. The default dataset is whichever entry is flagged `"default": true` in `projects/server/data/datasets.json`.
 - Player details dialog and side-by-side comparison.
 - Filtering by position, club, nationality, and drafted status.
 
@@ -152,6 +152,8 @@ The core of the app. Every route runs `authMiddleware` first. Key endpoints:
 
 ### 2. `/api/players` — `playerRouter` (public)
 Serves player datasets from JSON files in `projects/server/data/`. Files are read once and cached in an in-memory `Map`, so subsequent requests are served from memory. This data is static and read-heavy.
+
+Datasets are refreshed with `node scripts/fetch-fc-2027.mjs`, which scrapes the EA ratings page and writes both `projects/server/data/fc-2027.json` and the client's bundled copy at `projects/client/src/assets/data/2027.json`.
 
 ### 3. `/bot/webhook` — `botRouter` (grammy)
 Handles Telegram bot updates. The `/start` command shows Create/Join buttons that open the Mini App, supports deep links (`/start CODE` → join prompt), and stores the user's `chatId` so the server can send "it's your turn" notifications later.
