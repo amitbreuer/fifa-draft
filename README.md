@@ -158,7 +158,7 @@ Two player pools ship with the app:
 | `fc-2027` | EA FC 27 *(default)* |
 | `fc-2026` | EA FC 26 |
 
-Each pool lives in a JSON file under `projects/server/data/` and is served by the API (`GET /api/players/:datasetId`). The client also bundles a copy under `projects/client/src/assets/data/` so drafts still work if the API is unreachable.
+Each pool lives in a JSON file under `projects/server/data/` — the single source of truth. The API serves them (`GET /api/players/:datasetId`), and the client bundles the default pool directly from that same directory via the `@fifa-draft/data/*` path alias, so a draft still works if the API is unreachable.
 
 To refresh the FC 27 pool from EA:
 

@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable, tap } from 'rxjs';
 import { Player, PositionFilter, Dataset, DATASETS, DEFAULT_DATASET_ID } from '../types';
 import { environment } from '../../environments/environment';
-import playersData from '../../assets/data/2027.json';
+import playersData from '@fifa-draft/data/fc-2027.json';
 
 @Injectable({
   providedIn: 'root'

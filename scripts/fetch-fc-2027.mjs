@@ -1,6 +1,9 @@
 #!/usr/bin/env node
 /**
- * Fetches EA SPORTS FC 27 player ratings and writes them to the draft data files.
+ * Fetches EA SPORTS FC 27 player ratings and writes them to projects/server/data/.
+ *
+ * That file is the single source of truth: the API serves it at runtime, and the
+ * client bundles it directly via the @fifa-draft/data/* path alias.
  *
  * The public drop-api still serves the previous (FC 25/26) ratings iteration, so this
  * script reads the ratings page instead: page 1 comes from the __NEXT_DATA__ blob
@@ -25,10 +28,7 @@ const ORDER_BY = 'ovr:desc';
 const USER_AGENT =
   'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36';
 
-const OUTPUT_TARGETS = [
-  join(repoRoot, 'projects/server/data/fc-2027.json'),
-  join(repoRoot, 'projects/client/src/assets/data/2027.json'),
-];
+const DEFAULT_OUTPUT = join(repoRoot, 'projects/server/data/fc-2027.json');
 
 function parseArgs(argv) {
   const args = { limit: 500, gender: 0, out: null };
@@ -154,13 +154,11 @@ async function main() {
 
   const players = [...byId.values()].sort((a, b) => b.overallRating - a.overallRating);
   const json = `${JSON.stringify(players, null, 2)}\n`;
-  const targets = out ? [resolve(process.cwd(), out)] : OUTPUT_TARGETS;
+  const file = out ? resolve(process.cwd(), out) : DEFAULT_OUTPUT;
 
-  for (const file of targets) {
-    await mkdir(dirname(file), { recursive: true });
-    await writeFile(file, json, 'utf-8');
-    console.log(`Wrote ${players.length} players to ${file}`);
-  }
+  await mkdir(dirname(file), { recursive: true });
+  await writeFile(file, json, 'utf-8');
+  console.log(`Wrote ${players.length} players to ${file}`);
 }
 
 main().catch((err) => {
