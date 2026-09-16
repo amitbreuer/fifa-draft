@@ -151,7 +151,7 @@ The core of the app. Every route runs `authMiddleware` first. Key endpoints:
 6. If the next manager is offline, fires a Telegram notification.
 
 ### 2. `/api/players` — `playerRouter` (public)
-Serves player datasets from JSON files in `projects/server/data/`. Files are read once and cached in an in-memory `Map`, so subsequent requests are served from memory. This data is static and read-heavy.
+Serves player datasets from JSON files in `projects/server/data/`, via `services/datasets.ts`. That service is the single source of truth for which datasets exist and which one is the default — it reads `datasets.json` and caches both the dataset list and each parsed player file in memory, so subsequent requests never touch disk. This data is static and read-heavy.
 
 Datasets are refreshed with `node scripts/fetch-fc-2027.mjs`, which scrapes the EA ratings page and writes both `projects/server/data/fc-2027.json` and the client's bundled copy at `projects/client/src/assets/data/2027.json`.
 
