@@ -10,7 +10,7 @@ A web-based FIFA Ultimate Team draft simulator that allows multiple managers to 
 - ⚽ **Formation Builder** - Choose from 30+ real FIFA formations
 - 🔄 **Drag & Drop** - Easy player positioning with intuitive drag-and-drop
 - 📊 **Player Comparison** - Compare two players side-by-side by their stats
-- 🗂️ **Selectable Player Pools** - Draft from EA FC 27 (default) or EA FC 25/26 ratings
+- 🗂️ **Selectable Player Pools** - Draft from EA FC 27 (default) or EA FC 26 ratings
 - 💾 **Auto-Save** - Your draft is automatically saved to browser storage
 - 📱 **Responsive Design** - Works on desktop, tablet, and mobile devices
 
@@ -43,7 +43,7 @@ A web-based FIFA Ultimate Team draft simulator that allows multiple managers to 
    - This allows you to save and resume drafts later
 
 3. **Choose the Player Pool**
-   - Pick the ratings dataset to draft from: **EA FC 27** (default) or **EA FC 25/26**
+   - Pick the ratings dataset to draft from: **EA FC 27** (default) or **EA FC 26**
    - This is locked in when the draft starts, so pick it before you begin
 
 4. **Randomize Pick Order** (optional)
@@ -156,7 +156,7 @@ Two player pools ship with the app:
 | Dataset | Label in the UI |
 |---------|-----------------|
 | `fc-2027` | EA FC 27 *(default)* |
-| `fc-2026` | EA FC 25/26 |
+| `fc-2026` | EA FC 26 |
 
 Each pool lives in a JSON file under `projects/server/data/` and is served by the API (`GET /api/players/:datasetId`). The client also bundles a copy under `projects/client/src/assets/data/` so drafts still work if the API is unreachable.
 
