@@ -9,6 +9,8 @@ export {
   type MainStats,
   type Dataset,
   AVAILABLE_POSITIONS,
+  DATASETS,
+  DEFAULT_DATASET_ID,
   FORMATIONS,
   POSITION_COORDINATES,
   mainStatsMap,

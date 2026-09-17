@@ -3,6 +3,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { TelegramService } from './telegram.service';
 import { environment } from '../../environments/environment';
+import { DEFAULT_DATASET_ID } from '../types';
 
 export interface DraftResponse {
   id: string;
@@ -92,7 +93,7 @@ export class DraftApiService {
     return headers;
   }
 
-  createDraft(name: string, maxRounds: number, datasetId: string = 'fc-2026'): Observable<DraftResponse> {
+  createDraft(name: string, maxRounds: number, datasetId: string = DEFAULT_DATASET_ID): Observable<DraftResponse> {
     return this.http.post<DraftResponse>(
       `${this.baseUrl}/api/drafts`,
       { name, maxRounds, datasetId },

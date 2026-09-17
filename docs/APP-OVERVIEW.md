@@ -101,7 +101,7 @@ The repo is a **monorepo** with three packages:
 
 ### Player Database
 - Full EA FC player pool with ratings, stats, positions, clubs, nationalities.
-- Multiple datasets supported (e.g. `fc-2026`), listed via `/api/players/datasets`.
+- Multiple datasets supported (`fc-2027` by default, plus `fc-2026`), listed via `/api/players/datasets`. The default dataset is whichever entry is flagged `"default": true` in `projects/server/data/datasets.json`.
 - Player details dialog and side-by-side comparison.
 - Filtering by position, club, nationality, and drafted status.
 
@@ -151,7 +151,11 @@ The core of the app. Every route runs `authMiddleware` first. Key endpoints:
 6. If the next manager is offline, fires a Telegram notification.
 
 ### 2. `/api/players` — `playerRouter` (public)
-Serves player datasets from JSON files in `projects/server/data/`. Files are read once and cached in an in-memory `Map`, so subsequent requests are served from memory. This data is static and read-heavy.
+Serves player datasets from JSON files in `projects/server/data/`, via `services/datasets.ts`. That service is the single source of truth for which datasets exist and which one is the default — it reads `datasets.json` and caches both the dataset list and each parsed player file in memory, so subsequent requests never touch disk. This data is static and read-heavy.
+
+Datasets are refreshed with `node scripts/fetch-fc-2027.mjs`, which scrapes the EA ratings page and writes `projects/server/data/fc-2027.json`.
+
+`projects/server/data/` is the single source of truth for player data. The client does **not** keep its own copy — `PlayerService` imports the default pool straight from that directory via the `@fifa-draft/data/*` path alias in `projects/client/tsconfig.json`, so the bundler inlines it at build time. That gives the client an instant player pool on first paint (important since the API is a scale-to-zero Cloud Run service on a different origin) without the file being duplicated in the repo.
 
 ### 3. `/bot/webhook` — `botRouter` (grammy)
 Handles Telegram bot updates. The `/start` command shows Create/Join buttons that open the Mini App, supports deep links (`/start CODE` → join prompt), and stores the user's `chatId` so the server can send "it's your turn" notifications later.

@@ -7,7 +7,7 @@ import { DraftApiService, DraftState, MyDraft } from '../../services/draft-api.s
 import { DraftService, SavedDraftDetails } from '../../services/draft.service';
 import { TelegramService } from '../../services/telegram.service';
 import { PlayerService } from '../../services/player.service';
-import { Dataset } from '../../types';
+import { Dataset, DATASETS, DEFAULT_DATASET_ID } from '../../types';
 
 type LobbyMode = 'home' | 'create' | 'join' | 'waiting';
 
@@ -33,8 +33,8 @@ export class LobbyComponent implements OnInit, OnDestroy {
   isCreator = false;
 
   // Dataset selection
-  datasets: Dataset[] = [{ id: 'fc-2026', label: 'EA FC 25/26', file: 'fc-2026.json', default: true }];
-  selectedDatasetId = 'fc-2026';
+  datasets: Dataset[] = DATASETS;
+  selectedDatasetId = DEFAULT_DATASET_ID;
 
   // My Drafts
   myDrafts: MyDraft[] = [];

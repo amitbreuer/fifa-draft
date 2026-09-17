@@ -171,3 +171,10 @@ export interface Dataset {
   file: string;
   default: boolean;
 }
+
+export const DATASETS: Dataset[] = [
+  { id: 'fc-2027', label: 'EA FC 27', file: 'fc-2027.json', default: true },
+  { id: 'fc-2026', label: 'EA FC 26', file: 'fc-2026.json', default: false },
+];
+
+export const DEFAULT_DATASET_ID = 'fc-2027';

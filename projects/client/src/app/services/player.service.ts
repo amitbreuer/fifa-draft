@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable, tap } from 'rxjs';
-import { Player, PositionFilter, Dataset } from '../types';
+import { Player, PositionFilter, Dataset, DATASETS, DEFAULT_DATASET_ID } from '../types';
 import { environment } from '../../environments/environment';
-import playersData from '../../assets/data/2026.json';
+import playersData from '@fifa-draft/data/fc-2027.json';
 
 @Injectable({
   providedIn: 'root'
@@ -11,10 +11,8 @@ import playersData from '../../assets/data/2026.json';
 export class PlayerService {
   private playersSubject = new BehaviorSubject<Player[]>(playersData);
   private selectedPlayerIdsSubject = new BehaviorSubject<Set<number>>(new Set());
-  private datasetsSubject = new BehaviorSubject<Dataset[]>([
-    { id: 'fc-2026', label: 'EA FC 25/26', file: 'fc-2026.json', default: true }
-  ]);
-  private currentDatasetSubject = new BehaviorSubject<string>('fc-2026');
+  private datasetsSubject = new BehaviorSubject<Dataset[]>(DATASETS);
+  private currentDatasetSubject = new BehaviorSubject<string>(DEFAULT_DATASET_ID);
 
   players$ = this.playersSubject.asObservable();
   selectedPlayerIds$ = this.selectedPlayerIdsSubject.asObservable();
@@ -32,7 +30,7 @@ export class PlayerService {
 
   /** Load a specific dataset's players */
   loadDataset(datasetId: string): Observable<Player[]> {
-    if (datasetId === 'fc-2026' && this.currentDatasetSubject.value === 'fc-2026') {
+    if (datasetId === DEFAULT_DATASET_ID && this.currentDatasetSubject.value === DEFAULT_DATASET_ID) {
       // Already loaded from bundled data
       return new Observable(sub => {
         sub.next(this.playersSubject.value);
